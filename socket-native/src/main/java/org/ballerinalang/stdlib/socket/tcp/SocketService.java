@@ -19,10 +19,8 @@
 package org.ballerinalang.stdlib.socket.tcp;
 
 import io.ballerina.runtime.api.Runtime;
-import io.ballerina.runtime.api.values.BObject;
 
 import java.nio.channels.SelectableChannel;
-import java.util.concurrent.Semaphore;
 
 /**
  * This will hold the ServerSocketChannel or client SocketChannel
@@ -32,22 +30,14 @@ import java.util.concurrent.Semaphore;
  */
 public class SocketService {
 
-    private Semaphore resourceLock = new Semaphore(1);
     private SelectableChannel socketChannel;
     private long readTimeout;
-    private BObject service;
     private Runtime runtime;
 
-    public SocketService(SelectableChannel socketChannel, Runtime runtime, BObject service, long readTimeout) {
+    public SocketService(SelectableChannel socketChannel, Runtime runtime, long readTimeout) {
         this.socketChannel = socketChannel;
         this.runtime = runtime;
-        this.service = service;
         this.readTimeout = readTimeout;
-    }
-
-    public SocketService(Runtime runtime, BObject service) {
-        this.runtime = runtime;
-        this.service = service;
     }
 
     SelectableChannel getSocketChannel() {
@@ -56,14 +46,6 @@ public class SocketService {
 
     public Runtime getRuntime() {
         return runtime;
-    }
-
-    public BObject getService() {
-        return service;
-    }
-
-    Semaphore getResourceLock() {
-        return resourceLock;
     }
 
     public long getReadTimeout() {

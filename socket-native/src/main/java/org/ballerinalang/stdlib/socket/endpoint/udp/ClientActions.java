@@ -99,7 +99,7 @@ public class ClientActions {
                 }
             }
             long timeout = config.getIntValue(StringUtils.fromString(READ_TIMEOUT));
-            socketService = new SocketService(socketChannel, env.getRuntime(), null, timeout);
+            socketService = new SocketService(socketChannel, env.getRuntime(), timeout);
             client.addNativeData(SOCKET_SERVICE, socketService);
             selectorManager = SelectorManager.getInstance();
             selectorManager.start();
@@ -131,7 +131,7 @@ public class ClientActions {
                 host = bHost.getValue();
             }
         } catch (NullPointerException e) {
-            host = null;
+            return null;
         }
         return host;
     }
@@ -150,7 +150,7 @@ public class ClientActions {
                 socketService.getReadTimeout());
         ReadPendingSocketMap.getInstance().add(socket.hashCode(), readPendingCallback);
         log.debug("Notify to invokeRead");
-        SelectorManager.getInstance().invokeRead(socketHash, false);
+        SelectorManager.getInstance().invokeRead(socketHash);
         return null;
     }
 

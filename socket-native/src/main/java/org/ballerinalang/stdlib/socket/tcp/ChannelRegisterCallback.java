@@ -48,14 +48,9 @@ public class ChannelRegisterCallback {
 
     /**
      * Notifies the worker to resume the hold thread.
-     *
-     * @param serviceAttached whether to invoke onConnect or not.
      */
-    public void notifyRegister(boolean serviceAttached) {
+    public void notifyRegister() {
         balFuture.complete(null);
-        if (serviceAttached) {
-            SelectorDispatcher.invokeOnConnect(socketService);
-        }
     }
 
     /**

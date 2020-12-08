@@ -17,6 +17,7 @@
 import ballerina/java;
 import ballerina/log;
 import ballerina/test;
+import ballerina/io;
 
 @test:BeforeSuite
 function setup() {
@@ -37,6 +38,12 @@ function testClientEcho() {
     string readContent = receiveClientContent(socketClient);
     test:assertEquals(readContent, msg, "Found unexpected output");
     checkpanic socketClient->close();
+}
+
+function getString(byte[] content, int numberOfBytes) returns @tainted string|io:Error {
+    io:ReadableByteChannel byteChannel = check io:createReadableChannel(content);
+    io:ReadableCharacterChannel characterChannel = new io:ReadableCharacterChannel(byteChannel, "UTF-8");
+    return check characterChannel.read(numberOfBytes);
 }
 
 @test:Config {
@@ -93,6 +100,7 @@ function receiveClientContent(UdpClient socketClient) returns string {
         var str = getString(content, 50);
         if (str is string) {
             returnStr = <@untainted>str;
+            io:println("Response is :", returnStr);
         } else {
             test:assertFail(msg = str.message());
         }

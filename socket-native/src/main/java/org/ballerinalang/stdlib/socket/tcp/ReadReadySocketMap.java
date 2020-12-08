@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This map will hold all the read ready sockets until it is read through the
- * {@link org.ballerinalang.stdlib.socket.endpoint.tcp.ClientActions} read action.
+ * {@link org.ballerinalang.stdlib.socket.endpoint.udp.ClientActions} read action.
  *
  * @since 0.995.0
  */
@@ -46,10 +46,6 @@ public class ReadReadySocketMap {
 
     public SocketReader remove(int hashId) {
         return socketReaderMap.remove(hashId);
-    }
-
-    public SocketReader get(int hashId) {
-        return socketReaderMap.get(hashId);
     }
 
     public boolean isReadReady(int hashId) {
