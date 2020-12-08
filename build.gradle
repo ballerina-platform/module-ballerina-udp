@@ -115,7 +115,7 @@ release {
 }
 
 task build {
-    dependsOn('socket-ballerina:build')
+    dependsOn('udp-ballerina:build')
 }
 
 task codeCoverageReport(type: JacocoReport) {

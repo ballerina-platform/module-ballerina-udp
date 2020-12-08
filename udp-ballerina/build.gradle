@@ -17,7 +17,7 @@
 
 import org.apache.tools.ant.taskdefs.condition.Os
 
-description = 'Ballerina - Socket Ballerina Generator'
+description = 'Ballerina - UDP Ballerina Generator'
 
 configurations {
     jbalTools
@@ -27,7 +27,7 @@ dependencies {
     jbalTools ("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
         transitive = false
     }
-    compile project(':socket-native')
+    compile project(':udp-native')
 }
 
 clean {
@@ -59,7 +59,7 @@ task unpackStdLibs() {
     }
 }
 
-def packageName = "socket"
+def packageName = "udp"
 def packageOrg = "ballerina"
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
 def artifactBallerinaDocs = file("$project.projectDir/build/docs_parent/")
@@ -107,8 +107,8 @@ task revertTomlFile {
 }
 
 task ballerinaTest {
-    dependsOn(":socket-native:build")
-    dependsOn(":socket-test-utils:build")
+    dependsOn(":udp-native:build")
+    dependsOn(":udp-test-utils:build")
     dependsOn(unpackJballerinaTools)
     dependsOn(unpackStdLibs)
     dependsOn(copyStdlibs)
@@ -140,8 +140,8 @@ test {
 
 task ballerinaBuild {
     inputs.dir file(project.projectDir)
-    dependsOn(":socket-native:build")
-    dependsOn(":socket-test-utils:build")
+    dependsOn(":udp-native:build")
+    dependsOn(":udp-test-utils:build")
     dependsOn(unpackJballerinaTools)
     dependsOn(unpackStdLibs)
     dependsOn(copyStdlibs)

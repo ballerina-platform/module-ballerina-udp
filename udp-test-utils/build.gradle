@@ -19,13 +19,13 @@ plugins {
     id 'java'
 }
 
-description = 'Ballerina - Socket Java Utils'
+description = 'Ballerina - UDP Java Utils'
 
 dependencies {
     compile group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
     compile group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
     compile "org.slf4j:slf4j-jdk14:${slf4jVersion}"
-    compile project(":socket-native")
+    compile project(":udp-native")
 }
 
 compileJava {

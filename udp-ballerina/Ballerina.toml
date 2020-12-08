@@ -1,6 +1,6 @@
 [package]
 org = "ballerina"
-name = "socket"
+name = "udp"
 version = "@toml.version@"
 
 [[dependency]]
@@ -14,14 +14,14 @@ name = "log"
 version = "@stdlib.log.version@"
 
 [[platform.java11.dependency]]
-path = "../socket-native/build/libs/socket-native-@project.version@.jar"
+path = "../udp-native/build/libs/udp-native-@project.version@.jar"
 groupId = "ballerina"
-artifactId = "socket"
+artifactId = "udp"
 version = "@project.version@"
 
 [[platform.java11.dependency]]
-path = "../socket-test-utils/build/libs/socket-test-utils-@project.version@.jar"
-groupId = "org.ballerinalang.stdlib.socket"
+path = "../udp-test-utils/build/libs/udp-test-utils-@project.version@.jar"
+groupId = "org.ballerinalang.stdlib.udp"
 scope = "testOnly"
-artifactId = "socket"
+artifactId = "udp"
 version = "@project.version@"

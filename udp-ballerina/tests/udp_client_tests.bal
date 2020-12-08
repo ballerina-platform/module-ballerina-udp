@@ -27,7 +27,7 @@ function setup() {
 @test:Config {
 }
 function testClientEcho() {
-    UdpClient socketClient = new;
+    Client socketClient = new;
     string msg = "Hello Ballerina echo";
     var sendResult = socketClient->sendTo(msg.toBytes(), {host: "localhost", port: 48829});
     if (sendResult is int) {
@@ -51,7 +51,7 @@ function getString(byte[] content, int numberOfBytes) returns @tainted string|io
 }
 function testContentReceive() {
     int udpPort = 48827;
-    UdpClient socketClient = new ({port: udpPort});
+    Client socketClient = new ({port: udpPort});
     string msg = "This is server";
     var reuslt = passUdpContent(msg, udpPort);
     string readContent = receiveClientContent(socketClient);
@@ -68,7 +68,7 @@ function testContentReceiveWithLength() {
     string msg = "This is going to be a tricky";
     var reuslt = passUdpContent(msg, udpPort);
 
-    UdpClient socketClient = new ({host: "localhost", port: udpPort});
+    Client socketClient = new ({host: "localhost", port: udpPort});
     string returnStr = "";
     var result = socketClient->receiveFrom(56);
     if (result is [byte[], int, Address]) {
@@ -92,7 +92,7 @@ function stopAll() {
     var result = stopUdpServer();
 }
 
-function receiveClientContent(UdpClient socketClient) returns string {
+function receiveClientContent(Client socketClient) returns string {
     string returnStr = "";
     var result = socketClient->receiveFrom();
     if (result is [byte[], int, Address]) {

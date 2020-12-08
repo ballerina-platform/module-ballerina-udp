@@ -22,7 +22,7 @@ import ballerina/java;
 # + localAddress - The local IP address string in textual presentation to which the socket is bound
 # + interface - The network interface to bind
 # + id - A unique identifier to identify each client
-public client class UdpClient {
+public client class Client {
 
     private Address? localAddress = ();
     public int localPort = 0;
@@ -47,12 +47,12 @@ public client class UdpClient {
 
     # Sends the given data to the specified remote client.
     # ```ballerina
-    # int|socket:Error result = socketClient->sendTo(c1, {host: "localhost", port: 48826});
+    # int|udp:Error result = socketClient->sendTo(c1, {host: "localhost", port: 48826});
     # ```
     #
     # + content - The content to be sent to the client socket
     # + address - The address of the remote client socket
-    # + return - The number of bytes got written or else a `socket:Error` if the given data can't be sent
+    # + return - The number of bytes got written or else a `udp:Error` if the given data can't be sent
     isolated remote function sendTo(byte[] content, Address address) returns int|Error {
         return udpClientSendTo(self, content, address);
     }
@@ -66,17 +66,17 @@ public client class UdpClient {
     #
     # + length - Represents the number of bytes, which should be read
     # + return - The content as a byte array, the number of bytes read, the address of the sender,
-    #            or else a `socket:Error` if the data can't be read from the client
+    #            or else a `udp:Error` if the data can't be read from the client
     isolated remote function receiveFrom(int length = -100) returns [byte[], int, Address]|ReadTimedOutError {
         return externReceiveFrom(self, length);
     }
 
     # Closes the client socket connection.
     # ```ballerina
-    # socket:Error? closeResult = socketClient->close();
+    # udp:Error? closeResult = socketClient->close();
     # ```
     #
-    # + return - A `socket:Error` if it can't close the connection or else `()`
+    # + return - A `udp:Error` if it can't close the connection or else `()`
     isolated remote function close() returns Error? {
         return closeUdpClient(self);
     }
@@ -99,25 +99,25 @@ public type UdpClientConfig record {|
     int readTimeoutInMillis = 300000;
 |};
 
-isolated function initUdpClientEndpoint(UdpClient udpClient, Address? localAddress, UdpClientConfig config) returns error? =
+isolated function initUdpClientEndpoint(Client udpClient, Address? localAddress, UdpClientConfig config) returns error? =
 @java:Method {
     name: "initEndpoint",
     'class: "org.ballerinalang.stdlib.socket.endpoint.udp.ClientActions"
 } external;
 
-isolated function closeUdpClient(UdpClient udpClient) returns Error? =
+isolated function closeUdpClient(Client udpClient) returns Error? =
 @java:Method {
     name: "close",
     'class: "org.ballerinalang.stdlib.socket.endpoint.udp.ClientActions"
 } external;
 
-isolated function externReceiveFrom(UdpClient udpClient, int length) returns [byte[], int, Address]|ReadTimedOutError =
+isolated function externReceiveFrom(Client udpClient, int length) returns [byte[], int, Address]|ReadTimedOutError =
 @java:Method {
     name: "receiveFrom",
     'class: "org.ballerinalang.stdlib.socket.endpoint.udp.ClientActions"
 } external;
 
-isolated function udpClientSendTo(UdpClient udpClient, byte[] content, Address address) returns int|Error =
+isolated function udpClientSendTo(Client udpClient, byte[] content, Address address) returns int|Error =
 @java:Method {
     name: "sendTo",
     'class: "org.ballerinalang.stdlib.socket.endpoint.udp.ClientActions"
