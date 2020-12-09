@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.testutils;
+package org.ballerinalang.stdlib.udp.testutils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * This server socket will use to mock the backend server.
+ * This server udp will use to mock the backend server.
  */
 public class MockUdpServer implements Runnable {
 

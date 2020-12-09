@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.tcp;
+package org.ballerinalang.stdlib.udp;
 
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.TypeCreator;
@@ -27,9 +27,7 @@ import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
-import org.ballerinalang.stdlib.socket.SocketConstants;
-import org.ballerinalang.stdlib.socket.SocketThreadFactory;
-import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
+import org.ballerinalang.stdlib.udp.exceptions.SelectorInitializeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,9 +49,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import static java.nio.channels.SelectionKey.OP_READ;
-import static org.ballerinalang.stdlib.socket.SocketConstants.DEFAULT_EXPECTED_READ_LENGTH;
-import static org.ballerinalang.stdlib.socket.SocketConstants.ErrorType.ReadTimedOutError;
-import static org.ballerinalang.stdlib.socket.SocketConstants.SOCKET_PACKAGE_ID;
+import static org.ballerinalang.stdlib.udp.SocketConstants.DEFAULT_EXPECTED_READ_LENGTH;
+import static org.ballerinalang.stdlib.udp.SocketConstants.ErrorType.ReadTimedOutError;
+import static org.ballerinalang.stdlib.udp.SocketConstants.SOCKET_PACKAGE_ID;
 
 /**
  * This will manage the Selector instance and handle the accept, read and write operations.
@@ -65,7 +63,7 @@ public class SelectorManager {
     private static final Logger log = LoggerFactory.getLogger(SelectorManager.class);
 
     private Selector selector;
-    private ThreadFactory threadFactory = new SocketThreadFactory("socket-selector");
+    private ThreadFactory threadFactory = new SocketThreadFactory("udp-selector");
     private ExecutorService executor = null;
     private boolean running = false;
     private boolean executing = true;
@@ -104,7 +102,7 @@ public class SelectorManager {
     }
 
     /**
-     * Add channel to register pending socket queue. Socket registration has to be happen in the same thread
+     * Add channel to register pending udp queue. Socket registration has to be happen in the same thread
      * that selector loop execute.
      *
      * @param callback A {@link ChannelRegisterCallback} instance which contains the resources,
@@ -174,7 +172,7 @@ public class SelectorManager {
                 socketService.getSocketChannel()
                         .register(selector, channelRegisterCallback.getInitialInterest(), socketService);
             } catch (ClosedChannelException e) {
-                channelRegisterCallback.notifyFailure("socket already closed");
+                channelRegisterCallback.notifyFailure("udp already closed");
                 continue;
             }
             channelRegisterCallback.notifyRegister();
@@ -201,13 +199,13 @@ public class SelectorManager {
     }
 
     /**
-     * Perform the read operation for the given socket. This will either read data from the socket channel or dispatch
+     * Perform the read operation for the given udp. This will either read data from the udp channel or dispatch
      * to the onReadReady resource if resource's lock available.
      *
-     * @param socketHashId socket hash id
+     * @param socketHashId udp hash id
      */
     public void invokeRead(int socketHashId) {
-        // Check whether there is any caller->read pending action and read ready socket.
+        // Check whether there is any caller->read pending action and read ready udp.
         ReadPendingSocketMap readPendingSocketMap = ReadPendingSocketMap.getInstance();
         if (readPendingSocketMap.isPending(socketHashId)) {
             // Lock the ReadPendingCallback instance. This will prevent duplicate invocation that happen from both

@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.ballerinalang.stdlib.socket.endpoint.udp;
+package org.ballerinalang.stdlib.udp.endpoint;
 
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Future;
@@ -24,14 +24,14 @@ import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import org.ballerinalang.stdlib.socket.SocketConstants;
-import org.ballerinalang.stdlib.socket.exceptions.SelectorInitializeException;
-import org.ballerinalang.stdlib.socket.tcp.ChannelRegisterCallback;
-import org.ballerinalang.stdlib.socket.tcp.ReadPendingCallback;
-import org.ballerinalang.stdlib.socket.tcp.ReadPendingSocketMap;
-import org.ballerinalang.stdlib.socket.tcp.SelectorManager;
-import org.ballerinalang.stdlib.socket.tcp.SocketService;
-import org.ballerinalang.stdlib.socket.tcp.SocketUtils;
+import org.ballerinalang.stdlib.udp.ChannelRegisterCallback;
+import org.ballerinalang.stdlib.udp.ReadPendingCallback;
+import org.ballerinalang.stdlib.udp.ReadPendingSocketMap;
+import org.ballerinalang.stdlib.udp.SelectorManager;
+import org.ballerinalang.stdlib.udp.SocketConstants;
+import org.ballerinalang.stdlib.udp.SocketService;
+import org.ballerinalang.stdlib.udp.SocketUtils;
+import org.ballerinalang.stdlib.udp.exceptions.SelectorInitializeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,11 +43,11 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.DatagramChannel;
 
 import static java.nio.channels.SelectionKey.OP_READ;
-import static org.ballerinalang.stdlib.socket.SocketConstants.DEFAULT_EXPECTED_READ_LENGTH;
-import static org.ballerinalang.stdlib.socket.SocketConstants.IS_CLIENT;
-import static org.ballerinalang.stdlib.socket.SocketConstants.READ_TIMEOUT;
-import static org.ballerinalang.stdlib.socket.SocketConstants.SOCKET_KEY;
-import static org.ballerinalang.stdlib.socket.SocketConstants.SOCKET_SERVICE;
+import static org.ballerinalang.stdlib.udp.SocketConstants.DEFAULT_EXPECTED_READ_LENGTH;
+import static org.ballerinalang.stdlib.udp.SocketConstants.IS_CLIENT;
+import static org.ballerinalang.stdlib.udp.SocketConstants.READ_TIMEOUT;
+import static org.ballerinalang.stdlib.udp.SocketConstants.SOCKET_KEY;
+import static org.ballerinalang.stdlib.udp.SocketConstants.SOCKET_SERVICE;
 
 /**
  * Native function implementations of the UDP Client.
@@ -70,8 +70,8 @@ public class ClientActions {
                 SelectorManager.getInstance().stop(true);
             }
         } catch (IOException e) {
-            log.error("Unable to close the socket", e);
-            return SocketUtils.createSocketError("unable to close the client socket. " + e.getMessage());
+            log.error("Unable to close the udp", e);
+            return SocketUtils.createSocketError("unable to close the client udp. " + e.getMessage());
         }
         return null;
     }
@@ -108,15 +108,15 @@ public class ClientActions {
             balFuture.complete(SocketUtils.createSocketError("unable to initialize the selector"));
             return null;
         } catch (SocketException e) {
-            balFuture.complete(SocketUtils.createSocketError("unable to bind the local socket port"));
+            balFuture.complete(SocketUtils.createSocketError("unable to bind the local udp port"));
             return null;
         } catch (IOException e) {
-            log.error("Unable to initiate the client socket", e);
-            balFuture.complete(SocketUtils.createSocketError("unable to initiate the socket: " + e.getMessage()));
+            log.error("Unable to initiate the client udp", e);
+            balFuture.complete(SocketUtils.createSocketError("unable to initiate the udp: " + e.getMessage()));
             return null;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            balFuture.complete(SocketUtils.createSocketError("unable to start the socket client."));
+            balFuture.complete(SocketUtils.createSocketError("unable to start the udp client."));
             return null;
         }
         selectorManager.registerChannel(new ChannelRegisterCallback(socketService, balFuture, OP_READ));
@@ -170,7 +170,7 @@ public class ClientActions {
             }
             return write;
         } catch (ClosedChannelException e) {
-            return SocketUtils.createSocketError("client socket close already.");
+            return SocketUtils.createSocketError("client udp close already.");
         } catch (IOException e) {
             log.error("Unable to perform write[" + socket.hashCode() + "]", e);
             return SocketUtils.createSocketError("write failed. " + e.getMessage());

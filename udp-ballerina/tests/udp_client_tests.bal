@@ -111,13 +111,13 @@ function receiveClientContent(Client socketClient) returns string {
 }
 
 public function startUdpServer() returns Error? = @java:Method {
-    'class: "org/ballerinalang/stdlib/socket/testutils/MockServerUtils"
+    'class: "org/ballerinalang/stdlib/udp/testutils/MockServerUtils"
 } external;
 
 public function stopUdpServer() returns Error? = @java:Method {
-    'class: "org/ballerinalang/stdlib/socket/testutils/MockServerUtils"
+    'class: "org/ballerinalang/stdlib/udp/testutils/MockServerUtils"
 } external;
 
 public function passUdpContent(string content, int port) returns Error? = @java:Method {
-    'class: "org/ballerinalang/stdlib/socket/testutils/MockServerUtils"
+    'class: "org/ballerinalang/stdlib/udp/testutils/MockServerUtils"
 } external;

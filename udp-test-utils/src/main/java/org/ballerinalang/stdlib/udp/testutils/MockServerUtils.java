@@ -16,10 +16,10 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.testutils;
+package org.ballerinalang.stdlib.udp.testutils;
 
 import io.ballerina.runtime.api.values.BString;
-import org.ballerinalang.stdlib.socket.tcp.SocketUtils;
+import org.ballerinalang.stdlib.udp.SocketUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * This UDP server socket will use to mock the backend server.
+ * This UDP server udp will use to mock the backend server.
  */
 public class MockServerUtils {
     private static final Logger log = LoggerFactory.getLogger(MockServerUtils.class);

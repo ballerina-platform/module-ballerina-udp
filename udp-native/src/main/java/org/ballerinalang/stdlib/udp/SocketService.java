@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.tcp;
+package org.ballerinalang.stdlib.udp;
 
 import io.ballerina.runtime.api.Runtime;
 

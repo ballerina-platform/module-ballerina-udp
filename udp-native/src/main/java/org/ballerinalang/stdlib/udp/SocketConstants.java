@@ -16,14 +16,14 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket;
+package org.ballerinalang.stdlib.udp;
 
 import io.ballerina.runtime.api.Module;
 
 import static io.ballerina.runtime.api.constants.RuntimeConstants.BALLERINA_BUILTIN_PKG_PREFIX;
 
 /**
- * Constant variable for socket related operations.
+ * Constant variable for udp related operations.
  */
 public class SocketConstants {
     private SocketConstants() {

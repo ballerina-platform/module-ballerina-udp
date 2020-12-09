@@ -16,19 +16,18 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.tcp;
+package org.ballerinalang.stdlib.udp;
 
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
-import org.ballerinalang.stdlib.socket.SocketConstants;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.ballerinalang.stdlib.socket.SocketConstants.ErrorType.GenericError;
-import static org.ballerinalang.stdlib.socket.SocketConstants.SOCKET_PACKAGE_ID;
+import static org.ballerinalang.stdlib.udp.SocketConstants.ErrorType.GenericError;
+import static org.ballerinalang.stdlib.udp.SocketConstants.SOCKET_PACKAGE_ID;
 
 
 /**
@@ -42,7 +41,7 @@ public class SocketUtils {
     }
 
     /**
-     * Create Generic socket error with given error message.
+     * Create Generic udp error with given error message.
      *
      * @param errMsg the error message
      * @return BError instance which contains the error details
@@ -53,7 +52,7 @@ public class SocketUtils {
     }
 
     /**
-     * Create socket error with given error type and message.
+     * Create udp error with given error type and message.
      *
      * @param type   the error type which cause for this error
      * @param errMsg the error message

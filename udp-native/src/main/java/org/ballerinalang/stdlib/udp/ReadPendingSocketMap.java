@@ -16,13 +16,15 @@
  * under the License.
  */
 
-package org.ballerinalang.stdlib.socket.tcp;
+package org.ballerinalang.stdlib.udp;
+
+import org.ballerinalang.stdlib.udp.endpoint.ClientActions;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This map will hold all the pending read action that coming through
- * {@link org.ballerinalang.stdlib.socket.endpoint.udp.ClientActions} read action until new content ready.
+ * {@link ClientActions} read action until new content ready.
  *
  * @since 0.995.0
  */

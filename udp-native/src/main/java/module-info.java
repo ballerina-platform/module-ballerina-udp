@@ -21,6 +21,6 @@ module io.ballerina.stdlib.socket {
     requires io.ballerina.lang;
     requires io.ballerina.tools.api;
     requires org.slf4j;
-    exports org.ballerinalang.stdlib.socket.endpoint.udp;
-    exports org.ballerinalang.stdlib.socket.tcp;
+    exports org.ballerinalang.stdlib.udp.endpoint;
+    exports org.ballerinalang.stdlib.udp;
 }
