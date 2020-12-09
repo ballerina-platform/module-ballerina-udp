@@ -14,8 +14,6 @@ plugins {
 rootProject.name = 'udp'
 include(':build-config:checkstyle')
 include ':udp-native', ':udp-test-utils', ':udp-ballerina'
-include 'udp-test-utils'
-include 'udp-native'
 
 gradleEnterprise {
     buildScan {
