@@ -16,9 +16,9 @@
  * under the License.
  */
 
-module io.ballerina.stdlib.socket.testutils {
+module io.ballerina.stdlib.udp.testutils {
     requires io.ballerina.runtime;
     requires org.slf4j;
-    requires io.ballerina.stdlib.socket;
+    requires io.ballerina.stdlib.udp;
     exports org.ballerinalang.stdlib.udp.testutils;
 }
