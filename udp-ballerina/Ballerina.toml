@@ -1,0 +1,27 @@
+[package]
+org = "ballerina"
+name = "udp"
+version = "@toml.version@"
+
+[[dependency]]
+org = "ballerina"
+name = "io"
+version = "@stdlib.io.version@"
+
+[[dependency]]
+org = "ballerina"
+name = "log"
+version = "@stdlib.log.version@"
+
+[[platform.java11.dependency]]
+path = "../udp-native/build/libs/udp-native-@project.version@.jar"
+groupId = "ballerina"
+artifactId = "udp"
+version = "@project.version@"
+
+[[platform.java11.dependency]]
+path = "../udp-test-utils/build/libs/udp-test-utils-@project.version@.jar"
+groupId = "org.ballerinalang.stdlib.udp"
+scope = "testOnly"
+artifactId = "udp"
+version = "@project.version@"
