@@ -30,7 +30,7 @@ public class SocketConstants {
     }
 
     public static final String SOCKET_KEY = "Socket";
-    public static final Module SOCKET_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "udp", "0.7.2");
+    public static final Module SOCKET_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "udp", "0.8.0");
     public static final String CONFIG_FIELD_HOST = "host";
     public static final String CONFIG_FIELD_PORT = "port";
 
