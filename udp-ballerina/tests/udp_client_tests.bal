@@ -31,7 +31,7 @@ function testClientEcho() {
     string msg = "Hello Ballerina echo";
     var sendResult = socketClient->sendTo(msg.toBytes(), {host: "localhost", port: 48829});
     if (sendResult is int) {
-        log:printInfo("Number of bytes written: " + sendResult.toString());
+        log:print("Number of bytes written: " + sendResult.toString());
     } else {
         test:assertFail(msg = sendResult.message());
     }
@@ -82,8 +82,8 @@ function testContentReceiveWithLength() {
     } else {
         test:assertFail(msg = result.message());
     }
-    log:printInfo(msg);
-    log:printInfo(returnStr);
+    log:print(msg);
+    log:print(returnStr);
     checkpanic socketClient->close();
 }
 
