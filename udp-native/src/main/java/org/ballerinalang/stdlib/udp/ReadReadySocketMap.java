@@ -18,13 +18,13 @@
 
 package org.ballerinalang.stdlib.udp;
 
-import org.ballerinalang.stdlib.udp.endpoint.ClientActions;
+import org.ballerinalang.stdlib.udp.endpoint.ConnectionlessClientActions;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This map will hold all the read ready sockets until it is read through the
- * {@link ClientActions} read action.
+ * {@link ConnectionlessClientActions} read action.
  *
  * @since 0.995.0
  */

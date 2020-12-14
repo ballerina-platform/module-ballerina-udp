@@ -243,6 +243,7 @@ public class SelectorManager {
                     .getCurrentLength()) {
                 ReadPendingSocketMap.getInstance().add(channel.hashCode(), callback);
                 invokeRead(channel.hashCode());
+
                 return;
             }
             byte[] bytes = SocketUtils
@@ -267,16 +268,16 @@ public class SelectorManager {
     }
 
 
-    private BArray createUdpSocketReturnValue(ReadPendingCallback callback, byte[] bytes,
-            InetSocketAddress remoteAddress) {
+    private BMap<BString, Object>  createUdpSocketReturnValue(ReadPendingCallback callback, byte[] bytes,
+                                                             InetSocketAddress remoteAddress) {
         BMap<BString, Object> address = ValueCreator.createRecordValue(SOCKET_PACKAGE_ID, "Address");
         address.put(StringUtils.fromString("port"), remoteAddress.getPort());
         address.put(StringUtils.fromString("host"), StringUtils.fromString(remoteAddress.getHostName()));
         BArray contentTuple = ValueCreator.createTupleValue(receiveFromResultTuple);
-        contentTuple.add(0, ValueCreator.createArrayValue(bytes));
-        contentTuple.add(1, Long.valueOf(callback.getCurrentLength()));
-        contentTuple.add(2, address);
-        return contentTuple;
+        BMap<BString, Object> datagram = ValueCreator.createRecordValue(SOCKET_PACKAGE_ID, "Datagram");
+        datagram.put(StringUtils.fromString("remoteAddress"), address);
+        datagram.put(StringUtils.fromString("data"), ValueCreator.createArrayValue(bytes));
+        return  datagram;
     }
 
     private ByteBuffer createBuffer(ReadPendingCallback callback, int osBufferSize) {
