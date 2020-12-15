@@ -31,7 +31,7 @@ public client class Client {
     public isolated function init(string? localHost = (), int timeoutInMillis = 30000) {
         self.localHost = localHost;
         var initResult = initConnectionlessClient(self, localHost, timeoutInMillis);
-        if (initResult is error) {
+        if (initResult is Error) {
             panic initResult;
         }
     }
