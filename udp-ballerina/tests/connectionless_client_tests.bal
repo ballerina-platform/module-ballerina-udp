@@ -39,7 +39,7 @@ function testClientEcho() {
 
     var sendResult = socketClient->send(datagram);
     if (sendResult is ()) {
-        log:print("datagram sent to remote address");
+        log:print("Datagram was sent to the remote address.");
     } else {
         test:assertFail(msg = sendResult.message());
     }
@@ -59,7 +59,7 @@ function getString(byte[] content, int numberOfBytes) returns @tainted string|io
 }
 function testContentReceive() {
     Client socketClient = new("localhost", 2000);
-    string msg = "hello server! send me the data";
+    string msg = "Hello server! send me the data";
     Datagram datagram = {
         remoteAddress : {
             host : "localhost",
@@ -71,8 +71,8 @@ function testContentReceive() {
     var sendResult = socketClient->send(datagram);
 
     string readContent = receiveClientContent(socketClient);
-    string expectedResponse = "hi client! here is your data";
-    test:assertEquals(readContent, expectedResponse, "Found unexpected output");
+    string expectedResponse = "Hi client! here is your data";
+    test:assertEquals(readContent, expectedResponse, "Found an unexpected output");
     checkpanic socketClient->close();
 }
 

@@ -151,8 +151,8 @@ public class ConnectionlessClientActions {
                 SelectorManager.getInstance().stop(true);
             }
         } catch (IOException e) {
-            log.error("Unable to close the udp", e);
-            return SocketUtils.createSocketError("unable to close the client udp. " + e.getMessage());
+            log.error("Unable to close the UDP client.", e);
+            return SocketUtils.createSocketError("unable to close the  UDP client. " + e.getMessage());
         }
         return null;
     }

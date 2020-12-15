@@ -96,9 +96,9 @@ public class MockUdpServer implements Runnable {
         SocketAddress client = channel.receive(buffer);
         byte[] readBytes = buffer.array();
         receivedString = new String(readBytes, StandardCharsets.UTF_8.name()).trim();
-        if(receivedString.equals("hello server! send me the data")) {
+        if(receivedString.equals("Hello server! send me the data")) {
             buffer.clear();
-            buffer.put("hi client! here is your data".getBytes());
+            buffer.put("Hi client! here is your data".getBytes());
         }
         buffer.flip();
         channel.send(buffer, client);
