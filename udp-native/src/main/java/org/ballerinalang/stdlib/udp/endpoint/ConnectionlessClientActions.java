@@ -45,39 +45,19 @@ import java.nio.channels.DatagramChannel;
 import static java.nio.channels.SelectionKey.OP_READ;
 import static org.ballerinalang.stdlib.udp.SocketConstants.DEFAULT_EXPECTED_READ_LENGTH;
 import static org.ballerinalang.stdlib.udp.SocketConstants.IS_CLIENT;
-import static org.ballerinalang.stdlib.udp.SocketConstants.READ_TIMEOUT;
 import static org.ballerinalang.stdlib.udp.SocketConstants.SOCKET_KEY;
 import static org.ballerinalang.stdlib.udp.SocketConstants.SOCKET_SERVICE;
 
 /**
- * Native function implementations of the UDP Client.
+ * Native function implementations of the UDP ConnectionlessClient.
  *
  * @since 1.1.0
  */
-public class ClientActions {
-    private static final Logger log = LoggerFactory.getLogger(ClientActions.class);
+public class ConnectionlessClientActions {
+    private static final Logger log = LoggerFactory.getLogger(ConnectionlessClientActions.class);
 
-    public static Object close(BObject client) {
-        final DatagramChannel socketChannel = (DatagramChannel) client.getNativeData(SOCKET_KEY);
-        try {
-            // SocketChannel can be null if something happen during the onConnect. Hence the null check.
-            if (socketChannel != null) {
-                socketChannel.close();
-                SelectorManager.getInstance().unRegisterChannel(socketChannel);
-            }
-            // This need to handle to support multiple client close.
-            if (Boolean.parseBoolean(client.getNativeData(IS_CLIENT).toString())) {
-                SelectorManager.getInstance().stop(true);
-            }
-        } catch (IOException e) {
-            log.error("Unable to close the udp", e);
-            return SocketUtils.createSocketError("unable to close the client udp. " + e.getMessage());
-        }
-        return null;
-    }
-
-    public static Object initEndpoint(Environment env, BObject client, Object address,
-                                      BMap<BString, Object> config) {
+    public static Object initEndpoint(Environment env, BObject client, Object host,
+                                      long timeout) {
         final Future balFuture = env.markAsync();
         SelectorManager selectorManager;
         SocketService socketService;
@@ -87,18 +67,13 @@ public class ClientActions {
             socketChannel.socket().setReuseAddress(true);
             client.addNativeData(SOCKET_KEY, socketChannel);
             client.addNativeData(IS_CLIENT, true);
-            if (address != null) {
-                BMap<BString, Object> addressRecord = (BMap<BString, Object>) address;
-                String host = getHostFromAddress(addressRecord);
-                int port = addressRecord.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT))
-                        .intValue();
-                if (host == null) {
-                    socketChannel.bind(new InetSocketAddress(port));
-                } else {
-                    socketChannel.bind(new InetSocketAddress(host, port));
-                }
+            //  A port number of zero will let the system pick up an ephemeral port in a bind operation.
+            if (host == null) {
+                socketChannel.bind(new InetSocketAddress(0));
+            } else {
+                String hostname = ((BString) host).getValue();
+                socketChannel.bind(new InetSocketAddress(hostname, 0));
             }
-            long timeout = config.getIntValue(StringUtils.fromString(READ_TIMEOUT));
             socketService = new SocketService(socketChannel, env.getRuntime(), timeout);
             client.addNativeData(SOCKET_SERVICE, socketService);
             selectorManager = SelectorManager.getInstance();
@@ -123,42 +98,28 @@ public class ClientActions {
         return null;
     }
 
-    private static String getHostFromAddress(BMap<BString, Object> addressRecord) {
-        String host = null;
-        try {
-            BString bHost = addressRecord.getStringValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST));
-            if (bHost != null) {
-                host = bHost.getValue();
-            }
-        } catch (NullPointerException e) {
-            return null;
-        }
-        return host;
-    }
-
-    public static Object receiveFrom(Environment env, BObject client, long length) {
+    public static Object receive(Environment env, BObject client) {
         final Future balFuture = env.markAsync();
-        if (length != DEFAULT_EXPECTED_READ_LENGTH && length < 1) {
-            String msg = "requested byte length need to be 1 or more";
-            balFuture.complete(SocketUtils.createSocketError(msg));
-            return null;
-        }
         DatagramChannel socket = (DatagramChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
         int socketHash = socket.hashCode();
         SocketService socketService = (SocketService) client.getNativeData(SocketConstants.SOCKET_SERVICE);
-        ReadPendingCallback readPendingCallback = new ReadPendingCallback(balFuture, (int) length, socketHash,
-                socketService.getReadTimeout());
+        ReadPendingCallback readPendingCallback = new ReadPendingCallback(balFuture, DEFAULT_EXPECTED_READ_LENGTH,
+                socketHash, socketService.getReadTimeout());
         ReadPendingSocketMap.getInstance().add(socket.hashCode(), readPendingCallback);
         log.debug("Notify to invokeRead");
         SelectorManager.getInstance().invokeRead(socketHash);
         return null;
     }
 
-    public static Object sendTo(BObject client, BArray content, BMap<BString, Object> address) {
+    public static Object send(BObject client, BMap<BString, Object> datagram) {
         DatagramChannel socket = (DatagramChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
-        String host = address.getStringValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
-        int port = address.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)).intValue();
-        byte[] byteContent = content.getBytes();
+        BMap<BString, Object> remoteAddress = (BMap<BString, Object>) datagram
+                .getMapValue(StringUtils.fromString(SocketConstants.DATAGRAM_REMOTE_ADDRESS));
+        BArray data = datagram.getArrayValue(StringUtils.fromString(SocketConstants.DATAGRAM_DATA));
+        String host = remoteAddress.getStringValue(
+                StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
+        int port = remoteAddress.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)).intValue();
+        byte[] byteContent = data.getBytes();
         if (log.isDebugEnabled()) {
             log.debug(String.format("No of byte going to write[%d]: %d", socket.hashCode(), byteContent.length));
         }
@@ -168,12 +129,31 @@ public class ClientActions {
             if (log.isDebugEnabled()) {
                 log.debug(String.format("No of byte written for the client[%d]: %d", socket.hashCode(), write));
             }
-            return write;
+            return null;
         } catch (ClosedChannelException e) {
             return SocketUtils.createSocketError("client udp close already.");
         } catch (IOException e) {
             log.error("Unable to perform write[" + socket.hashCode() + "]", e);
             return SocketUtils.createSocketError("write failed. " + e.getMessage());
         }
+    }
+    
+    public static Object close(BObject client) {
+        final DatagramChannel socketChannel = (DatagramChannel) client.getNativeData(SOCKET_KEY);
+        try {
+            // SocketChannel can be null if something happen during the onConnect. Hence the null check.
+            if (socketChannel != null) {
+                socketChannel.close();
+                SelectorManager.getInstance().unRegisterChannel(socketChannel);
+            }
+            // This need to handle to support multiple client close.
+            if (Boolean.parseBoolean(client.getNativeData(IS_CLIENT).toString())) {
+                SelectorManager.getInstance().stop(true);
+            }
+        } catch (IOException e) {
+            log.error("Unable to close the UDP client.", e);
+            return SocketUtils.createSocketError("unable to close the  UDP client. " + e.getMessage());
+        }
+        return null;
     }
 }

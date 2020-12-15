@@ -1,4 +1,4 @@
-// Copyright (c) 2019 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2020 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 //
 // WSO2 Inc. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -27,17 +27,30 @@ function setup() {
 @test:Config {
 }
 function testClientEcho() {
-    Client socketClient = new;
-    string msg = "Hello Ballerina echo";
-    var sendResult = socketClient->sendTo(msg.toBytes(), {host: "localhost", port: 48829});
-    if (sendResult is int) {
-        log:print("Number of bytes written: " + sendResult.toString());
-    } else {
-        test:assertFail(msg = sendResult.message());
+    Client|Error? socketClient = new ("localhost", 2000);
+    if (socketClient is Client) {
+         string msg = "Hello Ballerina echo";
+        Datagram datagram = {
+            remoteAddress : {
+                host : "localhost",
+                port : 48829
+            },
+            data : msg.toBytes()
+        };
+
+        var sendResult = socketClient->send(datagram);
+        if (sendResult is ()) {
+            log:print("Datagram was sent to the remote host.");
+        } else {
+            test:assertFail(msg = sendResult.message());
+        }
+        string readContent = receiveClientContent(socketClient);
+        test:assertEquals(readContent, msg, "Found unexpected output");
+        checkpanic socketClient->close();
+        
+    } else if (socketClient is Error) {
+        log:printError("Error initializing UDP Client", err = socketClient);
     }
-    string readContent = receiveClientContent(socketClient);
-    test:assertEquals(readContent, msg, "Found unexpected output");
-    checkpanic socketClient->close();
 }
 
 function getString(byte[] content, int numberOfBytes) returns @tainted string|io:Error {
@@ -50,41 +63,27 @@ function getString(byte[] content, int numberOfBytes) returns @tainted string|io
     dependsOn: ["testClientEcho"]
 }
 function testContentReceive() {
-    int udpPort = 48827;
-    Client socketClient = new ({port: udpPort});
-    string msg = "This is server";
-    var reuslt = passUdpContent(msg, udpPort);
-    string readContent = receiveClientContent(socketClient);
-    test:assertEquals(readContent, msg, "Found unexpected output");
-    checkpanic socketClient->close();
-}
+    Client|Error? socketClient = new("localhost", 2000);
+     if (socketClient is Client) {
+        string msg = "Hello server! send me the data";
+        Datagram datagram = {
+            remoteAddress : {
+                host : "localhost",
+                port : 48829
+            },
+            data : msg.toBytes()
+        };
 
-@test:Config {
-    dependsOn: ["testContentReceive"]
-}
-function testContentReceiveWithLength() {
-    int udpPort = 48828;
+        var sendResult = socketClient->send(datagram);
 
-    string msg = "This is going to be a tricky";
-    var reuslt = passUdpContent(msg, udpPort);
+        string readContent = receiveClientContent(socketClient);
+        string expectedResponse = "Hi client! here is your data";
+        test:assertEquals(readContent, expectedResponse, "Found an unexpected output");
+        checkpanic socketClient->close();
 
-    Client socketClient = new ({host: "localhost", port: udpPort});
-    string returnStr = "";
-    var result = socketClient->receiveFrom(56);
-    if (result is [byte[], int, Address]) {
-        var [content, length, address] = result;
-        var resultContent = getString(content, 50);
-        if (resultContent is string) {
-            returnStr = <@untainted>resultContent;
-        } else {
-            test:assertFail(msg = resultContent.message());
-        }
-    } else {
-        test:assertFail(msg = result.message());
+    } else if (socketClient is Error) {
+        log:printError("Error initializing UDP Client", err = socketClient);
     }
-    log:print(msg);
-    log:print(returnStr);
-    checkpanic socketClient->close();
 }
 
 @test:AfterSuite{}
@@ -94,10 +93,9 @@ function stopAll() {
 
 function receiveClientContent(Client socketClient) returns string {
     string returnStr = "";
-    var result = socketClient->receiveFrom();
-    if (result is [byte[], int, Address]) {
-        var [content, length, address] = result;
-        var str = getString(content, 50);
+    var result = socketClient->receive();
+    if (result is Datagram) {
+        var str = getString(result.data, 50);
         if (str is string) {
             returnStr = <@untainted>str;
             io:println("Response is :", returnStr);

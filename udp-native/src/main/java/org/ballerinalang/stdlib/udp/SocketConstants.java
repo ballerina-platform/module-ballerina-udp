@@ -37,6 +37,11 @@ public class SocketConstants {
     public static final String SOCKET_SERVICE = "socketService";
     public static final String IS_CLIENT = "isClient";
 
+    public static final String ADDRESS_RECORD = "Address";
+    public static final String DATAGRAM_RECORD = "Datagram";
+    public static final String DATAGRAM_REMOTE_ADDRESS = "remoteAddress";
+    public static final String DATAGRAM_DATA = "data";
+
     // If default length pass as the read length then the entire buffer read.
     public static final int DEFAULT_EXPECTED_READ_LENGTH = -100;
 

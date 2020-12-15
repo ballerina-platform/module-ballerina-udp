@@ -65,7 +65,7 @@ public class MockUdpServer implements Runnable {
                         SelectionKey key = iter.next();
                         iter.remove();
                         if (key.isReadable()) {
-                            answerWithEcho(buffer, key);
+                            reply(buffer, key);
                         }
                     }
                 } catch (Throwable e) {
@@ -91,16 +91,19 @@ public class MockUdpServer implements Runnable {
         }
     }
 
-    private void answerWithEcho(ByteBuffer buffer, SelectionKey key) throws IOException {
+    private void reply(ByteBuffer buffer, SelectionKey key) throws IOException {
         DatagramChannel channel = (DatagramChannel) key.channel();
         SocketAddress client = channel.receive(buffer);
         byte[] readBytes = buffer.array();
         receivedString = new String(readBytes, StandardCharsets.UTF_8.name()).trim();
+        if(receivedString.equals("Hello server! send me the data")) {
+            buffer.clear();
+            buffer.put("Hi client! here is your data".getBytes());
+        }
         buffer.flip();
         channel.send(buffer, client);
         buffer.clear();
     }
-    String getReceivedString() {
-        return receivedString;
-    }
+
+    String getReceivedString() { return receivedString; }
 }

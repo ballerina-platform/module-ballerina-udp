@@ -3,7 +3,7 @@ Ballerina UDP Library
 
   [![Build](https://github.com/ballerina-platform/module-ballerina-udp/workflows/Build/badge.svg)](https://github.com/ballerina-platform/module-ballerina-udp/actions?query=workflow%3ABuild)
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-udp.svg)](https://github.com/ballerina-platform/module-ballerina-udp/commits/master)
-  [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/udp.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fsocket)
+  [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/udp.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fudp)
   [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 The UDP library is one of the standard library modules of the<a target="_blank" href="https://ballerina.io/"> Ballerina</a> language.
