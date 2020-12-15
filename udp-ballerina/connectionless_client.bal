@@ -73,7 +73,7 @@ public client class Client {
 # + host - The hostname of the Socket Address
 # + port - The port number of the Socket Address
 public type Address record {|
-    string host?;
+    string host;
     int port;
 |};
 
