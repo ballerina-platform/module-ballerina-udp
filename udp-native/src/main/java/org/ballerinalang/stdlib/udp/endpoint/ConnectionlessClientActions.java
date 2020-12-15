@@ -114,11 +114,10 @@ public class ConnectionlessClientActions {
     public static Object send(BObject client, BMap<BString, Object> datagram) {
         DatagramChannel socket = (DatagramChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
         BMap<BString, Object> remoteAddress = (BMap<BString, Object>) datagram
-                .getMapValue(StringUtils.fromString("remoteAddress"));
-        BArray data = datagram.getArrayValue(StringUtils.fromString("data"));
+                .getMapValue(StringUtils.fromString(SocketConstants.DATAGRAM_REMOTE_ADDRESS));
+        BArray data = datagram.getArrayValue(StringUtils.fromString(SocketConstants.DATAGRAM_DATA));
         String host = remoteAddress.getStringValue(
-                StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)
-        ).getValue();
+                StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
         int port = remoteAddress.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)).intValue();
         byte[] byteContent = data.getBytes();
         if (log.isDebugEnabled()) {

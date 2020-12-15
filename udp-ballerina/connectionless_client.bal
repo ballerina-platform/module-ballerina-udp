@@ -30,7 +30,7 @@ public client class Client {
     #                         the default value of 300000 milliseconds (5 minutes) will be used.
     public isolated function init(string? localHost = (), int timeoutInMillis = 30000) {
         self.localHost = localHost;
-        var initResult = initConnectionlessClient(self,localHost,timeoutInMillis);
+        var initResult = initConnectionlessClient(self, localHost, timeoutInMillis);
         if (initResult is error) {
             panic initResult;
         }
@@ -44,7 +44,7 @@ public client class Client {
     # + datagram - Contains the data to be sent to the remote host socket and the address of the remote host
     # + return - () or else a `udp:Error` if the given data can't be sent
     isolated remote function send(Datagram datagram) returns Error? {
-        return externConnectionlessSend(self,datagram);
+        return externConnectionlessSend(self, datagram);
     }
 
     # Reads data from the remote host. 
@@ -88,7 +88,7 @@ public type Datagram record {|
    byte[] data;
 |};
 
-isolated function initConnectionlessClient(Client udpClient,string? host, int timeout) returns error? =
+isolated function initConnectionlessClient(Client udpClient, string? host, int timeout) returns error? =
 @java:Method {
     name: "initEndpoint",
     'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectionlessClientActions"

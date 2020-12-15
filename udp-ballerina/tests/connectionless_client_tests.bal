@@ -27,7 +27,7 @@ function setup() {
 @test:Config {
 }
 function testClientEcho() {
-    Client socketClient = new ("localhost",2000);
+    Client socketClient = new ("localhost", 2000);
     string msg = "Hello Ballerina echo";
     Datagram datagram = {
         remoteAddress : {
@@ -58,7 +58,7 @@ function getString(byte[] content, int numberOfBytes) returns @tainted string|io
     dependsOn: ["testClientEcho"]
 }
 function testContentReceive() {
-    Client socketClient = new("localhost",2000);
+    Client socketClient = new("localhost", 2000);
     string msg = "hello server! send me the data";
     Datagram datagram = {
         remoteAddress : {
