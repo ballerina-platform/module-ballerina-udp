@@ -27,25 +27,30 @@ function setup() {
 @test:Config {
 }
 function testClientEcho() {
-    Client socketClient = new ("localhost", 2000);
-    string msg = "Hello Ballerina echo";
-    Datagram datagram = {
-        remoteAddress : {
-            host : "localhost",
-            port : 48829
-        },
-        data : msg.toBytes()
-    };
+    Client|Error? socketClient = new ("localhost", 2000);
+    if (socketClient is Client) {
+         string msg = "Hello Ballerina echo";
+        Datagram datagram = {
+            remoteAddress : {
+                host : "localhost",
+                port : 48829
+            },
+            data : msg.toBytes()
+        };
 
-    var sendResult = socketClient->send(datagram);
-    if (sendResult is ()) {
-        log:print("Datagram was sent to the remote address.");
-    } else {
-        test:assertFail(msg = sendResult.message());
+        var sendResult = socketClient->send(datagram);
+        if (sendResult is ()) {
+            log:print("Datagram was sent to the remote host.");
+        } else {
+            test:assertFail(msg = sendResult.message());
+        }
+        string readContent = receiveClientContent(socketClient);
+        test:assertEquals(readContent, msg, "Found unexpected output");
+        checkpanic socketClient->close();
+        
+    } else if (socketClient is Error) {
+        log:printError("Error initializing UDP Client", err = socketClient);
     }
-    string readContent = receiveClientContent(socketClient);
-    test:assertEquals(readContent, msg, "Found unexpected output");
-    checkpanic socketClient->close();
 }
 
 function getString(byte[] content, int numberOfBytes) returns @tainted string|io:Error {
@@ -58,22 +63,27 @@ function getString(byte[] content, int numberOfBytes) returns @tainted string|io
     dependsOn: ["testClientEcho"]
 }
 function testContentReceive() {
-    Client socketClient = new("localhost", 2000);
-    string msg = "Hello server! send me the data";
-    Datagram datagram = {
-        remoteAddress : {
-            host : "localhost",
-            port : 48829
-        },
-        data : msg.toBytes()
-    };
+    Client|Error? socketClient = new("localhost", 2000);
+     if (socketClient is Client) {
+        string msg = "Hello server! send me the data";
+        Datagram datagram = {
+            remoteAddress : {
+                host : "localhost",
+                port : 48829
+            },
+            data : msg.toBytes()
+        };
 
-    var sendResult = socketClient->send(datagram);
+        var sendResult = socketClient->send(datagram);
 
-    string readContent = receiveClientContent(socketClient);
-    string expectedResponse = "Hi client! here is your data";
-    test:assertEquals(readContent, expectedResponse, "Found an unexpected output");
-    checkpanic socketClient->close();
+        string readContent = receiveClientContent(socketClient);
+        string expectedResponse = "Hi client! here is your data";
+        test:assertEquals(readContent, expectedResponse, "Found an unexpected output");
+        checkpanic socketClient->close();
+
+    } else if (socketClient is Error) {
+        log:printError("Error initializing UDP Client", err = socketClient);
+    }
 }
 
 @test:AfterSuite{}
