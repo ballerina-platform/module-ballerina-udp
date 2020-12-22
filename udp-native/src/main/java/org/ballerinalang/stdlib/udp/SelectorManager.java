@@ -51,7 +51,7 @@ import java.util.concurrent.ThreadFactory;
 import static java.nio.channels.SelectionKey.OP_READ;
 import static org.ballerinalang.stdlib.udp.SocketConstants.DEFAULT_EXPECTED_READ_LENGTH;
 import static org.ballerinalang.stdlib.udp.SocketConstants.ErrorType.ReadTimedOutError;
-import static org.ballerinalang.stdlib.udp.SocketConstants.SOCKET_PACKAGE_ID;
+import static org.ballerinalang.stdlib.udp.SocketUtils.getUdpPackage;
 
 /**
  * This will manage the Selector instance and handle the accept, read and write operations.
@@ -71,7 +71,7 @@ public class SelectorManager {
     private final Object startStopLock = new Object();
     private static final TupleType receiveFromResultTuple = TypeCreator.createTupleType(
             Arrays.asList(TypeCreator.createArrayType(PredefinedTypes.TYPE_BYTE), PredefinedTypes.TYPE_INT,
-                    ValueCreator.createRecordValue(SOCKET_PACKAGE_ID, SocketConstants.ADDRESS_RECORD).getType()));
+                    ValueCreator.createRecordValue(getUdpPackage(), SocketConstants.ADDRESS_RECORD).getType()));
 
     private SelectorManager() throws IOException {
         selector = Selector.open();
@@ -270,13 +270,13 @@ public class SelectorManager {
 
     private BMap<BString, Object>  createUdpSocketReturnValue(ReadPendingCallback callback, byte[] bytes,
                                                              InetSocketAddress remoteAddress) {
-        BMap<BString, Object> address = ValueCreator.createRecordValue(SOCKET_PACKAGE_ID,
+        BMap<BString, Object> address = ValueCreator.createRecordValue(getUdpPackage(),
                 SocketConstants.ADDRESS_RECORD);
         address.put(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT), remoteAddress.getPort());
         address.put(StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST),
                 StringUtils.fromString(remoteAddress.getHostName()));
         BArray contentTuple = ValueCreator.createTupleValue(receiveFromResultTuple);
-        BMap<BString, Object> datagram = ValueCreator.createRecordValue(SOCKET_PACKAGE_ID,
+        BMap<BString, Object> datagram = ValueCreator.createRecordValue(getUdpPackage(),
                 SocketConstants.DATAGRAM_RECORD);
         datagram.put(StringUtils.fromString(SocketConstants.DATAGRAM_REMOTE_ADDRESS), address);
         datagram.put(StringUtils.fromString(SocketConstants.DATAGRAM_DATA), ValueCreator.createArrayValue(bytes));
