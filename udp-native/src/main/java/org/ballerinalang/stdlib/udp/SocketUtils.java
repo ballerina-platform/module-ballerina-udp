@@ -18,6 +18,7 @@
 
 package org.ballerinalang.stdlib.udp;
 
+import io.ballerina.runtime.api.Module;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
@@ -27,8 +28,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static org.ballerinalang.stdlib.udp.SocketConstants.ErrorType.GenericError;
-import static org.ballerinalang.stdlib.udp.SocketConstants.SOCKET_PACKAGE_ID;
-
 
 /**
  * Represents the util functions of Socket operations.
@@ -47,7 +46,7 @@ public class SocketUtils {
      * @return BError instance which contains the error details
      */
     public static BError createSocketError(String errMsg) {
-        return ErrorCreator.createDistinctError(GenericError.errorType(), SOCKET_PACKAGE_ID,
+        return ErrorCreator.createDistinctError(GenericError.errorType(), getUdpPackage(),
                                                  StringUtils.fromString(errMsg));
     }
 
@@ -59,7 +58,7 @@ public class SocketUtils {
      * @return BError instance which contains the error details
      */
     public static BError createSocketError(SocketConstants.ErrorType type, String errMsg) {
-        return ErrorCreator.createDistinctError(type.errorType(), SOCKET_PACKAGE_ID, StringUtils.fromString(errMsg));
+        return ErrorCreator.createDistinctError(type.errorType(), getUdpPackage(), StringUtils.fromString(errMsg));
     }
 
 
@@ -102,5 +101,14 @@ public class SocketUtils {
      */
     public static void shutdownExecutorImmediately(ExecutorService executorService) {
         executorService.shutdownNow();
+    }
+
+    /**
+     * Gets ballerina udp package.
+     *
+     * @return io package.
+     */
+    public static Module getUdpPackage() {
+        return ModuleUtils.getModule();
     }
 }
