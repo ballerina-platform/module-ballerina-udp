@@ -33,7 +33,7 @@ public class SocketConstants {
 
     /**
      * udp standard library package ID.
-     * @deprecated Use SocketUtils.getIOPackage().
+     * @deprecated Use SocketUtils.getUdpPackage().
      */
     @Deprecated
     public static final Module SOCKET_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "udp", "0.8.0");
