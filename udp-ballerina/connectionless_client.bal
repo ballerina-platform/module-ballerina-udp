@@ -24,18 +24,18 @@ public client class Client {
     private string? localHost = ();
    
     # Initializes the UDP connectionless client based on the provided configurations.
+    # ```ballerina
+    # udp:Client|udp:Error? socketClient = new(localHost = "localhost");
+    # ```
     #
-    # + localHost - Local binding of the interface
-    # + timeoutInMillis - The socket reading timeout value to be used in milliseconds. If this is not set,
-    #                         the default value of 300000 milliseconds (5 minutes) will be used.
-    public isolated function init(string? localHost = (), int timeoutInMillis = 30000) returns Error?  {
-        self.localHost = localHost;
-        return initConnectionlessClient(self, localHost, timeoutInMillis);
+    # + config - Connectionless client related configuration
+    public isolated function init(*ClientConfig	config) returns Error? {
+        return initConnectionlessClient(self, config);
     }
 
     # Sends the given data to the specified remote host.
     # ```ballerina
-    # udp:Error? result = socketClient->send({remoteAddress: {host: "localhost", port: 48826}, data:"msg".toBytes());
+    # udp:Error? result = socketClient->send({remoteHost: "localhost", remotePort: 48826, data:"msg".toBytes());
     # ```
     #
     # + datagram - Contains the data to be sent to the remote host socket and the address of the remote host
@@ -46,11 +46,11 @@ public client class Client {
 
     # Reads data from the remote host. 
     # ```ballerina
-    # Datagram|ReadTimedOutError result = socketClient->receive();
+    # udp:Datagram|udp:Error? result = socketClient->receive();
     # ```
     #
     # + return - The Datagram, or else a `udp:Error` if the data can't be read from the remote host
-    isolated remote function receive() returns Datagram|ReadTimedOutError {
+    isolated remote function receive() returns Datagram|Error? {
         return externConnectionlessReceive(self);
     }
 
@@ -65,27 +65,35 @@ public client class Client {
     }
 }
 
-# This represent the IP socket address.
-#
-# + host - The hostname of the Socket Address
-# + port - The port number of the Socket Address
-public type Address record {|
-    string host;
-    int port;
-|};
 
 # A self-contained, independent entity of data carrying sufficient information
 # to be routed from the source to the destination nodes without reliance
 # on earlier exchanges between the nodes and the transporting network.
 # 
-# + remoteAddress - The remote address of the remote host
+# + remoteHost - The hostname of the remote host
+# + remotePort - The port number of the remote host
 # + data - The content which needs to be transported to the remote host
 public type Datagram record {|
-   Address remoteAddress;
+   string remoteHost;
+   int remotePort;
+   // readonly byte[] data;
    byte[] data;
 |};
 
-isolated function initConnectionlessClient(Client udpClient, string? host, int timeout) returns Error? =
+#Configurations for the connectionless udp client
+# 
+# + localHost - Local binding of the interface
+# + timeoutInMillis - The socket reading timeout value to be used in milliseconds. If this is not set,
+#                         the default value of 300000 milliseconds (5 minutes) will be used.
+//connectionless client configurations
+public type ClientConfig record {
+   int timeoutInMillis = 30000;
+   string? localHost = ();
+   // can have other socket options
+};
+
+
+isolated function initConnectionlessClient(Client udpClient, ClientConfig config) returns Error? =
 @java:Method {
     name: "initEndpoint",
     'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectionlessClientActions"
@@ -97,7 +105,7 @@ isolated function externConectionlessClientClose(Client udpClient) returns Error
     'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectionlessClientActions"
 } external;
 
-isolated function externConnectionlessReceive(Client udpClient) returns Datagram|ReadTimedOutError =
+isolated function externConnectionlessReceive(Client udpClient) returns Datagram|Error? =
 @java:Method {
     name: "receive",
     'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectionlessClientActions"

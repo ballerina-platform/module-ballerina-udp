@@ -38,22 +38,21 @@ public class SocketConstants {
     @Deprecated
     public static final Module SOCKET_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "udp", "0.8.0");
     
-    public static final String CONFIG_FIELD_HOST = "host";
-    public static final String CONFIG_FIELD_PORT = "port";
+
 
     public static final String SOCKET_SERVICE = "socketService";
     public static final String IS_CLIENT = "isClient";
 
-    public static final String ADDRESS_RECORD = "Address";
     public static final String DATAGRAM_RECORD = "Datagram";
-    public static final String DATAGRAM_REMOTE_ADDRESS = "remoteAddress";
+    public static final String DATAGRAM_REMOTE_HOST = "remoteHost";
+    public static final String DATAGRAM_REMOTE_PORT = "remotePort";
     public static final String DATAGRAM_DATA = "data";
 
     // If default length pass as the read length then the entire buffer read.
     public static final int DEFAULT_EXPECTED_READ_LENGTH = -100;
 
     // Default read timeout set as 5 min.
-    public static final String READ_TIMEOUT = "readTimeoutInMillis";
+    public static final String READ_TIMEOUT = "timeoutInMillis";
 
     /**
      * Specifies the error type for udp module.
