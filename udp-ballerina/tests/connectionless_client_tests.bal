@@ -27,18 +27,12 @@ function setup() {
 @test:Config {
 }
 function testClientEcho() {
-    Client|Error? socketClient = new ("localhost", 2000);
+    Client|Error? socketClient = new(localHost = "localhost");
     if (socketClient is Client) {
          string msg = "Hello Ballerina echo";
-        Datagram datagram = {
-            remoteAddress : {
-                host : "localhost",
-                port : 48829
-            },
-            data : msg.toBytes()
-        };
+        Datagram datagram = prepareDatagram(msg);
 
-        var sendResult = socketClient->send(datagram);
+        var sendResult = socketClient->sendDatagram(datagram);
         if (sendResult is ()) {
             log:print("Datagram was sent to the remote host.");
         } else {
@@ -63,19 +57,18 @@ function getString(byte[] content, int numberOfBytes) returns @tainted string|io
     dependsOn: ["testClientEcho"]
 }
 function testContentReceive() {
-    Client|Error? socketClient = new("localhost", 2000);
+    Client|Error? socketClient = new(localHost = "localhost", timeoutInMillis = 3000);
      if (socketClient is Client) {
         string msg = "Hello server! send me the data";
-        Datagram datagram = {
-            remoteAddress : {
-                host : "localhost",
-                port : 48829
-            },
-            data : msg.toBytes()
-        };
+         Datagram datagram = prepareDatagram(msg);
 
-        var sendResult = socketClient->send(datagram);
-
+        var sendResult = socketClient->sendDatagram(datagram);
+              if (sendResult is ()) {
+            log:print("Datagram was sent to the remote host.");
+        } else {
+            test:assertFail(msg = sendResult.message());
+        }
+        
         string readContent = receiveClientContent(socketClient);
         string expectedResponse = "Hi client! here is your data";
         test:assertEquals(readContent, expectedResponse, "Found an unexpected output");
@@ -91,9 +84,14 @@ function stopAll() {
     var result = stopUdpServer();
 }
 
+isolated function prepareDatagram(string msg) returns Datagram {
+    byte[] data =  msg.toBytes();
+    return { data:<byte[] & readonly>data.cloneReadOnly(), remoteHost: "localhost", remotePort: 48829 };
+}
+
 function receiveClientContent(Client socketClient) returns string {
     string returnStr = "";
-    var result = socketClient->receive();
+    var result = socketClient->receiveDatagram();
     if (result is Datagram) {
         var str = getString(result.data, 50);
         if (str is string) {
@@ -103,7 +101,7 @@ function receiveClientContent(Client socketClient) returns string {
             test:assertFail(msg = str.message());
         }
     } else {
-        test:assertFail(msg = result.message());
+        test:assertFail(msg = "Failed to receive the datagram");
     }
     return returnStr;
 }

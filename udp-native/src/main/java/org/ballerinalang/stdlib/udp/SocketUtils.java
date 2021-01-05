@@ -106,7 +106,7 @@ public class SocketUtils {
     /**
      * Gets ballerina udp package.
      *
-     * @return io package.
+     * @return udp package.
      */
     public static Module getUdpPackage() {
         return ModuleUtils.getModule();
