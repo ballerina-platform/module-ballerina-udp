@@ -27,7 +27,7 @@ function setup() {
 @test:Config {
 }
 function testClientEcho() {
-    Client|Error? socketClient = new({localHost:"localhost", timeoutInMillis:3000});
+    Client|Error? socketClient = new(localHost = "localhost");
     if (socketClient is Client) {
          string msg = "Hello Ballerina echo";
         Datagram datagram = prepareDatagram(msg);
@@ -57,7 +57,7 @@ function getString(byte[] content, int numberOfBytes) returns @tainted string|io
     dependsOn: ["testClientEcho"]
 }
 function testContentReceive() {
-    Client|Error? socketClient = new({localHost:"localhost", timeoutInMillis:3000});
+    Client|Error? socketClient = new(localHost = "localhost", timeoutInMillis = 3000);
      if (socketClient is Client) {
         string msg = "Hello server! send me the data";
          Datagram datagram = prepareDatagram(msg);
@@ -101,7 +101,7 @@ function receiveClientContent(Client socketClient) returns string {
             test:assertFail(msg = str.message());
         }
     } else {
-        test:assertFail(msg = "failed to receive datagram");
+        test:assertFail(msg = "Failed to receive the datagram");
     }
     return returnStr;
 }
