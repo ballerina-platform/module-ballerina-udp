@@ -33,16 +33,14 @@ import java.util.TimerTask;
 public class ReadPendingCallback {
 
     private Future balFuture;
-    private final int expectedLength;
     private int currentLength;
     private ByteBuffer buffer;
     private int socketHash;
     private Timer timer;
     private long timeout;
 
-    public ReadPendingCallback(Future balFuture, int expectedLength, int socketHash, long timeout) {
+    public ReadPendingCallback(Future balFuture, int socketHash, long timeout) {
         this.balFuture = balFuture;
-        this.expectedLength = expectedLength;
         this.socketHash = socketHash;
         this.timeout = timeout;
         scheduleTimeout(timeout);
@@ -50,14 +48,6 @@ public class ReadPendingCallback {
 
     public Future getFuture() {
         return balFuture;
-    }
-
-    public int getExpectedLength() {
-        return expectedLength;
-    }
-
-    public int getCurrentLength() {
-        return currentLength;
     }
 
     public void updateCurrentLength(int currentLength) {

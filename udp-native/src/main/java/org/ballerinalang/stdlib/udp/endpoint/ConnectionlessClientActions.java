@@ -43,7 +43,6 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.DatagramChannel;
 
 import static java.nio.channels.SelectionKey.OP_READ;
-import static org.ballerinalang.stdlib.udp.SocketConstants.DEFAULT_EXPECTED_READ_LENGTH;
 import static org.ballerinalang.stdlib.udp.SocketConstants.IS_CLIENT;
 import static org.ballerinalang.stdlib.udp.SocketConstants.SOCKET_KEY;
 import static org.ballerinalang.stdlib.udp.SocketConstants.SOCKET_SERVICE;
@@ -104,8 +103,8 @@ public class ConnectionlessClientActions {
         DatagramChannel socket = (DatagramChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
         int socketHash = socket.hashCode();
         SocketService socketService = (SocketService) client.getNativeData(SocketConstants.SOCKET_SERVICE);
-        ReadPendingCallback readPendingCallback = new ReadPendingCallback(balFuture, DEFAULT_EXPECTED_READ_LENGTH,
-                socketHash, socketService.getReadTimeout());
+        ReadPendingCallback readPendingCallback = new ReadPendingCallback(balFuture, socketHash,
+                socketService.getReadTimeout());
         ReadPendingSocketMap.getInstance().add(socket.hashCode(), readPendingCallback);
         log.debug("Notify to invokeRead");
         SelectorManager.getInstance().invokeRead(socketHash);
