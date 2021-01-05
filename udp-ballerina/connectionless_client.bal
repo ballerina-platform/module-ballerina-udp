@@ -84,7 +84,6 @@ public type Datagram record {|
 # + localHost - Local binding of the interface
 # + timeoutInMillis - The socket reading timeout value to be used in milliseconds. If this is not set,
 #                         the default value of 300000 milliseconds (5 minutes) will be used.
-//connectionless client configurations
 public type ClientConfig record {
    int timeoutInMillis = 30000;
    string? localHost = ();

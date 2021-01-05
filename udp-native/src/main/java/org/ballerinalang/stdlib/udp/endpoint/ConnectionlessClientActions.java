@@ -67,7 +67,7 @@ public class ConnectionlessClientActions {
             client.addNativeData(SOCKET_KEY, socketChannel);
             client.addNativeData(IS_CLIENT, true);
             //  A port number of zero will let the system pick up an ephemeral port in a bind operation.
-           Object host = config.getNativeData("localHost");
+           Object host = config.getNativeData(SocketConstants.LOCALHOST);
             if (host == null) {
                 socketChannel.bind(new InetSocketAddress(0));
             } else {

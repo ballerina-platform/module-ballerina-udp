@@ -53,6 +53,7 @@ public class SocketConstants {
 
     // Default read timeout set as 5 min.
     public static final String READ_TIMEOUT = "timeoutInMillis";
+    public static final String LOCALHOST = "localHost";
 
     /**
      * Specifies the error type for udp module.
