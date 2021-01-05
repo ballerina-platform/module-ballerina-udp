@@ -234,7 +234,7 @@ public class SelectorManager {
             processError(callback, null, e.getMessage());
         } catch (Throwable e) {
             log.error(e.getMessage(), e);
-            processError(callback, ReadTimedOutError, "error while on receiveFrom operation");
+            processError(callback, ReadTimedOutError, "Error occured on receive operation.");
         }
     }
 

@@ -80,18 +80,18 @@ public class ConnectionlessClientActions {
             selectorManager.start();
         } catch (SelectorInitializeException e) {
             log.error(e.getMessage(), e);
-            balFuture.complete(SocketUtils.createSocketError("unable to initialize the selector"));
+            balFuture.complete(SocketUtils.createSocketError("Unable to initialize the selector."));
             return null;
         } catch (SocketException e) {
-            balFuture.complete(SocketUtils.createSocketError("unable to bind the local udp port"));
+            balFuture.complete(SocketUtils.createSocketError("Unable to a port."));
             return null;
         } catch (IOException e) {
             log.error("Unable to initiate the client udp", e);
-            balFuture.complete(SocketUtils.createSocketError("unable to initiate the udp: " + e.getMessage()));
+            balFuture.complete(SocketUtils.createSocketError("Unable to initiate the udp client: " + e.getMessage()));
             return null;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            balFuture.complete(SocketUtils.createSocketError("unable to start the udp client."));
+            balFuture.complete(SocketUtils.createSocketError("Unable to start the udp client."));
             return null;
         }
         selectorManager.registerChannel(new ChannelRegisterCallback(socketService, balFuture, OP_READ));
@@ -129,7 +129,7 @@ public class ConnectionlessClientActions {
             }
             return null;
         } catch (ClosedChannelException e) {
-            return SocketUtils.createSocketError("client udp close already.");
+            return SocketUtils.createSocketError("udp client closed already.");
         } catch (IOException e) {
             log.error("Unable to perform write[" + socket.hashCode() + "]", e);
             return SocketUtils.createSocketError("write failed. " + e.getMessage());
@@ -150,7 +150,7 @@ public class ConnectionlessClientActions {
             }
         } catch (IOException e) {
             log.error("Unable to close the UDP client.", e);
-            return SocketUtils.createSocketError("unable to close the  UDP client. " + e.getMessage());
+            return SocketUtils.createSocketError("Unable to close the  UDP client. " + e.getMessage());
         }
         return null;
     }
