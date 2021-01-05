@@ -35,7 +35,7 @@ public client class Client {
 
     # Sends the given data to the specified remote host.
     # ```ballerina
-    # udp:Error? result = socketClient->send({remoteHost: "localhost", remotePort: 48826, data:"msg".toBytes());
+    # udp:Error? result = socketClient->send({remoteHost: "localhost", remotePort: 48826, data:"msg".toBytes()});
     # ```
     #
     # + datagram - Contains the data to be sent to the remote host socket and the address of the remote host
