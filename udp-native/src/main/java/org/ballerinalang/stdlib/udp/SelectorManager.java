@@ -44,7 +44,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import static java.nio.channels.SelectionKey.OP_READ;
-import static org.ballerinalang.stdlib.udp.SocketConstants.DEFAULT_EXPECTED_READ_LENGTH;
 import static org.ballerinalang.stdlib.udp.SocketConstants.ErrorType.ReadTimedOutError;
 import static org.ballerinalang.stdlib.udp.SocketUtils.getUdpPackage;
 
@@ -224,20 +223,6 @@ public class SelectorManager {
             // Re-register for read ready events.
             socketReader.getSelectionKey().interestOps(OP_READ);
             selector.wakeup();
-            if (callback.getExpectedLength() != DEFAULT_EXPECTED_READ_LENGTH) {
-                if (callback.getBuffer() == null) {
-                    callback.setBuffer(ByteBuffer.allocate(buffer.capacity()));
-                }
-                buffer.flip();
-                callback.getBuffer().put(buffer);
-            }
-            if (callback.getExpectedLength() != DEFAULT_EXPECTED_READ_LENGTH && callback.getExpectedLength() != callback
-                    .getCurrentLength()) {
-                ReadPendingSocketMap.getInstance().add(channel.hashCode(), callback);
-                invokeRead(channel.hashCode());
-
-                return;
-            }
             byte[] bytes = SocketUtils
                     .getByteArrayFromByteBuffer(callback.getBuffer() == null ? buffer : callback.getBuffer());
             callback.getFuture().complete(createUdpSocketReturnValue(callback, bytes, remoteAddress));
@@ -272,15 +257,8 @@ public class SelectorManager {
     }
 
     private ByteBuffer createBuffer(ReadPendingCallback callback, int osBufferSize) {
-        ByteBuffer buffer;
-        // If the length is not specified in the read action then create a byte buffer to match the size of
-        // the receiver buffer.
-        if (callback.getExpectedLength() == DEFAULT_EXPECTED_READ_LENGTH) {
-            buffer = ByteBuffer.allocate(osBufferSize);
-        } else {
-            int newBufferSize = callback.getExpectedLength() - callback.getCurrentLength();
-            buffer = ByteBuffer.allocate(newBufferSize);
-        }
+        ByteBuffer buffer = ByteBuffer.allocate(osBufferSize);
+
         return buffer;
     }
 
