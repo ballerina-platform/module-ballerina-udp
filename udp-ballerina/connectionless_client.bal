@@ -76,8 +76,7 @@ public client class Client {
 public type Datagram record {|
    string remoteHost;
    int remotePort;
-   // readonly byte[] data;
-   byte[] data;
+   readonly byte[] data;
 |};
 
 #Configurations for the connectionless udp client

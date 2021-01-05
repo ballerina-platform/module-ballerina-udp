@@ -86,7 +86,7 @@ function stopAll() {
 
 isolated function prepareDatagram(string msg) returns Datagram {
     byte[] data =  msg.toBytes();
-    return { data, remoteHost: "localhost", remotePort : 48829 };
+    return { data:<byte[] & readonly>data.cloneReadOnly(), remoteHost: "localhost", remotePort : 48829 };
 }
 
 function receiveClientContent(Client socketClient) returns string {
