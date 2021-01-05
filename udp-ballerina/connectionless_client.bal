@@ -35,22 +35,22 @@ public client class Client {
 
     # Sends the given data to the specified remote host.
     # ```ballerina
-    # udp:Error? result = socketClient->send({remoteHost: "localhost", remotePort: 48826, data:"msg".toBytes()});
+    # udp:Error? result = socketClient->sendDatagram({remoteHost: "localhost", remotePort: 48826, data:"msg".toBytes()});
     # ```
     #
     # + datagram - Contains the data to be sent to the remote host socket and the address of the remote host
     # + return - () or else a `udp:Error` if the given data can't be sent
-    isolated remote function send(Datagram datagram) returns Error? {
+    isolated remote function sendDatagram(Datagram datagram) returns Error? {
         return externConnectionlessSend(self, datagram);
     }
 
     # Reads data from the remote host. 
     # ```ballerina
-    # udp:Datagram|udp:Error? result = socketClient->receive();
+    # udp:Datagram|udp:Error result = socketClient->receiveDatagram();
     # ```
     #
     # + return - The Datagram, or else a `udp:Error` if the data can't be read from the remote host
-    isolated remote function receive() returns Datagram|Error? {
+    isolated remote function receiveDatagram() returns Datagram|Error {
         return externConnectionlessReceive(self);
     }
 
@@ -103,7 +103,7 @@ isolated function externConectionlessClientClose(Client udpClient) returns Error
     'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectionlessClientActions"
 } external;
 
-isolated function externConnectionlessReceive(Client udpClient) returns Datagram|Error? =
+isolated function externConnectionlessReceive(Client udpClient) returns Datagram|Error =
 @java:Method {
     name: "receive",
     'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectionlessClientActions"

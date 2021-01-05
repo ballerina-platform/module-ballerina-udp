@@ -32,7 +32,7 @@ function testClientEcho() {
          string msg = "Hello Ballerina echo";
         Datagram datagram = prepareDatagram(msg);
 
-        var sendResult = socketClient->send(datagram);
+        var sendResult = socketClient->sendDatagram(datagram);
         if (sendResult is ()) {
             log:print("Datagram was sent to the remote host.");
         } else {
@@ -62,7 +62,7 @@ function testContentReceive() {
         string msg = "Hello server! send me the data";
          Datagram datagram = prepareDatagram(msg);
 
-        var sendResult = socketClient->send(datagram);
+        var sendResult = socketClient->sendDatagram(datagram);
               if (sendResult is ()) {
             log:print("Datagram was sent to the remote host.");
         } else {
@@ -91,7 +91,7 @@ isolated function prepareDatagram(string msg) returns Datagram {
 
 function receiveClientContent(Client socketClient) returns string {
     string returnStr = "";
-    var result = socketClient->receive();
+    var result = socketClient->receiveDatagram();
     if (result is Datagram) {
         var str = getString(result.data, 50);
         if (str is string) {
