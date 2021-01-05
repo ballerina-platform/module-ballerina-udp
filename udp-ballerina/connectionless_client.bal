@@ -29,7 +29,7 @@ public client class Client {
     # ```
     #
     # + config - Connectionless client related configuration
-    public isolated function init(*ClientConfig	config) returns Error? {
+    public isolated function init(*ClientConfig config) returns Error? {
         return initConnectionlessClient(self, config);
     }
 
@@ -79,7 +79,7 @@ public type Datagram record {|
    readonly byte[] data;
 |};
 
-#Configurations for the connectionless udp client
+# Configurations for the connectionless udp client
 # 
 # + localHost - Local binding of the interface
 # + timeoutInMillis - The socket reading timeout value to be used in milliseconds. If this is not set,

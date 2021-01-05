@@ -27,7 +27,7 @@ function setup() {
 @test:Config {
 }
 function testClientEcho() {
-    Client|Error? socketClient = new({localHost:"localhost",timeoutInMillis:3000});
+    Client|Error? socketClient = new({localHost:"localhost", timeoutInMillis:3000});
     if (socketClient is Client) {
          string msg = "Hello Ballerina echo";
         Datagram datagram = prepareDatagram(msg);
@@ -57,7 +57,7 @@ function getString(byte[] content, int numberOfBytes) returns @tainted string|io
     dependsOn: ["testClientEcho"]
 }
 function testContentReceive() {
-    Client|Error? socketClient = new({localHost:"localhost",timeoutInMillis:3000});
+    Client|Error? socketClient = new({localHost:"localhost", timeoutInMillis:3000});
      if (socketClient is Client) {
         string msg = "Hello server! send me the data";
          Datagram datagram = prepareDatagram(msg);
@@ -86,7 +86,7 @@ function stopAll() {
 
 isolated function prepareDatagram(string msg) returns Datagram {
     byte[] data =  msg.toBytes();
-    return { data:<byte[] & readonly>data.cloneReadOnly(), remoteHost: "localhost", remotePort : 48829 };
+    return { data:<byte[] & readonly>data.cloneReadOnly(), remoteHost: "localhost", remotePort: 48829 };
 }
 
 function receiveClientContent(Client socketClient) returns string {
@@ -101,7 +101,7 @@ function receiveClientContent(Client socketClient) returns string {
             test:assertFail(msg = str.message());
         }
     } else {
-        test:assertFail(msg = "failed");
+        test:assertFail(msg = "failed to receive datagram");
     }
     return returnStr;
 }
