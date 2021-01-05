@@ -52,10 +52,11 @@ import static org.ballerinalang.stdlib.udp.SocketConstants.SOCKET_SERVICE;
  *
  * @since 1.1.0
  */
-public class ConnectionlessClientActions {
+public class ConnectClientActions {
     private static final Logger log = LoggerFactory.getLogger(ConnectionlessClientActions.class);
 
-    public static Object initEndpoint(Environment env, BObject client, BMap<BString, Object> config) {
+    public static Object initEndpoint(Environment env, BObject client, BString remoteHost, 
+                                      int remotePort, BMap<BString, Object> config) {
         final Future balFuture = env.markAsync();
         SelectorManager selectorManager;
         SocketService socketService;
@@ -72,6 +73,8 @@ public class ConnectionlessClientActions {
                 String hostname = ((BString) host).getValue();
                 socketChannel.bind(new InetSocketAddress(hostname, 0));
             }
+            // connect the client to remote host
+            socketChannel.connect(new InetSocketAddress(remoteHost.getValue(), remotePort));
             long timeout = config.getIntValue(StringUtils.fromString(SocketConstants.READ_TIMEOUT));
             socketService = new SocketService(socketChannel, env.getRuntime(), timeout);
             client.addNativeData(SOCKET_SERVICE, socketService);
@@ -79,14 +82,14 @@ public class ConnectionlessClientActions {
             selectorManager.start();
         } catch (SelectorInitializeException e) {
             log.error(e.getMessage(), e);
-            balFuture.complete(SocketUtils.createSocketError("unable to initialize the selector"));
+            balFuture.complete(SocketUtils.createSocketError("Unable to initialize the selector."));
             return null;
         } catch (SocketException e) {
-            balFuture.complete(SocketUtils.createSocketError("unable to bind the local udp port"));
+            balFuture.complete(SocketUtils.createSocketError("Unable to bind the client to a port."));
             return null;
         } catch (IOException e) {
-            log.error("Unable to initiate the client udp", e);
-            balFuture.complete(SocketUtils.createSocketError("unable to initiate the udp: " + e.getMessage()));
+            log.error("Unable to initiate the udp client.", e);
+            balFuture.complete(SocketUtils.createSocketError("Unable to initiate the udp client.: " + e.getMessage()));
             return null;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -97,38 +100,34 @@ public class ConnectionlessClientActions {
         return null;
     }
 
-    public static Object receive(Environment env, BObject client) {
+    public static Object read(Environment env, BObject client) {
         final Future balFuture = env.markAsync();
         DatagramChannel socket = (DatagramChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
         int socketHash = socket.hashCode();
         SocketService socketService = (SocketService) client.getNativeData(SocketConstants.SOCKET_SERVICE);
         ReadPendingCallback readPendingCallback = new ReadPendingCallback(balFuture, socketHash,
-                socketService.getReadTimeout(), SocketConstants.CallFrom.CONNECTIONLESS_CLIENT);
+                socketService.getReadTimeout(), SocketConstants.CallFrom.CONNECT_CLIENT);
         ReadPendingSocketMap.getInstance().add(socket.hashCode(), readPendingCallback);
         log.debug("Notify to invokeRead");
         SelectorManager.getInstance().invokeRead(socketHash);
         return null;
     }
 
-    public static Object send(BObject client, BMap<BString, Object> datagram) {
+    public static Object write(BObject client, BArray data) {
         DatagramChannel socket = (DatagramChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
-        BArray data = datagram.getArrayValue(StringUtils.fromString(SocketConstants.DATAGRAM_DATA));
-        String host = datagram.getStringValue(
-                StringUtils.fromString(SocketConstants.DATAGRAM_REMOTE_HOST)).getValue();
-        int port = datagram.getIntValue(StringUtils.fromString(SocketConstants.DATAGRAM_REMOTE_PORT)).intValue();
         byte[] byteContent = data.getBytes();
         if (log.isDebugEnabled()) {
             log.debug(String.format("No of byte going to write[%d]: %d", socket.hashCode(), byteContent.length));
         }
         try {
-            final InetSocketAddress remote = new InetSocketAddress(host, port);
-            int write = socket.send(ByteBuffer.wrap(byteContent), remote);
+            // write to remote host
+            int write = socket.write(ByteBuffer.wrap(byteContent));
             if (log.isDebugEnabled()) {
                 log.debug(String.format("No of byte written for the client[%d]: %d", socket.hashCode(), write));
             }
             return null;
         } catch (ClosedChannelException e) {
-            return SocketUtils.createSocketError("client udp close already.");
+            return SocketUtils.createSocketError("udp client close already.");
         } catch (IOException e) {
             log.error("Unable to perform write[" + socket.hashCode() + "]", e);
             return SocketUtils.createSocketError("write failed. " + e.getMessage());
