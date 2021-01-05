@@ -56,8 +56,7 @@ import static org.ballerinalang.stdlib.udp.SocketConstants.SOCKET_SERVICE;
 public class ConnectionlessClientActions {
     private static final Logger log = LoggerFactory.getLogger(ConnectionlessClientActions.class);
 
-    public static Object initEndpoint(Environment env, BObject client, Object host,
-                                      long timeout) {
+    public static Object initEndpoint(Environment env, BObject client, BMap<BString, Object> config) {
         final Future balFuture = env.markAsync();
         SelectorManager selectorManager;
         SocketService socketService;
@@ -68,12 +67,14 @@ public class ConnectionlessClientActions {
             client.addNativeData(SOCKET_KEY, socketChannel);
             client.addNativeData(IS_CLIENT, true);
             //  A port number of zero will let the system pick up an ephemeral port in a bind operation.
+           Object host = config.getNativeData(SocketConstants.LOCALHOST);
             if (host == null) {
                 socketChannel.bind(new InetSocketAddress(0));
             } else {
                 String hostname = ((BString) host).getValue();
                 socketChannel.bind(new InetSocketAddress(hostname, 0));
             }
+            long timeout = config.getIntValue(StringUtils.fromString(SocketConstants.READ_TIMEOUT));
             socketService = new SocketService(socketChannel, env.getRuntime(), timeout);
             client.addNativeData(SOCKET_SERVICE, socketService);
             selectorManager = SelectorManager.getInstance();
@@ -113,12 +114,10 @@ public class ConnectionlessClientActions {
 
     public static Object send(BObject client, BMap<BString, Object> datagram) {
         DatagramChannel socket = (DatagramChannel) client.getNativeData(SocketConstants.SOCKET_KEY);
-        BMap<BString, Object> remoteAddress = (BMap<BString, Object>) datagram
-                .getMapValue(StringUtils.fromString(SocketConstants.DATAGRAM_REMOTE_ADDRESS));
         BArray data = datagram.getArrayValue(StringUtils.fromString(SocketConstants.DATAGRAM_DATA));
-        String host = remoteAddress.getStringValue(
-                StringUtils.fromString(SocketConstants.CONFIG_FIELD_HOST)).getValue();
-        int port = remoteAddress.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_FIELD_PORT)).intValue();
+        String host = datagram.getStringValue(
+                StringUtils.fromString(SocketConstants.DATAGRAM_REMOTE_HOST)).getValue();
+        int port = datagram.getIntValue(StringUtils.fromString(SocketConstants.DATAGRAM_REMOTE_PORT)).intValue();
         byte[] byteContent = data.getBytes();
         if (log.isDebugEnabled()) {
             log.debug(String.format("No of byte going to write[%d]: %d", socket.hashCode(), byteContent.length));
