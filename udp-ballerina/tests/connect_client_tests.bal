@@ -46,16 +46,17 @@ function testConnectClientEcho() {
     dependsOn: ["testConnectClientEcho"]
 }
 isolated function testConnectClientReadTimeOut() {
-    ConnectClient|Error? socketClient = new("www.remoteHost.com", 48830, localHost = "localhost", timeoutInMillis = 1000);
+    ConnectClient|Error? socketClient = new("www.remote.com", 48830, localHost = "localhost", timeoutInMillis = 1000);
     if (socketClient is ConnectClient) {
         
     var result = socketClient->readBytes();
     if (result is byte[]) {
-        test:assertFail(msg = "No UDP service on www.remoteHost.com result can't be returned");
+        test:assertFail(msg = "No UDP service running on www.remote.com, no result should be returned");
     } else {
         log:print(result.message());
     }
-        checkpanic socketClient->close();
+
+    checkpanic socketClient->close();
         
     } else if (socketClient is Error) {
         log:printError("Error initializing UDP Client", err = socketClient);
