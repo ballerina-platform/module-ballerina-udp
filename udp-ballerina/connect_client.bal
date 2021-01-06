@@ -55,7 +55,7 @@ public client class ConnectClient {
         return externConnectClientRead(self);
     }
 
-    # Free up the occupied socket 
+    # Free up the occupied socket.
     # ```ballerina
     # udp:Error? closeResult = socketClient->close();
     # ```
