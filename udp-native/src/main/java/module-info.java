@@ -21,6 +21,7 @@ module io.ballerina.stdlib.udp {
     requires io.ballerina.lang;
     requires io.ballerina.tools.api;
     requires org.slf4j;
+    requires io.netty.all;
     exports org.ballerinalang.stdlib.udp.endpoint;
     exports org.ballerinalang.stdlib.udp;
 }
