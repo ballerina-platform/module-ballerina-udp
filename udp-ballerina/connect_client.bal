@@ -66,7 +66,7 @@ public client class ConnectClient {
     }
 }
 
-# Configurations for the connection oriented udp client
+# Configurations for the connection oriented udp client.
 # 
 # + localHost - Local binding of the interface
 # + timeoutInMillis - The socket reading timeout value to be used 
