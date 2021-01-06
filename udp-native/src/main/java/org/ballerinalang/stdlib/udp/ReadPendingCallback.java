@@ -38,11 +38,13 @@ public class ReadPendingCallback {
     private int socketHash;
     private Timer timer;
     private long timeout;
+    private SocketConstants.CallFrom calledBy;
 
-    public ReadPendingCallback(Future balFuture, int socketHash, long timeout) {
+    public ReadPendingCallback(Future balFuture, int socketHash, long timeout, SocketConstants.CallFrom calledBy) {
         this.balFuture = balFuture;
         this.socketHash = socketHash;
         this.timeout = timeout;
+        this.calledBy = calledBy;
         scheduleTimeout(timeout);
     }
 
@@ -60,6 +62,10 @@ public class ReadPendingCallback {
 
     public void setBuffer(ByteBuffer buffer) {
         this.buffer = buffer;
+    }
+
+    public SocketConstants.CallFrom getCalledBy() {
+        return this.calledBy;
     }
 
     private void scheduleTimeout(long timeout) {
@@ -98,4 +104,5 @@ public class ReadPendingCallback {
             }
         };
     }
+
 }

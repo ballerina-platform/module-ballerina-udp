@@ -54,11 +54,19 @@ public class SocketConstants {
     public static final String LOCALHOST = "localHost";
 
     /**
+     * Specifies the client and listener types.
+     */
+    public enum CallFrom {
+        CONNECTIONLESS_CLIENT,
+        CONNECT_CLIENT
+    }
+
+    /**
      * Specifies the error type for udp module.
      */
     public enum ErrorType {
 
-        GenericError("GenericError"), ReadTimedOutError("ReadTimedOut");
+        GenericError("GenericError"), ReadTimedOutError("ReadTimedOutError");
 
         private String errorType;
 

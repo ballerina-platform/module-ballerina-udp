@@ -20,6 +20,7 @@ package org.ballerinalang.stdlib.udp;
 
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
@@ -215,18 +216,11 @@ public class SelectorManager {
     private void readUdpSocket(SocketReader socketReader, ReadPendingCallback callback) {
         DatagramChannel channel = (DatagramChannel) socketReader.getSocketService().getSocketChannel();
         try {
-            ByteBuffer buffer = createBuffer(callback, channel);
-            final InetSocketAddress remoteAddress = (InetSocketAddress) channel.receive(buffer);
-            callback.resetTimeout();
-            final int bufferPosition = buffer.position();
-            callback.updateCurrentLength(bufferPosition);
-            // Re-register for read ready events.
-            socketReader.getSelectionKey().interestOps(OP_READ);
-            selector.wakeup();
-            byte[] bytes = SocketUtils
-                    .getByteArrayFromByteBuffer(callback.getBuffer() == null ? buffer : callback.getBuffer());
-            callback.getFuture().complete(createUdpSocketReturnValue(callback, bytes, remoteAddress));
-            callback.cancelTimeout();
+            if (callback.getCalledBy() == SocketConstants.CallFrom.CONNECTIONLESS_CLIENT) {
+                processConnectionLessClientReceive(socketReader, callback, channel);
+            } else if (callback.getCalledBy() == SocketConstants.CallFrom.CONNECT_CLIENT) {
+                processConnectClientRead(socketReader, callback, channel);
+            }
         } catch (CancelledKeyException | ClosedChannelException e) {
             processError(callback, null, "connection closed");
         } catch (IOException e) {
@@ -236,6 +230,38 @@ public class SelectorManager {
             log.error(e.getMessage(), e);
             processError(callback, ReadTimedOutError, "Error occured on receive operation.");
         }
+    }
+
+    private void processConnectClientRead(SocketReader socketReader, ReadPendingCallback callback,
+                                          DatagramChannel channel) throws IOException {
+        ByteBuffer buffer = createBuffer(callback, channel);
+        channel.read(buffer);
+        callback.resetTimeout();
+        final int bufferPosition = buffer.position();
+        callback.updateCurrentLength(bufferPosition);
+        // Re-register for read ready events.
+        socketReader.getSelectionKey().interestOps(OP_READ);
+        selector.wakeup();
+        byte[] bytes = SocketUtils
+                .getByteArrayFromByteBuffer(callback.getBuffer() == null ? buffer : callback.getBuffer());
+        callback.getFuture().complete(createUdpSocketReturnValue(callback, bytes));
+        callback.cancelTimeout();
+    }
+
+    private void processConnectionLessClientReceive(SocketReader socketReader, ReadPendingCallback callback,
+                                                    DatagramChannel channel) throws IOException {
+        ByteBuffer buffer = createBuffer(callback, channel);
+        final InetSocketAddress remoteAddress = (InetSocketAddress) channel.receive(buffer);
+        callback.resetTimeout();
+        final int bufferPosition = buffer.position();
+        callback.updateCurrentLength(bufferPosition);
+        // Re-register for read ready events.
+        socketReader.getSelectionKey().interestOps(OP_READ);
+        selector.wakeup();
+        byte[] bytes = SocketUtils
+                .getByteArrayFromByteBuffer(callback.getBuffer() == null ? buffer : callback.getBuffer());
+        callback.getFuture().complete(createUdpSocketReturnValue(callback, bytes, remoteAddress));
+        callback.cancelTimeout();
     }
 
     private void processError(ReadPendingCallback callback, SocketConstants.ErrorType type, String msg) {
@@ -254,6 +280,10 @@ public class SelectorManager {
                 StringUtils.fromString(remoteAddress.getHostName()));
         datagram.put(StringUtils.fromString(SocketConstants.DATAGRAM_DATA), ValueCreator.createArrayValue(bytes));
         return  datagram;
+    }
+
+    private BArray createUdpSocketReturnValue(ReadPendingCallback callback, byte[] bytes) {
+        return ValueCreator.createArrayValue(bytes);
     }
 
     private ByteBuffer createBuffer(ReadPendingCallback callback, int osBufferSize) {
