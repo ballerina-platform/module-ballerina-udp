@@ -18,14 +18,13 @@ import ballerina/java;
 
 # Initializes the UDP connection oriented client based on the 
 # provided configurations.
-#
 public client class ConnectClient {
    
     # Initializes the UDP connect client based on the 
     # provided configurations.
     # ```ballerina
     # udp:ConnectClient|udp:Error? socketClient = new("www.remote.com", 80,
-    #                              localHost="localHost");
+    #                              localHost = "localHost");
     # ```
     # + remoteHost - The hostname of the remote host
     # + remotePort - The port number of the remmote host
@@ -46,7 +45,7 @@ public client class ConnectClient {
         return externConnectClientWrite(self, data);
     }
 
-    # Reads data from the remote host. 
+    # Reads data only from the connected remote host. 
     # ```ballerina
     # udp:Datagram|udp:Error result = socketClient->receiveDatagram();
     # ```
