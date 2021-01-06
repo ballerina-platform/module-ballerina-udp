@@ -83,7 +83,7 @@ public class ConnectionlessClientActions {
             balFuture.complete(SocketUtils.createSocketError("Unable to initialize the selector."));
             return null;
         } catch (SocketException e) {
-            balFuture.complete(SocketUtils.createSocketError("Unable to a port."));
+            balFuture.complete(SocketUtils.createSocketError("Unable to bind to a local port."));
             return null;
         } catch (IOException e) {
             log.error("Unable to initiate the client udp", e);
@@ -129,7 +129,7 @@ public class ConnectionlessClientActions {
             }
             return null;
         } catch (ClosedChannelException e) {
-            return SocketUtils.createSocketError("udp client closed already.");
+            return SocketUtils.createSocketError("UDP client is already closed .");
         } catch (IOException e) {
             log.error("Unable to perform write[" + socket.hashCode() + "]", e);
             return SocketUtils.createSocketError("write failed. " + e.getMessage());

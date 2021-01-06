@@ -21,8 +21,6 @@ import ballerina/java;
 # + localHost - The local IP address string in textual presentation to which
 #                the socket is bound
 public client class Client {
- 
-    // private string? localHost = ();
    
     # Initializes the UDP connectionless client based on the provided 
     # configurations.
