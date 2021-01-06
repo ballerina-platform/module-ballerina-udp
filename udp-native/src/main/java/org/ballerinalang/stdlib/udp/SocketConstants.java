@@ -66,7 +66,7 @@ public class SocketConstants {
      */
     public enum ErrorType {
 
-        GenericError("GenericError"), ReadTimedOutError("ReadTimedOut");
+        GenericError("GenericError"), ReadTimedOutError("ReadTimedOutError");
 
         private String errorType;
 
