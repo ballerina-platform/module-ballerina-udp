@@ -16,14 +16,11 @@
 
 import ballerina/java;
 
-# Initializes the UDP connectionless client based on the provided configurations.
-#
-# + localHost - The local IP address string in textual presentation to which the socket is bound
+# Initializes the UDP connectionless client based on the provided configurations
 public client class Client {
- 
-    private string? localHost = ();
    
-    # Initializes the UDP connectionless client based on the provided configurations.
+    # Initializes the UDP connectionless client based on the provided 
+    # configurations.
     # ```ballerina
     # udp:Client|udp:Error? socketClient = new(localHost = "localhost");
     # ```
@@ -35,10 +32,12 @@ public client class Client {
 
     # Sends the given data to the specified remote host.
     # ```ballerina
-    # udp:Error? result = socketClient->sendDatagram({remoteHost: "localhost", remotePort: 48826, data:"msg".toBytes()});
+    # udp:Error? result = socketClient->sendDatagram({remoteHost: "localhost",
+    #            remotePort: 48826, data:"msg".toBytes()});
     # ```
     #
-    # + datagram - Contains the data to be sent to the remote host socket and the address of the remote host
+    # + datagram - Contains the data to be sent to the remote host
+    #              and the address of the remote host
     # + return - () or else a `udp:Error` if the given data can't be sent
     isolated remote function sendDatagram(Datagram datagram) returns Error? {
         return externConnectionlessSend(self, datagram);
@@ -49,7 +48,8 @@ public client class Client {
     # udp:Datagram|udp:Error result = socketClient->receiveDatagram();
     # ```
     #
-    # + return - The Datagram, or else a `udp:Error` if the data can't be read from the remote host
+    # + return - The Datagram, or else a `udp:Error` if the data 
+    #            can't be read from the remote host
     isolated remote function receiveDatagram() returns Datagram|Error {
         return externConnectionlessReceive(self);
     }
@@ -76,14 +76,15 @@ public client class Client {
 public type Datagram record {|
    string remoteHost;
    int remotePort;
-   readonly byte[] data;
+   byte[] data;
 |};
 
 # Configurations for the connectionless udp client
 # 
 # + localHost - Local binding of the interface
-# + timeoutInMillis - The socket reading timeout value to be used in milliseconds. If this is not set,
-#                         the default value of 300000 milliseconds (5 minutes) will be used.
+# + timeoutInMillis - The socket reading timeout value to be used in 
+#                     milliseconds. If this is not set,the default value of
+#                     300000 milliseconds (5 minutes) will be used.
 public type ClientConfig record {
    int timeoutInMillis = 30000;
    string? localHost = ();
