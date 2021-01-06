@@ -25,3 +25,9 @@ groupId = "org.ballerinalang.stdlib.udp"
 scope = "testOnly"
 artifactId = "udp"
 version = "@project.version@"
+
+[[platform.java11.dependency]]
+artifactId = "netty-all"
+version = "@netty.version@"
+path = "./build/libs/netty-all-@netty.version@.jar"
+groupId = "io.netty"
