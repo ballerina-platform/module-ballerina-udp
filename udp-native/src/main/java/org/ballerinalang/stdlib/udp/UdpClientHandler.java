@@ -33,28 +33,18 @@ import static org.ballerinalang.stdlib.udp.SocketUtils.getUdpPackage;
 
 /**
  *  {@link UdpClientHandler} ia a ChannelInboundHandler implementation for udp client.
- *
  */
 public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
     private Future callback;
-    private SocketConstants.CallFrom callFrom;
 
     public UdpClientHandler(){}
-
-    public UdpClientHandler(Future callback, SocketConstants.CallFrom callFrom) {
-        this.callback = callback;
-        this.callFrom = callFrom;
-    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
                                 DatagramPacket datagramPacket) throws Exception {
-        if (callFrom == SocketConstants.CallFrom.CONNECTIONLESS_CLIENT) {
-            callback.complete(returnDatagram(datagramPacket));
-        } else {
-            callback.complete(returnByteArray(datagramPacket));
-        }
+        callback.complete(returnDatagram(datagramPacket));
+        ctx.channel().pipeline().remove(SocketConstants.READ_TIMEOUT_HANDLER);
     }
 
     @Override
@@ -63,12 +53,18 @@ public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             // return timeout error
             callback.complete(SocketUtils.createSocketError(SocketConstants.ErrorType.ReadTimedOutError,
                     "Read timed out"));
+            ctx.channel().pipeline().remove(SocketConstants.READ_TIMEOUT_HANDLER);
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+        callback.complete(SocketUtils.createSocketError(cause.getMessage()));
+        ctx.channel().pipeline().remove(SocketConstants.READ_TIMEOUT_HANDLER);
+    }
+
+    public void setCallback(Future callback) {
+        this.callback = callback;
     }
 
     private BMap<BString, Object> returnDatagram(DatagramPacket datagramPacket) {

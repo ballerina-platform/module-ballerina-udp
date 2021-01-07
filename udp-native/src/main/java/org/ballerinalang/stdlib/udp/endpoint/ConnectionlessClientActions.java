@@ -77,9 +77,9 @@ public class ConnectionlessClientActions {
         long readTimeOut = (long) client.getNativeData(SocketConstants.CONFIG_READ_TIMEOUT);
         try {
             UdpClient udpClient = (UdpClient) client.getNativeData(SocketConstants.CONNECTIONLESS_CLIENT);
-            udpClient.receiveData(readTimeOut, callback, SocketConstants.CallFrom.CONNECTIONLESS_CLIENT);
+            udpClient.receiveData(readTimeOut, callback);
         } catch (InterruptedException e) {
-            callback.complete(SocketUtils.createSocketError("Error while receiving data"));
+            callback.complete(SocketUtils.createSocketError("Error while receiving data."));
         }
 
         return null;
@@ -98,7 +98,6 @@ public class ConnectionlessClientActions {
         UdpClient udpClient = (UdpClient) client.getNativeData(SocketConstants.CONNECTIONLESS_CLIENT);
         udpClient.sendData(datagramPacket, callback);
 
-        callback.complete(null);
         return null;
     }
     

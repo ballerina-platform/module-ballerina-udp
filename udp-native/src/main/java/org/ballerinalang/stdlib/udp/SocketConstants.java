@@ -50,15 +50,13 @@ public class SocketConstants {
     public static final String CONFIG_READ_TIMEOUT = "timeoutInMillis";
     public static final String CONFIG_LOCALHOST = "localHost";
 
-    public static final String REMOTE_ADDRESS = "remoteAddress";
+    // Constant handler names
+    public static final String READ_TIMEOUT_HANDLER = "readTimeoutHandler";
+    public static final String CONNECTIONLESS_CLIENT_HANDLER = "clientHandler";
+    public static final String CONNECT_CLIENT_HANDLER = "connectClientHandler";
 
-    /**
-     * Specifies the client and listener types.
-     */
-    public enum CallFrom {
-        CONNECTIONLESS_CLIENT,
-        CONNECT_CLIENT
-    }
+
+    public static final String REMOTE_ADDRESS = "remoteAddress";
 
     /**
      * Specifies the error type for udp module.

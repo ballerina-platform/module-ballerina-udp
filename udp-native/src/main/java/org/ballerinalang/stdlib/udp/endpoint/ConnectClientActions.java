@@ -81,9 +81,9 @@ public class ConnectClientActions {
         long readTimeOut = (long) client.getNativeData(SocketConstants.CONFIG_READ_TIMEOUT);
         try {
             UdpClient udpClient = (UdpClient) client.getNativeData(SocketConstants.CONNECT_CLIENT);
-            udpClient.receiveData(readTimeOut, balFuture, SocketConstants.CallFrom.CONNECT_CLIENT);
+            udpClient.receiveData(readTimeOut, balFuture);
         } catch (InterruptedException e) {
-            balFuture.complete(SocketUtils.createSocketError("Error while receiving data"));
+            balFuture.complete(SocketUtils.createSocketError("Error while receiving data."));
         }
 
         return null;
@@ -99,7 +99,6 @@ public class ConnectClientActions {
         UdpClient udpClient = (UdpClient) client.getNativeData(SocketConstants.CONNECT_CLIENT);
         udpClient.sendData(datagramPacket, balFuture);
 
-        balFuture.complete(null);
         return null;
     }
     

@@ -75,7 +75,7 @@ function testContentReceive() {
 
         // repeating the send and receive
         sendResult = socketClient->sendDatagram(datagram);
-              if (sendResult is ()) {
+        if (sendResult is ()) {
             log:print("Datagram was sent to the remote host.");
         } else {
             test:assertFail(msg = sendResult.message());
