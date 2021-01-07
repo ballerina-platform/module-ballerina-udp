@@ -39,7 +39,6 @@ public client class ConnectClient {
     # ```
     #
     # + data - The data need to be sent to the connected remote host
-    # 
     # + return - () or else a `udp:Error` if the given data can't be sent
     isolated remote function writeBytes(byte[] data) returns Error? {
         return externConnectClientWrite(self, data);
@@ -56,7 +55,7 @@ public client class ConnectClient {
         return externConnectClientRead(self);
     }
 
-    # Free up the occupied socket 
+    # Free up the occupied socket.
     # ```ballerina
     # udp:Error? closeResult = socketClient->close();
     # ```
@@ -67,7 +66,7 @@ public client class ConnectClient {
     }
 }
 
-# Configurations for the connection oriented udp client
+# Configurations for the connection oriented udp client.
 # 
 # + localHost - Local binding of the interface
 # + timeoutInMillis - The socket reading timeout value to be used 
@@ -103,4 +102,3 @@ isolated function externConnectClientWrite(ConnectClient connectClient, byte[] d
     name: "write",
     'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectClientActions"
 } external;
-
