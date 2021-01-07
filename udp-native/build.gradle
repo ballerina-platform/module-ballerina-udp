@@ -26,7 +26,9 @@ dependencies {
     checkstyle project(':build-config:checkstyle')
     checkstyle "com.puppycrawl.tools:checkstyle:${puppycrawlCheckstyleVersion}"
     
-    compile group: 'io.netty', name: 'netty-all', version:"${nettyVersion}"
+    compile group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}"
+    compile group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}"
+    compile group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}"
     compile group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
     compile group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
     compile group: 'org.ballerinalang', name: 'ballerina-tools-api', version: "${ballerinaLangVersion}"

@@ -28,7 +28,13 @@ dependencies {
     jbalTools ("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
         transitive = false
     }
-    externalJars (group: 'io.netty', name: 'netty-all', version: "${nettyVersion}") {
+    externalJars (group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}") {
+        transitive = false
+    }
+     externalJars (group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}") {
+        transitive = false
+    }
+     externalJars (group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}") {
         transitive = false
     }
     compile project(':udp-native')

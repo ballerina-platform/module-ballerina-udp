@@ -27,7 +27,19 @@ artifactId = "udp"
 version = "@project.version@"
 
 [[platform.java11.dependency]]
-artifactId = "netty-all"
+artifactId = "netty-handler"
 version = "@netty.version@"
-path = "./build/libs/netty-all-@netty.version@.jar"
+path = "./build/libs/netty-handler-@netty.version@.jar"
+groupId = "io.netty"
+
+[[platform.java11.dependency]]
+artifactId = "netty-buffer"
+version = "@netty.version@"
+path = "./build/libs/netty-buffer-@netty.version@.jar"
+groupId = "io.netty"
+
+[[platform.java11.dependency]]
+artifactId = "netty-transport"
+version = "@netty.version@"
+path = "./build/libs/netty-transport-@netty.version@.jar"
 groupId = "io.netty"
