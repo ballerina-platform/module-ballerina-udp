@@ -72,6 +72,18 @@ function testContentReceive() {
         string readContent = receiveClientContent(socketClient);
         string expectedResponse = "Hi client! here is your data";
         test:assertEquals(readContent, expectedResponse, "Found an unexpected output");
+
+        // repeating the send and receive
+        sendResult = socketClient->sendDatagram(datagram);
+              if (sendResult is ()) {
+            log:print("Datagram was sent to the remote host.");
+        } else {
+            test:assertFail(msg = sendResult.message());
+        }
+        
+        readContent = receiveClientContent(socketClient);
+        test:assertEquals(readContent, expectedResponse, "Found an unexpected output");
+
         checkpanic socketClient->close();
 
     } else if (socketClient is Error) {
