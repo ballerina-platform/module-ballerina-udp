@@ -23,10 +23,6 @@ import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
 
-import java.nio.ByteBuffer;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import static org.ballerinalang.stdlib.udp.SocketConstants.ErrorType.GenericError;
 
 /**
@@ -61,47 +57,6 @@ public class SocketUtils {
         return ErrorCreator.createDistinctError(type.errorType(), getUdpPackage(), StringUtils.fromString(errMsg));
     }
 
-
-    /**
-     * This will return a byte array that only contains the data from ByteBuffer.
-     * This will not copy any unused byte from ByteBuffer.
-     *
-     * @param content {@link ByteBuffer} with content
-     * @return a byte array
-     */
-    public static byte[] getByteArrayFromByteBuffer(ByteBuffer content) {
-        int contentLength = content.position();
-        byte[] bytesArray = new byte[contentLength];
-        content.flip();
-        content.get(bytesArray, 0, contentLength);
-        return bytesArray;
-    }
-
-    /**
-     * This will try to shutdown executor service gracefully.
-     *
-     * @param executorService {@link ExecutorService} that need shutdown
-     */
-    public static void shutdownExecutorGracefully(ExecutorService executorService) {
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(1, TimeUnit.MINUTES)) {
-                executorService.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            executorService.shutdownNow();
-        }
-    }
-
-    /**
-     * This will shutdown executor immediately.
-     *
-     * @param executorService {@link ExecutorService} that need shutdown
-     */
-    public static void shutdownExecutorImmediately(ExecutorService executorService) {
-        executorService.shutdownNow();
-    }
 
     /**
      * Gets ballerina udp package.
