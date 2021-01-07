@@ -1,33 +1,33 @@
 [package]
 org = "ballerina"
 name = "udp"
-version = "0.8.1"
+version = "@toml.version@"
 
 [[dependency]]
 org = "ballerina"
 name = "io"
-version = "0.5.5"
+version = "@stdlib.io.version@"
 
 [[dependency]]
 org = "ballerina"
 name = "log"
-version = "1.0.5"
+version = "@stdlib.log.version@"
 
 [[platform.java11.dependency]]
-path = "../udp-native/build/libs/udp-native-0.8.1-SNAPSHOT.jar"
+path = "../udp-native/build/libs/udp-native-@project.version@.jar"
 groupId = "ballerina"
 artifactId = "udp"
-version = "0.8.1-SNAPSHOT"
+version = "@project.version@"
 
 [[platform.java11.dependency]]
-path = "../udp-test-utils/build/libs/udp-test-utils-0.8.1-SNAPSHOT.jar"
+path = "../udp-test-utils/build/libs/udp-test-utils-@project.version@.jar"
 groupId = "org.ballerinalang.stdlib.udp"
 scope = "testOnly"
 artifactId = "udp"
-version = "0.8.1-SNAPSHOT"
+version = "@project.version@"
 
 [[platform.java11.dependency]]
 artifactId = "netty-all"
-version = "4.1.50.Final"
-path = "./build/libs/netty-all-4.1.50.Final.jar"
+version = "@netty.version@"
+path = "./build/libs/netty-all-@netty.version@.jar"
 groupId = "io.netty"
