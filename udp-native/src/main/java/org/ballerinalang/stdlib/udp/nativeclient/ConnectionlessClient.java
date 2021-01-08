@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.ballerinalang.stdlib.udp.endpoint;
+package org.ballerinalang.stdlib.udp.nativeclient;
 
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Future;
@@ -26,10 +26,10 @@ import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.socket.DatagramPacket;
-import org.ballerinalang.stdlib.udp.SocketConstants;
-import org.ballerinalang.stdlib.udp.SocketUtils;
+import org.ballerinalang.stdlib.udp.Constants;
 import org.ballerinalang.stdlib.udp.UdpClient;
 import org.ballerinalang.stdlib.udp.UdpFactory;
+import org.ballerinalang.stdlib.udp.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,13 +41,13 @@ import java.net.InetSocketAddress;
  *
  * @since 1.1.0
  */
-public class ConnectionlessClientActions {
-    private static final Logger log = LoggerFactory.getLogger(ConnectionlessClientActions.class);
+public class ConnectionlessClient {
+    private static final Logger log = LoggerFactory.getLogger(ConnectionlessClient.class);
 
     public static Object initEndpoint(Environment env, BObject client, BMap<BString, Object> config) {
         final Future balFuture = env.markAsync();
 
-        Object host = config.getNativeData(SocketConstants.CONFIG_LOCALHOST);
+        Object host = config.getNativeData(Constants.CONFIG_LOCALHOST);
         InetSocketAddress localAddress = null;
         if (host == null) {
            // A port number of zero will let the system pick up an ephemeral port in a bind operation.
@@ -57,14 +57,14 @@ public class ConnectionlessClientActions {
             localAddress = new InetSocketAddress(hostname, 0);
         }
 
-        long timeout = config.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_READ_TIMEOUT));
-        client.addNativeData(SocketConstants.CONFIG_READ_TIMEOUT, timeout);
+        long timeout = config.getIntValue(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT));
+        client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
 
         try {
            UdpClient udpClient = UdpFactory.createUdpClient(localAddress);
-           client.addNativeData(SocketConstants.CONNECTIONLESS_CLIENT, udpClient);
+           client.addNativeData(Constants.CONNECTIONLESS_CLIENT, udpClient);
         } catch (InterruptedException e) {
-            balFuture.complete(SocketUtils.createSocketError("Unable to initialize the udp client."));
+            balFuture.complete(Utils.createSocketError("Unable to initialize the udp client."));
         }
 
         balFuture.complete(null);
@@ -74,12 +74,12 @@ public class ConnectionlessClientActions {
     public static Object receive(Environment env, BObject client) {
         final Future callback = env.markAsync();
 
-        long readTimeOut = (long) client.getNativeData(SocketConstants.CONFIG_READ_TIMEOUT);
+        long readTimeOut = (long) client.getNativeData(Constants.CONFIG_READ_TIMEOUT);
         try {
-            UdpClient udpClient = (UdpClient) client.getNativeData(SocketConstants.CONNECTIONLESS_CLIENT);
+            UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECTIONLESS_CLIENT);
             udpClient.receiveData(readTimeOut, callback);
         } catch (InterruptedException e) {
-            callback.complete(SocketUtils.createSocketError("Error while receiving data."));
+            callback.complete(Utils.createSocketError("Error while receiving data."));
         }
 
         return null;
@@ -88,14 +88,14 @@ public class ConnectionlessClientActions {
     public static Object send(Environment env, BObject client, BMap<BString, Object> datagram) {
         final Future callback = env.markAsync();
 
-        String host = datagram.getStringValue(StringUtils.fromString(SocketConstants.DATAGRAM_REMOTE_HOST)).getValue();
-        int port = datagram.getIntValue(StringUtils.fromString(SocketConstants.DATAGRAM_REMOTE_PORT)).intValue();
-        BArray data = datagram.getArrayValue(StringUtils.fromString(SocketConstants.DATAGRAM_DATA));
+        String host = datagram.getStringValue(StringUtils.fromString(Constants.DATAGRAM_REMOTE_HOST)).getValue();
+        int port = datagram.getIntValue(StringUtils.fromString(Constants.DATAGRAM_REMOTE_PORT)).intValue();
+        BArray data = datagram.getArrayValue(StringUtils.fromString(Constants.DATAGRAM_DATA));
         byte[] byteContent = data.getBytes();
         DatagramPacket datagramPacket = new DatagramPacket(Unpooled.wrappedBuffer(byteContent),
                 new InetSocketAddress(host, port));
 
-        UdpClient udpClient = (UdpClient) client.getNativeData(SocketConstants.CONNECTIONLESS_CLIENT);
+        UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECTIONLESS_CLIENT);
         udpClient.sendData(datagramPacket, callback);
 
         return null;
@@ -103,11 +103,11 @@ public class ConnectionlessClientActions {
     
     public static Object close(BObject client) {
         try {
-        UdpClient udpClient = (UdpClient) client.getNativeData(SocketConstants.CONNECTIONLESS_CLIENT);
+        UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECTIONLESS_CLIENT);
         udpClient.shutdown();
         } catch (InterruptedException e) {
             log.error("Unable to close the UDP client.", e);
-            return SocketUtils.createSocketError("Unable to close the  UDP client. " + e.getMessage());
+            return Utils.createSocketError("Unable to close the  UDP client. " + e.getMessage());
         }
 
         return null;

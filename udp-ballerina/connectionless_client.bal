@@ -95,24 +95,24 @@ public type ClientConfig record {
 isolated function initConnectionlessClient(Client udpClient, ClientConfig config) returns Error? =
 @java:Method {
     name: "initEndpoint",
-    'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectionlessClientActions"
+    'class: "org.ballerinalang.stdlib.udp.nativeclient.ConnectionlessClient"
 } external;
 
 isolated function externConectionlessClientClose(Client udpClient) returns Error? =
 @java:Method {
     name: "close",
-    'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectionlessClientActions"
+    'class: "org.ballerinalang.stdlib.udp.nativeclient.ConnectionlessClient"
 } external;
 
 isolated function externConnectionlessReceive(Client udpClient) returns Datagram|Error =
 @java:Method {
     name: "receive",
-    'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectionlessClientActions"
+    'class: "org.ballerinalang.stdlib.udp.nativeclient.ConnectionlessClient"
 } external;
 
 isolated function externConnectionlessSend(Client udpClient, Datagram datagram) returns Error? =
 @java:Method {
     name: "send",
-    'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectionlessClientActions"
+    'class: "org.ballerinalang.stdlib.udp.nativeclient.ConnectionlessClient"
 } external;
 

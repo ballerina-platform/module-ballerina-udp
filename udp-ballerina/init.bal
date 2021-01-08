@@ -21,5 +21,5 @@ function init() {
 }
 
 function setModule() = @java:Method {
-    'class: "org.ballerinalang.stdlib.udp.ModuleUtils"
+    'class: "org.ballerinalang.stdlib.udp.Utils"
 } external;

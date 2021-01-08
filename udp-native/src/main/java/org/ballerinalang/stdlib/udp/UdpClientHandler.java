@@ -29,7 +29,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.timeout.IdleStateEvent;
 
-import static org.ballerinalang.stdlib.udp.SocketUtils.getUdpPackage;
+import static org.ballerinalang.stdlib.udp.Utils.getUdpPackage;
 
 /**
  *  {@link UdpClientHandler} ia a ChannelInboundHandler implementation for udp client.
@@ -42,23 +42,23 @@ public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket
     protected void channelRead0(ChannelHandlerContext ctx,
                                 DatagramPacket datagramPacket) throws Exception {
         callback.complete(returnDatagram(datagramPacket));
-        ctx.channel().pipeline().remove(SocketConstants.READ_TIMEOUT_HANDLER);
+        ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
     }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
             // return timeout error
-            callback.complete(SocketUtils.createSocketError(SocketConstants.ErrorType.ReadTimedOutError,
+            callback.complete(Utils.createSocketError(Constants.ErrorType.ReadTimedOutError,
                     "Read timed out"));
-            ctx.channel().pipeline().remove(SocketConstants.READ_TIMEOUT_HANDLER);
+            ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        callback.complete(SocketUtils.createSocketError(cause.getMessage()));
-        ctx.channel().pipeline().remove(SocketConstants.READ_TIMEOUT_HANDLER);
+        callback.complete(Utils.createSocketError(cause.getMessage()));
+        ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
     }
 
     public void setCallback(Future callback) {
@@ -70,12 +70,12 @@ public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket
         datagramPacket.content().readBytes(byteContent);
 
         BMap<BString, Object> datagram = ValueCreator.createRecordValue(getUdpPackage(),
-                SocketConstants.DATAGRAM_RECORD);
-        datagram.put(StringUtils.fromString(SocketConstants.DATAGRAM_REMOTE_PORT),
+                Constants.DATAGRAM_RECORD);
+        datagram.put(StringUtils.fromString(Constants.DATAGRAM_REMOTE_PORT),
                 datagramPacket.recipient().getPort());
-        datagram.put(StringUtils.fromString(SocketConstants.DATAGRAM_REMOTE_HOST),
+        datagram.put(StringUtils.fromString(Constants.DATAGRAM_REMOTE_HOST),
                 StringUtils.fromString(datagramPacket.recipient().getHostName()));
-        datagram.put(StringUtils.fromString(SocketConstants.DATAGRAM_DATA),
+        datagram.put(StringUtils.fromString(Constants.DATAGRAM_DATA),
                 ValueCreator.createArrayValue(byteContent));
         return  datagram;
     }
