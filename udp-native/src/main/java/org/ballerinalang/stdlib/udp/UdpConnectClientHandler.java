@@ -34,7 +34,7 @@ public class UdpConnectClientHandler extends UdpClientHandler {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
                                 DatagramPacket datagramPacket) throws Exception {
-        callback.complete(returnByteArray(datagramPacket));
+        callback.complete(getBytesFromDatagram(datagramPacket));
         ctx.channel().pipeline().remove(SocketConstants.READ_TIMEOUT_HANDLER);
     }
     @Override
@@ -43,7 +43,7 @@ public class UdpConnectClientHandler extends UdpClientHandler {
         this.callback = callback;
     }
 
-    private BArray returnByteArray(DatagramPacket datagramPacket) {
+    private BArray getBytesFromDatagram(DatagramPacket datagramPacket) {
         byte[] byteContent = new byte[datagramPacket.content().readableBytes()];
         datagramPacket.content().readBytes(byteContent);
 

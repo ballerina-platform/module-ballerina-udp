@@ -55,7 +55,6 @@ public class SocketConstants {
     public static final String CONNECTIONLESS_CLIENT_HANDLER = "clientHandler";
     public static final String CONNECT_CLIENT_HANDLER = "connectClientHandler";
 
-
     public static final String REMOTE_ADDRESS = "remoteAddress";
 
     /**

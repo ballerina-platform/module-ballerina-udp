@@ -38,8 +38,6 @@ public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket
 
     private Future callback;
 
-    public UdpClientHandler(){}
-
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
                                 DatagramPacket datagramPacket) throws Exception {

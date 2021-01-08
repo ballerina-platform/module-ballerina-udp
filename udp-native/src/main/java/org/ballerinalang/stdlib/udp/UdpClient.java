@@ -62,6 +62,8 @@ public class UdpClient {
         channel.connect(remoteAddress).sync().addListener((ChannelFutureListener) future -> {
             if (!future.isSuccess()) {
                 callback.complete(SocketUtils.createSocketError("Can't connect to remote host"));
+            } else {
+                callback.complete(null);
             }
         });
     }

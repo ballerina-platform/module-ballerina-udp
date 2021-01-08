@@ -71,7 +71,6 @@ public class ConnectClientActions {
             balFuture.complete(SocketUtils.createSocketError("Unable to initialize the udp client."));
         }
 
-        balFuture.complete(null);
         return null;
     }
 
@@ -96,10 +95,10 @@ public class ConnectClientActions {
        InetSocketAddress remoteAddress = (InetSocketAddress) client.getNativeData(SocketConstants.REMOTE_ADDRESS);
        DatagramPacket datagramPacket = new DatagramPacket(Unpooled.wrappedBuffer(byteContent), remoteAddress);
 
-        UdpClient udpClient = (UdpClient) client.getNativeData(SocketConstants.CONNECT_CLIENT);
-        udpClient.sendData(datagramPacket, balFuture);
+       UdpClient udpClient = (UdpClient) client.getNativeData(SocketConstants.CONNECT_CLIENT);
+       udpClient.sendData(datagramPacket, balFuture);
 
-        return null;
+       return null;
     }
     
     public static Object close(BObject client) {
