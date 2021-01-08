@@ -29,10 +29,10 @@ import java.net.InetSocketAddress;
 public class UdpFactory {
 
     private static UdpFactory udpFactory;
-    private  EventLoopGroup group;
+    private EventLoopGroup group;
 
     private UdpFactory() {
-        group = new NioEventLoopGroup();
+        group = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() * 2);
     }
 
     private static UdpFactory getInstance() {

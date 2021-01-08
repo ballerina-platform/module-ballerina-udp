@@ -15,6 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.ballerinalang.stdlib.udp.nativeclient;
 
 import io.ballerina.runtime.api.Environment;
@@ -41,7 +42,7 @@ import java.net.InetSocketAddress;
  * @since 1.1.0
  */
 public class ConnectClient {
-    private static final Logger log = LoggerFactory.getLogger(ConnectionlessClient.class);
+    private static final Logger log = LoggerFactory.getLogger(Client.class);
 
     public static Object initEndpoint(Environment env, BObject client, BString remoteHost, 
                                       int remotePort, BMap<BString, Object> config) {
@@ -104,7 +105,7 @@ public class ConnectClient {
     public static Object close(BObject client) {
         try {
             UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECT_CLIENT);
-            udpClient.shutdown();
+            udpClient.close();
         } catch (InterruptedException e) {
             log.error("Unable to close the UDP client.", e);
             return Utils.createSocketError("Unable to close the  UDP client. " + e.getMessage());

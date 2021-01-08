@@ -97,7 +97,7 @@ public class UdpClient {
         channel.read();
     }
 
-    public void shutdown() throws InterruptedException {
+    public void close() throws InterruptedException {
         channel.close().sync();
     }
 }
