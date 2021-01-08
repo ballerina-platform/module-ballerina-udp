@@ -26,10 +26,9 @@ import static io.ballerina.runtime.api.constants.RuntimeConstants.BALLERINA_BUIL
  * Constant variable for udp related operations.
  */
 public class SocketConstants {
+
     private SocketConstants() {
     }
-
-    public static final String SOCKET_KEY = "Socket";
 
     /**
      * udp standard library package ID.
@@ -38,28 +37,25 @@ public class SocketConstants {
     @Deprecated
     public static final Module SOCKET_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "udp", "0.8.0");
     
-
-
-    public static final String SOCKET_SERVICE = "socketService";
-    public static final String IS_CLIENT = "isClient";
-
+    // Constant related to ballerina Datagram record
     public static final String DATAGRAM_RECORD = "Datagram";
     public static final String DATAGRAM_REMOTE_HOST = "remoteHost";
     public static final String DATAGRAM_REMOTE_PORT = "remotePort";
     public static final String DATAGRAM_DATA = "data";
 
+    public static final String CONNECTIONLESS_CLIENT = "client";
+    public static final String CONNECT_CLIENT = "connectClient";
 
-    // Default read timeout set as 5 min.
-    public static final String READ_TIMEOUT = "timeoutInMillis";
-    public static final String LOCALHOST = "localHost";
+    // Constant related to ballerina ClientConfig/ConnectClientConfig record
+    public static final String CONFIG_READ_TIMEOUT = "timeoutInMillis";
+    public static final String CONFIG_LOCALHOST = "localHost";
 
-    /**
-     * Specifies the client and listener types.
-     */
-    public enum CallFrom {
-        CONNECTIONLESS_CLIENT,
-        CONNECT_CLIENT
-    }
+    // Constant handler names
+    public static final String READ_TIMEOUT_HANDLER = "readTimeoutHandler";
+    public static final String CONNECTIONLESS_CLIENT_HANDLER = "clientHandler";
+    public static final String CONNECT_CLIENT_HANDLER = "connectClientHandler";
+
+    public static final String REMOTE_ADDRESS = "remoteAddress";
 
     /**
      * Specifies the error type for udp module.
@@ -68,7 +64,7 @@ public class SocketConstants {
 
         GenericError("GenericError"), ReadTimedOutError("ReadTimedOutError");
 
-        private String errorType;
+        private final String errorType;
 
         ErrorType(String errorType) {
             this.errorType = errorType;
