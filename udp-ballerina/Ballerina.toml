@@ -43,3 +43,15 @@ artifactId = "netty-transport"
 version = "@netty.version@"
 path = "./build/libs/netty-transport-@netty.version@.jar"
 groupId = "io.netty"
+
+[[platform.java11.dependency]]
+artifactId = "netty-common"
+version = "@netty.version@"
+path = "./build/libs/netty-common-@netty.version@.jar"
+groupId = "io.netty"
+
+[[platform.java11.dependency]]
+artifactId = "netty-resolver"
+version = "@netty.version@"
+path = "./build/libs/netty-resolver-@netty.version@.jar"
+groupId = "io.netty"

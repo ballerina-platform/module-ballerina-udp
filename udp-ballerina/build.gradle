@@ -31,10 +31,16 @@ dependencies {
     externalJars (group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}") {
         transitive = false
     }
-     externalJars (group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}") {
+    externalJars (group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}") {
         transitive = false
     }
-     externalJars (group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}") {
+    externalJars (group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars (group: 'io.netty', name: 'netty-common', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars (group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}") {
         transitive = false
     }
     compile project(':udp-native')
