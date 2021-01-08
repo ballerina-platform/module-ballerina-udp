@@ -19,7 +19,7 @@
 package org.ballerinalang.stdlib.udp.testutils;
 
 import io.ballerina.runtime.api.values.BString;
-import org.ballerinalang.stdlib.udp.SocketUtils;
+import org.ballerinalang.stdlib.udp.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +66,7 @@ public class MockServerUtils {
                 Thread.sleep(500);
             }
         } catch (IOException | InterruptedException e) {
-            return SocketUtils.createSocketError("write failed. " + e.getMessage());
+            return Utils.createSocketError("write failed. " + e.getMessage());
         }
         return null;
     }

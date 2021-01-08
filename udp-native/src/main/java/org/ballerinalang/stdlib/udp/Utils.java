@@ -18,21 +18,27 @@
 
 package org.ballerinalang.stdlib.udp;
 
+import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Module;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
 
-import static org.ballerinalang.stdlib.udp.SocketConstants.ErrorType.GenericError;
+import static org.ballerinalang.stdlib.udp.Constants.ErrorType.GenericError;
 
 /**
  * Represents the util functions of Socket operations.
  *
  * @since 0.985.0
  */
-public class SocketUtils {
+public class Utils {
 
-    private SocketUtils() {
+    /**
+     * udp standard library package ID.
+     */
+    private static Module udpModule = null;
+
+    private Utils() {
     }
 
     /**
@@ -53,7 +59,7 @@ public class SocketUtils {
      * @param errMsg the error message
      * @return BError instance which contains the error details
      */
-    public static BError createSocketError(SocketConstants.ErrorType type, String errMsg) {
+    public static BError createSocketError(Constants.ErrorType type, String errMsg) {
         return ErrorCreator.createDistinctError(type.errorType(), getUdpPackage(), StringUtils.fromString(errMsg));
     }
 
@@ -64,6 +70,14 @@ public class SocketUtils {
      * @return udp package.
      */
     public static Module getUdpPackage() {
-        return ModuleUtils.getModule();
+        return getModule();
+    }
+
+    public static void setModule(Environment env) {
+        udpModule = env.getCurrentModule();
+    }
+
+    public static Module getModule() {
+        return udpModule;
     }
 }

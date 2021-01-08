@@ -24,6 +24,6 @@ module io.ballerina.stdlib.udp {
     requires io.netty.transport;
     requires io.netty.handler;
     requires io.netty.buffer;
-    exports org.ballerinalang.stdlib.udp.endpoint;
+    exports org.ballerinalang.stdlib.udp.nativeclient;
     exports org.ballerinalang.stdlib.udp;
 }

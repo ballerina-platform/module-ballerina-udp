@@ -25,9 +25,9 @@ import static io.ballerina.runtime.api.constants.RuntimeConstants.BALLERINA_BUIL
 /**
  * Constant variable for udp related operations.
  */
-public class SocketConstants {
+public class Constants {
 
-    private SocketConstants() {
+    private Constants() {
     }
 
     /**

@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.ballerinalang.stdlib.udp.endpoint;
+package org.ballerinalang.stdlib.udp.nativeclient;
 
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Future;
@@ -26,10 +26,10 @@ import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.socket.DatagramPacket;
-import org.ballerinalang.stdlib.udp.SocketConstants;
-import org.ballerinalang.stdlib.udp.SocketUtils;
+import org.ballerinalang.stdlib.udp.Constants;
 import org.ballerinalang.stdlib.udp.UdpClient;
 import org.ballerinalang.stdlib.udp.UdpFactory;
+import org.ballerinalang.stdlib.udp.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,14 +40,14 @@ import java.net.InetSocketAddress;
  *
  * @since 1.1.0
  */
-public class ConnectClientActions {
-    private static final Logger log = LoggerFactory.getLogger(ConnectionlessClientActions.class);
+public class ConnectClient {
+    private static final Logger log = LoggerFactory.getLogger(ConnectionlessClient.class);
 
     public static Object initEndpoint(Environment env, BObject client, BString remoteHost, 
                                       int remotePort, BMap<BString, Object> config) {
         final Future balFuture = env.markAsync();
 
-        Object host = config.getNativeData(SocketConstants.CONFIG_LOCALHOST);
+        Object host = config.getNativeData(Constants.CONFIG_LOCALHOST);
         InetSocketAddress localAddress = null;
         if (host == null) {
             // A port number of zero will let the system pick up an ephemeral port in a bind operation.
@@ -57,18 +57,18 @@ public class ConnectClientActions {
             localAddress = new InetSocketAddress(hostname, 0);
         }
 
-        long timeout = config.getIntValue(StringUtils.fromString(SocketConstants.CONFIG_READ_TIMEOUT));
-        client.addNativeData(SocketConstants.CONFIG_READ_TIMEOUT, timeout);
+        long timeout = config.getIntValue(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT));
+        client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
 
         InetSocketAddress remoteAddress = new InetSocketAddress(remoteHost.getValue(), remotePort);
-        client.addNativeData(SocketConstants.REMOTE_ADDRESS, remoteAddress);
+        client.addNativeData(Constants.REMOTE_ADDRESS, remoteAddress);
 
         try {
             UdpClient udpClient = UdpFactory.createUdpClient(localAddress);
             udpClient.connect(remoteAddress, balFuture);
-            client.addNativeData(SocketConstants.CONNECT_CLIENT, udpClient);
+            client.addNativeData(Constants.CONNECT_CLIENT, udpClient);
         } catch (InterruptedException e) {
-            balFuture.complete(SocketUtils.createSocketError("Unable to initialize the udp client."));
+            balFuture.complete(Utils.createSocketError("Unable to initialize the udp client."));
         }
 
         return null;
@@ -77,12 +77,12 @@ public class ConnectClientActions {
     public static Object read(Environment env, BObject client) {
         final Future balFuture = env.markAsync();
 
-        long readTimeOut = (long) client.getNativeData(SocketConstants.CONFIG_READ_TIMEOUT);
+        long readTimeOut = (long) client.getNativeData(Constants.CONFIG_READ_TIMEOUT);
         try {
-            UdpClient udpClient = (UdpClient) client.getNativeData(SocketConstants.CONNECT_CLIENT);
+            UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECT_CLIENT);
             udpClient.receiveData(readTimeOut, balFuture);
         } catch (InterruptedException e) {
-            balFuture.complete(SocketUtils.createSocketError("Error while receiving data."));
+            balFuture.complete(Utils.createSocketError("Error while receiving data."));
         }
 
         return null;
@@ -92,10 +92,10 @@ public class ConnectClientActions {
        final Future balFuture = env.markAsync();
 
        byte[] byteContent = data.getBytes();
-       InetSocketAddress remoteAddress = (InetSocketAddress) client.getNativeData(SocketConstants.REMOTE_ADDRESS);
+       InetSocketAddress remoteAddress = (InetSocketAddress) client.getNativeData(Constants.REMOTE_ADDRESS);
        DatagramPacket datagramPacket = new DatagramPacket(Unpooled.wrappedBuffer(byteContent), remoteAddress);
 
-       UdpClient udpClient = (UdpClient) client.getNativeData(SocketConstants.CONNECT_CLIENT);
+       UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECT_CLIENT);
        udpClient.sendData(datagramPacket, balFuture);
 
        return null;
@@ -103,11 +103,11 @@ public class ConnectClientActions {
     
     public static Object close(BObject client) {
         try {
-            UdpClient udpClient = (UdpClient) client.getNativeData(SocketConstants.CONNECT_CLIENT);
+            UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECT_CLIENT);
             udpClient.shutdown();
         } catch (InterruptedException e) {
             log.error("Unable to close the UDP client.", e);
-            return SocketUtils.createSocketError("Unable to close the  UDP client. " + e.getMessage());
+            return Utils.createSocketError("Unable to close the  UDP client. " + e.getMessage());
         }
 
         return null;

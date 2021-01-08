@@ -48,7 +48,7 @@ public class UdpClient {
                 .handler(new ChannelInitializer<>() {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
-                        ch.pipeline().addLast(SocketConstants.CONNECTIONLESS_CLIENT_HANDLER, new UdpClientHandler());
+                        ch.pipeline().addLast(Constants.CONNECTIONLESS_CLIENT_HANDLER, new UdpClientHandler());
                     }
                 });
         channel = clientBootstrap.bind(localAddress).sync().channel();
@@ -57,11 +57,11 @@ public class UdpClient {
 
     // needed for connection oriented client
     public void connect(SocketAddress remoteAddress, Future callback) throws  InterruptedException {
-        channel.pipeline().replace(SocketConstants.CONNECTIONLESS_CLIENT_HANDLER,
-                SocketConstants.CONNECT_CLIENT_HANDLER, new UdpConnectClientHandler());
+        channel.pipeline().replace(Constants.CONNECTIONLESS_CLIENT_HANDLER,
+                Constants.CONNECT_CLIENT_HANDLER, new UdpConnectClientHandler());
         channel.connect(remoteAddress).sync().addListener((ChannelFutureListener) future -> {
             if (!future.isSuccess()) {
-                callback.complete(SocketUtils.createSocketError("Can't connect to remote host"));
+                callback.complete(Utils.createSocketError("Can't connect to remote host"));
             } else {
                 callback.complete(null);
             }
@@ -71,7 +71,7 @@ public class UdpClient {
     public void sendData(DatagramPacket datagram, Future callback) {
         channel.writeAndFlush(datagram).addListener((ChannelFutureListener) future -> {
             if (!future.isSuccess()) {
-                callback.complete(SocketUtils.createSocketError("Failed to send data"));
+                callback.complete(Utils.createSocketError("Failed to send data"));
             } else {
                 callback.complete(null);
             }
@@ -81,16 +81,16 @@ public class UdpClient {
     public void receiveData(long readTimeout, Future callback)
             throws InterruptedException {
 
-        channel.pipeline().addFirst(SocketConstants.READ_TIMEOUT_HANDLER, new IdleStateHandler(0, 0, readTimeout,
+        channel.pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(0, 0, readTimeout,
                 TimeUnit.MILLISECONDS));
 
-        if (channel.pipeline().get(SocketConstants.CONNECTIONLESS_CLIENT_HANDLER) != null) {
+        if (channel.pipeline().get(Constants.CONNECTIONLESS_CLIENT_HANDLER) != null) {
             UdpClientHandler handler = (UdpClientHandler) channel.pipeline().
-                    get(SocketConstants.CONNECTIONLESS_CLIENT_HANDLER);
+                    get(Constants.CONNECTIONLESS_CLIENT_HANDLER);
             handler.setCallback(callback);
         } else {
             UdpConnectClientHandler handler = (UdpConnectClientHandler) channel.pipeline().
-                    get(SocketConstants.CONNECT_CLIENT_HANDLER);
+                    get(Constants.CONNECT_CLIENT_HANDLER);
             handler.setCallback(callback);
         }
 

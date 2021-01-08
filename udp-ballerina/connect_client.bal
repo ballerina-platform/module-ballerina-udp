@@ -82,23 +82,23 @@ public type ConnectClientConfig record {
 isolated function initConnectClient(ConnectClient connectClient, string remoteHost, int remotePort, ConnectClientConfig config) returns Error? =
 @java:Method {
     name: "initEndpoint",
-    'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectClientActions"
+    'class: "org.ballerinalang.stdlib.udp.nativeclient.ConnectClient"
 } external;
 
 isolated function externConnectClientClose(ConnectClient connectClient) returns Error? =
 @java:Method {
     name: "close",
-    'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectClientActions"
+    'class: "org.ballerinalang.stdlib.udp.nativeclient.ConnectClient"
 } external;
 
 isolated function externConnectClientRead(ConnectClient connectClient) returns byte[]|Error =
 @java:Method {
     name: "read",
-    'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectClientActions"
+    'class: "org.ballerinalang.stdlib.udp.nativeclient.ConnectClient"
 } external;
 
 isolated function externConnectClientWrite(ConnectClient connectClient, byte[] data) returns Error? =
 @java:Method {
     name: "write",
-    'class: "org.ballerinalang.stdlib.udp.endpoint.ConnectClientActions"
+    'class: "org.ballerinalang.stdlib.udp.nativeclient.ConnectClient"
 } external;
