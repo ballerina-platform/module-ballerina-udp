@@ -132,7 +132,6 @@ task revertTomlFile {
 task ballerinaTest {
     dependsOn(":udp-native:build")
     dependsOn(":udp-test-utils:build")
-    dependsOn(copyToLib)
     dependsOn(unpackJballerinaTools)
     dependsOn(unpackStdLibs)
     dependsOn(copyStdlibs)
@@ -166,6 +165,7 @@ task ballerinaBuild {
     inputs.dir file(project.projectDir)
     dependsOn(":udp-native:build")
     dependsOn(":udp-test-utils:build")
+    dependsOn(copyToLib)
     dependsOn(unpackJballerinaTools)
     dependsOn(unpackStdLibs)
     dependsOn(copyStdlibs)
