@@ -39,10 +39,11 @@ public class UdpClient {
 
     private final Channel channel;
     private final EventLoopGroup group;
+    private final Bootstrap clientBootstrap;
 
     public UdpClient(InetSocketAddress localAddress, EventLoopGroup group) throws  InterruptedException {
         this.group = group;
-        Bootstrap clientBootstrap = new Bootstrap();
+        clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioDatagramChannel.class)
                 .handler(new ChannelInitializer<>() {
@@ -59,7 +60,7 @@ public class UdpClient {
     public void connect(SocketAddress remoteAddress, Future callback) throws  InterruptedException {
         channel.pipeline().replace(Constants.CONNECTIONLESS_CLIENT_HANDLER,
                 Constants.CONNECT_CLIENT_HANDLER, new UdpConnectClientHandler());
-        channel.connect(remoteAddress).sync().addListener((ChannelFutureListener) future -> {
+        clientBootstrap.connect(remoteAddress).sync().addListener((ChannelFutureListener) future -> {
             if (!future.isSuccess()) {
                 callback.complete(Utils.createSocketError("Can't connect to remote host"));
             } else {
