@@ -64,8 +64,7 @@ public class ConnectClient {
         client.addNativeData(Constants.REMOTE_ADDRESS, remoteAddress);
 
         try {
-            UdpClient udpClient = UdpFactory.createUdpClient(localAddress);
-            udpClient.connect(remoteAddress, balFuture);
+            UdpClient udpClient = UdpFactory.createUdpClient(localAddress, remoteAddress, balFuture);
             client.addNativeData(Constants.CONNECT_CLIENT, udpClient);
         } catch (InterruptedException e) {
             balFuture.complete(Utils.createSocketError("Unable to initialize the udp client."));

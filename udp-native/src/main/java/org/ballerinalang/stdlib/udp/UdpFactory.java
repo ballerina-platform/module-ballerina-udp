@@ -18,6 +18,7 @@
 
 package org.ballerinalang.stdlib.udp;
 
+import io.ballerina.runtime.api.Future;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 
@@ -42,7 +43,13 @@ public class UdpFactory {
         return udpFactory;
     }
 
-    public static UdpClient createUdpClient(InetSocketAddress localAddress) throws InterruptedException {
-        return new UdpClient(localAddress, getInstance().group);
+    public static UdpClient createUdpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
+                                            Future callback) throws InterruptedException {
+        return new UdpClient(localAddress, remoteAddress, getInstance().group, callback);
+    }
+
+    public static UdpClient createUdpClient(InetSocketAddress localAddress,
+                                            Future callback) throws InterruptedException {
+        return new UdpClient(localAddress, getInstance().group, callback);
     }
 }
