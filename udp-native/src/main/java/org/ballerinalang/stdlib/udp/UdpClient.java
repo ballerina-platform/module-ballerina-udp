@@ -21,6 +21,7 @@ package org.ballerinalang.stdlib.udp;
 import io.ballerina.runtime.api.Future;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -37,11 +38,31 @@ import java.util.concurrent.TimeUnit;
  */
 public class UdpClient {
 
-    private final Channel channel;
+    private Channel channel;
     private final EventLoopGroup group;
     private final Bootstrap clientBootstrap;
 
-    public UdpClient(InetSocketAddress localAddress, EventLoopGroup group) throws  InterruptedException {
+    // create connection oriented client
+    public UdpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
+                     EventLoopGroup group, Future callback) throws  InterruptedException {
+        this.group = group;
+        clientBootstrap = new Bootstrap();
+        clientBootstrap.group(group)
+                .channel(NioDatagramChannel.class)
+                .handler(new ChannelInitializer<>() {
+                    @Override
+                    protected void initChannel(Channel ch) throws Exception {
+                        ch.pipeline().addLast(Constants.CONNECTIONLESS_CLIENT_HANDLER, new UdpClientHandler());
+                    }
+                });
+        if (remoteAddress != null) {
+            this.connect(remoteAddress, localAddress, callback);
+        }
+    }
+
+    // create connection less client
+    public UdpClient(InetSocketAddress localAddress, EventLoopGroup group,
+                     Future callback) throws  InterruptedException {
         this.group = group;
         clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
@@ -54,13 +75,19 @@ public class UdpClient {
                 });
         channel = clientBootstrap.bind(localAddress).sync().channel();
         channel.config().setAutoRead(false);
+        callback.complete(null);
     }
 
     // needed for connection oriented client
-    public void connect(SocketAddress remoteAddress, Future callback) throws  InterruptedException {
+    private void connect(SocketAddress remoteAddress, SocketAddress localAddress,
+                         Future callback) throws  InterruptedException {
+        ChannelFuture channelFuture = clientBootstrap.connect(remoteAddress).sync();
+        channel = clientBootstrap.bind(localAddress).sync().channel();
         channel.pipeline().replace(Constants.CONNECTIONLESS_CLIENT_HANDLER,
                 Constants.CONNECT_CLIENT_HANDLER, new UdpConnectClientHandler());
-        clientBootstrap.connect(remoteAddress).sync().addListener((ChannelFutureListener) future -> {
+        channel.config().setAutoRead(false);
+
+        channelFuture.addListener((ChannelFutureListener) future -> {
             if (!future.isSuccess()) {
                 callback.complete(Utils.createSocketError("Can't connect to remote host"));
             } else {

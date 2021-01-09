@@ -37,6 +37,7 @@ public class UdpConnectClientHandler extends UdpClientHandler {
         callback.complete(getBytesFromDatagram(datagramPacket));
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
     }
+
     @Override
     public void setCallback(Future callback) {
         super.setCallback(callback);
