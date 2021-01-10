@@ -48,14 +48,13 @@ public class ConnectClient {
                                       int remotePort, BMap<BString, Object> config) {
         final Future balFuture = env.markAsync();
 
-        Object host = config.getNativeData(Constants.CONFIG_LOCALHOST);
+        BString host = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
         InetSocketAddress localAddress = null;
         if (host == null) {
-            // A port number of zero will let the system pick up an ephemeral port in a bind operation.
-            localAddress = new InetSocketAddress(0);
+           // A port number of zero will let the system pick up an ephemeral port in a bind operation.
+           localAddress = new InetSocketAddress(0);
         } else {
-            String hostname = ((BString) host).getValue();
-            localAddress = new InetSocketAddress(hostname, 0);
+            localAddress = new InetSocketAddress(host.getValue(), 0);
         }
 
         long timeout = config.getIntValue(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT));
@@ -65,8 +64,7 @@ public class ConnectClient {
         client.addNativeData(Constants.REMOTE_ADDRESS, remoteAddress);
 
         try {
-            UdpClient udpClient = UdpFactory.createUdpClient(localAddress);
-            udpClient.connect(remoteAddress, balFuture);
+            UdpClient udpClient = UdpFactory.createUdpClient(localAddress, remoteAddress, balFuture);
             client.addNativeData(Constants.CONNECT_CLIENT, udpClient);
         } catch (InterruptedException e) {
             balFuture.complete(Utils.createSocketError("Unable to initialize the udp client."));

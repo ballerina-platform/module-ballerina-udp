@@ -48,27 +48,25 @@ public class Client {
     public static Object initEndpoint(Environment env, BObject client, BMap<BString, Object> config) {
         final Future balFuture = env.markAsync();
 
-        Object host = config.getNativeData(Constants.CONFIG_LOCALHOST);
+        BString host = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
         InetSocketAddress localAddress = null;
         if (host == null) {
            // A port number of zero will let the system pick up an ephemeral port in a bind operation.
            localAddress = new InetSocketAddress(0);
         } else {
-            String hostname = ((BString) host).getValue();
-            localAddress = new InetSocketAddress(hostname, 0);
+            localAddress = new InetSocketAddress(host.getValue(), 0);
         }
 
         long timeout = config.getIntValue(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT));
         client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
 
         try {
-           UdpClient udpClient = UdpFactory.createUdpClient(localAddress);
+           UdpClient udpClient = UdpFactory.createUdpClient(localAddress, balFuture);
            client.addNativeData(Constants.CONNECTIONLESS_CLIENT, udpClient);
         } catch (InterruptedException e) {
             balFuture.complete(Utils.createSocketError("Unable to initialize the udp client."));
         }
 
-        balFuture.complete(null);
         return null;
     }
 
