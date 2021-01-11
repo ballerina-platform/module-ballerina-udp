@@ -21,8 +21,12 @@ package org.ballerinalang.stdlib.udp;
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Module;
 import io.ballerina.runtime.api.creators.ErrorCreator;
+import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BString;
+import io.netty.channel.socket.DatagramPacket;
 
 import static org.ballerinalang.stdlib.udp.Constants.ErrorType.GenericError;
 
@@ -38,9 +42,6 @@ public class Utils {
      */
     private static Module udpModule = null;
 
-    private Utils() {
-    }
-
     /**
      * Create Generic udp error with given error message.
      *
@@ -49,7 +50,7 @@ public class Utils {
      */
     public static BError createSocketError(String errMsg) {
         return ErrorCreator.createDistinctError(GenericError.errorType(), getUdpPackage(),
-                                                 StringUtils.fromString(errMsg));
+                StringUtils.fromString(errMsg));
     }
 
     /**
@@ -63,6 +64,20 @@ public class Utils {
         return ErrorCreator.createDistinctError(type.errorType(), getUdpPackage(), StringUtils.fromString(errMsg));
     }
 
+    public static BMap<BString, Object> createDatagram(DatagramPacket datagramPacket) {
+        byte[] byteContent = new byte[datagramPacket.content().readableBytes()];
+        datagramPacket.content().readBytes(byteContent);
+
+        BMap<BString, Object> datagram = ValueCreator.createRecordValue(getUdpPackage(),
+                Constants.DATAGRAM_RECORD);
+        datagram.put(StringUtils.fromString(Constants.DATAGRAM_REMOTE_PORT),
+                datagramPacket.sender().getPort());
+        datagram.put(StringUtils.fromString(Constants.DATAGRAM_REMOTE_HOST),
+                StringUtils.fromString(datagramPacket.sender().getHostName()));
+        datagram.put(StringUtils.fromString(Constants.DATAGRAM_DATA),
+                ValueCreator.createArrayValue(byteContent));
+        return datagram;
+    }
 
     /**
      * Gets ballerina udp package.

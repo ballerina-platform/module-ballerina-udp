@@ -32,11 +32,12 @@ public class Constants {
 
     /**
      * udp standard library package ID.
+     *
      * @deprecated Use SocketUtils.getUdpPackage().
      */
     @Deprecated
     public static final Module SOCKET_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "udp", "0.8.0");
-    
+
     // Constant related to ballerina Datagram record
     public static final String DATAGRAM_RECORD = "Datagram";
     public static final String DATAGRAM_REMOTE_HOST = "remoteHost";
@@ -45,17 +46,35 @@ public class Constants {
 
     public static final String CONNECTIONLESS_CLIENT = "client";
     public static final String CONNECT_CLIENT = "connectClient";
+    public static final String LISTENER = "listener";
 
     // Constant related to ballerina ClientConfig/ConnectClientConfig record
+    public static final String LISTENER_CONFIG = "ListenerConfig";
     public static final String CONFIG_READ_TIMEOUT = "timeoutInMillis";
     public static final String CONFIG_LOCALHOST = "localHost";
+    public static final String CONFIG_REMOTE_HOST = "remoteHost";
+    public static final String CONFIG_REMOTE_PORT = "remotePort";
 
     // Constant handler names
     public static final String READ_TIMEOUT_HANDLER = "readTimeoutHandler";
     public static final String CONNECTIONLESS_CLIENT_HANDLER = "clientHandler";
     public static final String CONNECT_CLIENT_HANDLER = "connectClientHandler";
+    public static final String LISTENER_HANDLER = "udpListenerHandler";
+
+    // Remote method names of ballerina service object
+    public static final String ON_BYTES = "onBytes";
+    public static final String ON_DATAGRAM = "onDatagram";
+    public static final String ON_ERROR = "onError";
+
+    // Constants related to caller
+    public static final String CALLER = "Caller";
+    public static final String CALLER_REMOTE_HOST = "remoteHost";
+    public static final String CALLER_REMOTE_PORT = "remotePort";
 
     public static final String REMOTE_ADDRESS = "remoteAddress";
+    public static final String SERVICE = "service";
+    public static final String LOCAL_PORT = "localPort";
+    public static final String CHANNEL = "Channel";
 
     /**
      * Specifies the error type for udp module.
