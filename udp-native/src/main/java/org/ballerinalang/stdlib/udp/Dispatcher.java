@@ -32,9 +32,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Dispatch async methods.
  */
-public class MethodDispatcher {
+public class Dispatcher {
 
-    private static final Logger log = LoggerFactory.getLogger(MethodDispatcher.class);
+    private static final Logger log = LoggerFactory.getLogger(Dispatcher.class);
 
     private static void invokeOnBytes(UdpService udpService, DatagramPacket datagramPacket, Channel channel) {
         try {
@@ -43,7 +43,7 @@ public class MethodDispatcher {
             udpService.getRuntime().invokeMethodAsync(udpService.getService(), Constants.ON_BYTES, null, null,
                     new UdpCallback(), params);
         } catch (BError e) {
-            MethodDispatcher.invokeOnError(udpService, e.getMessage());
+            Dispatcher.invokeOnError(udpService, e.getMessage());
         }
     }
 
@@ -54,7 +54,7 @@ public class MethodDispatcher {
             udpService.getRuntime().invokeMethodAsync(udpService.getService(), Constants.ON_DATAGRAM, null, null,
                     new UdpCallback(), params);
         } catch (BError e) {
-            MethodDispatcher.invokeOnError(udpService, e.getMessage());
+            Dispatcher.invokeOnError(udpService, e.getMessage());
         }
     }
 
@@ -68,7 +68,6 @@ public class MethodDispatcher {
         } catch (Throwable t) {
             log.error("Error while executing onError function", t);
         }
-
     }
 
     private static Object[] getOnBytesSignature(DatagramPacket datagramPacket, Channel channel) {
@@ -102,10 +101,10 @@ public class MethodDispatcher {
         for (MethodType method : udpService.getService().getType().getMethods()) {
             switch (method.getName()) {
                 case Constants.ON_BYTES:
-                    MethodDispatcher.invokeOnBytes(udpService, datagramPacket, channel);
+                    Dispatcher.invokeOnBytes(udpService, datagramPacket, channel);
                     break;
                 case Constants.ON_DATAGRAM:
-                    MethodDispatcher.invokeOnDatagram(udpService, datagramPacket,
+                    Dispatcher.invokeOnDatagram(udpService, datagramPacket,
                             channel);
                     break;
             }

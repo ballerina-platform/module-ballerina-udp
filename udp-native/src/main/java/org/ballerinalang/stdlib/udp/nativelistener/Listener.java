@@ -28,6 +28,9 @@ import org.ballerinalang.stdlib.udp.UdpFactory;
 import org.ballerinalang.stdlib.udp.UdpListener;
 import org.ballerinalang.stdlib.udp.UdpService;
 import org.ballerinalang.stdlib.udp.Utils;
+import org.ballerinalang.stdlib.udp.nativeclient.Client;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.BindException;
 import java.net.InetAddress;
@@ -37,7 +40,9 @@ import java.net.InetSocketAddress;
  * Native function implementations of the UDP Listener.
  */
 public class Listener {
-    public static Object initEndpoint(BObject listener, int localPort, BMap<BString, Object> config) {
+    private static final Logger log = LoggerFactory.getLogger(Client.class);
+
+    public static Object init(BObject listener, int localPort, BMap<BString, Object> config) {
         listener.addNativeData(Constants.LISTENER_CONFIG, config);
         listener.addNativeData(Constants.LOCAL_PORT, localPort);
         return null;
@@ -84,6 +89,16 @@ public class Listener {
             balFuture.complete(e.getMessage());
         }
 
+        return null;
+    }
+
+    public static Object detach(BObject listener) {
+        UdpService service = (UdpService) listener.getNativeData(Constants.SERVICE);
+        if (service == null) {
+            log.info("service is not attached to the listener");
+            return null;
+        }
+        listener.addNativeData(Constants.SERVICE, null);
         return null;
     }
 

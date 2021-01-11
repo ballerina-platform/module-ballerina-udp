@@ -27,7 +27,7 @@ public class Listener {
     # + localPort - The port number of the remote service
     # + config - Configurations related to the `udp:Listener`
     public isolated function init(int localPort, *ListenerConfig config) returns error? {
-        return externInitEndpoint(self,localPort, config);
+        return initListener(self,localPort, config);
     }
 
     # Binds a service to the `udp:Listener`.
@@ -40,7 +40,7 @@ public class Listener {
     # + return - `()` or else a `udp:Error` upon failure to register
     #             the listener
     public isolated function attach(Service s, string[]|string? name = ()) returns error? {
-        return externRegister(self, s);
+        return externAttach(self, s);
     }
 
     # Starts the registered service programmatically.
@@ -76,8 +76,7 @@ public class Listener {
     # + s - Type descriptor of the service
     # + return - `()` or else a `udp:Error` upon failure to detach the service
     public isolated function detach(Service s) returns error? {
-    // UDP listener operations are strictly bound to the attached service. In fact, a listener doesn't support
-    // multiple services. Therefore, an already attached service is not removed during the detachment.
+        return externDetach(self);
     }
 }
 
@@ -97,12 +96,12 @@ public type ListenerConfig record {
     int timeoutInMillis = 30000;
 };
 
-isolated function externInitEndpoint(Listener listenerObj,int localPort, ListenerConfig config) returns error? = @java:Method {
+isolated function initListener(Listener listenerObj,int localPort, ListenerConfig config) returns error? = @java:Method {
     'class: "org.ballerinalang.stdlib.udp.nativelistener.Listener",
-    name: "initEndpoint"
+    name: "init"
 } external;
 
-isolated function externRegister(Listener listenerObj, Service s) returns error? = @java:Method {
+isolated function externAttach(Listener listenerObj, Service s) returns error? = @java:Method {
     'class: "org.ballerinalang.stdlib.udp.nativelistener.Listener",
     name: "register"
 } external;
@@ -115,4 +114,9 @@ isolated function externStart(Listener listenerObj) returns error? = @java:Metho
 isolated function externGracefulStop(Listener listenerObj) returns error? = @java:Method {
     'class: "org.ballerinalang.stdlib.udp.nativelistener.Listener",
     name: "gracefulStop"
+} external;
+
+isolated function externDetach(Listener listenerObj) returns error? = @java:Method {
+    'class: "org.ballerinalang.stdlib.udp.nativelistener.Listener",
+    name: "detach"
 } external;

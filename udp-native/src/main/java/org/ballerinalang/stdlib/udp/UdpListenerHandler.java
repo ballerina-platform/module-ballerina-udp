@@ -38,29 +38,24 @@ public class UdpListenerHandler extends SimpleChannelInboundHandler<DatagramPack
         this.udpService = udpService;
     }
 
-
-    public void setUdpService(UdpService udpService) {
-        this.udpService = udpService;
-    }
-
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
                                 DatagramPacket datagramPacket) throws Exception {
-        MethodDispatcher.invokeRead(udpService, datagramPacket, ctx.channel());
+        Dispatcher.invokeRead(udpService, datagramPacket, ctx.channel());
         reRegisterReadTimeoutHandler(ctx);
     }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
-            MethodDispatcher.invokeOnError(udpService, "Read timed out.");
+            Dispatcher.invokeOnError(udpService, "Read timed out.");
             reRegisterReadTimeoutHandler(ctx);
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        MethodDispatcher.invokeOnError(udpService, cause.getMessage());
+        Dispatcher.invokeOnError(udpService, cause.getMessage());
     }
 
     private void reRegisterReadTimeoutHandler(ChannelHandlerContext ctx) {
