@@ -81,7 +81,7 @@ public type ConnectClientConfig record {
 
 isolated function initConnectClient(ConnectClient connectClient, string remoteHost, int remotePort, ConnectClientConfig config) returns Error? =
 @java:Method {
-    name: "initEndpoint",
+    name: "init",
     'class: "org.ballerinalang.stdlib.udp.nativeclient.ConnectClient"
 } external;
 

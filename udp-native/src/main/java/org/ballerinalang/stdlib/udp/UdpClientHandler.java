@@ -21,7 +21,6 @@ package org.ballerinalang.stdlib.udp;
 import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
-import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 import io.netty.channel.ChannelHandlerContext;
@@ -29,10 +28,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.timeout.IdleStateEvent;
 
-import static org.ballerinalang.stdlib.udp.Utils.getUdpPackage;
-
 /**
- *  {@link UdpClientHandler} ia a ChannelInboundHandler implementation for udp client.
+ * {@link UdpClientHandler} ia a ChannelInboundHandler implementation for udp client.
  */
 public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
@@ -69,7 +66,7 @@ public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket
         byte[] byteContent = new byte[datagramPacket.content().readableBytes()];
         datagramPacket.content().readBytes(byteContent);
 
-        BMap<BString, Object> datagram = ValueCreator.createRecordValue(getUdpPackage(),
+        BMap<BString, Object> datagram = ValueCreator.createRecordValue(Utils.getUdpPackage(),
                 Constants.DATAGRAM_RECORD);
         datagram.put(StringUtils.fromString(Constants.DATAGRAM_REMOTE_PORT),
                 datagramPacket.recipient().getPort());
@@ -77,14 +74,8 @@ public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                 StringUtils.fromString(datagramPacket.recipient().getHostName()));
         datagram.put(StringUtils.fromString(Constants.DATAGRAM_DATA),
                 ValueCreator.createArrayValue(byteContent));
-        return  datagram;
+        return datagram;
     }
 
-    private BArray returnByteArray(DatagramPacket datagramPacket) {
-        byte[] byteContent = new byte[datagramPacket.content().readableBytes()];
-        datagramPacket.content().readBytes(byteContent);
-
-        return ValueCreator.createArrayValue(byteContent);
-    }
 }
 

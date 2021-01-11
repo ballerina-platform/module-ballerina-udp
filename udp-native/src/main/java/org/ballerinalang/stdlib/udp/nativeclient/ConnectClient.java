@@ -44,8 +44,8 @@ import java.net.InetSocketAddress;
 public class ConnectClient {
     private static final Logger log = LoggerFactory.getLogger(Client.class);
 
-    public static Object initEndpoint(Environment env, BObject client, BString remoteHost, 
-                                      int remotePort, BMap<BString, Object> config) {
+    public static Object init(Environment env, BObject client, BString remoteHost,
+                              int remotePort, BMap<BString, Object> config) {
         final Future balFuture = env.markAsync();
 
         BString host = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));

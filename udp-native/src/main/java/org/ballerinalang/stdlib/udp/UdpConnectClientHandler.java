@@ -50,5 +50,4 @@ public class UdpConnectClientHandler extends UdpClientHandler {
 
         return ValueCreator.createArrayValue(byteContent);
     }
-
 }

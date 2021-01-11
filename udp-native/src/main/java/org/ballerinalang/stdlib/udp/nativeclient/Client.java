@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 
-
 /**
  * Native function implementations of the UDP ConnectionlessClient.
  *
@@ -45,7 +44,7 @@ import java.net.InetSocketAddress;
 public class Client {
     private static final Logger log = LoggerFactory.getLogger(Client.class);
 
-    public static Object initEndpoint(Environment env, BObject client, BMap<BString, Object> config) {
+    public static Object init(Environment env, BObject client, BMap<BString, Object> config) {
         final Future balFuture = env.markAsync();
 
         BString host = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));

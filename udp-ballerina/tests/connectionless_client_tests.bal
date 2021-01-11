@@ -47,7 +47,7 @@ function testClientEcho() {
     }
 }
 
-function getString(byte[] content, int numberOfBytes) returns @tainted string|io:Error {
+function getString(byte[] content, int numberOfBytes = 50) returns @tainted string|io:Error {
     io:ReadableByteChannel byteChannel = check io:createReadableChannel(content);
     io:ReadableCharacterChannel characterChannel = new io:ReadableCharacterChannel(byteChannel, "UTF-8");
     return check characterChannel.read(numberOfBytes);
@@ -96,16 +96,16 @@ function stopAll() {
     var result = stopUdpServer();
 }
 
-isolated function prepareDatagram(string msg) returns Datagram {
+isolated function prepareDatagram(string msg, string remoteHost = "localhost", int remotePort = 48829) returns Datagram {
     byte[] data =  msg.toBytes();
-    return { data, remoteHost: "localhost", remotePort: 48829 };
+    return { data, remoteHost: remoteHost, remotePort: remotePort };
 }
 
 function receiveClientContent(Client socketClient) returns string {
     string returnStr = "";
     var result = socketClient->receiveDatagram();
     if (result is Datagram) {
-        var str = getString(result.data, 50);
+        var str = getString(result.data);
         if (str is string) {
             returnStr = <@untainted>str;
             io:println("Response is :", returnStr);

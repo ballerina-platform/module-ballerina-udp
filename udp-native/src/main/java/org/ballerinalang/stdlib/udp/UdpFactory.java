@@ -25,7 +25,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import java.net.InetSocketAddress;
 
 /**
- *  {@link UdpFactory} creates {@link UdpClient} and UdpListener.
+ * {@link UdpFactory} creates {@link UdpClient} and UdpListener.
  */
 public class UdpFactory {
 
@@ -51,5 +51,10 @@ public class UdpFactory {
     public static UdpClient createUdpClient(InetSocketAddress localAddress,
                                             Future callback) throws InterruptedException {
         return new UdpClient(localAddress, getInstance().group, callback);
+    }
+
+    public static UdpListener createUdpListener(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
+                                                Future callback, UdpService udpService) throws InterruptedException {
+        return new UdpListener(localAddress, remoteAddress, getInstance().group, callback, udpService);
     }
 }

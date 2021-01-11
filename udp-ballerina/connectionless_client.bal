@@ -94,7 +94,7 @@ public type ClientConfig record {
 
 isolated function initConnectionlessClient(Client udpClient, ClientConfig config) returns Error? =
 @java:Method {
-    name: "initEndpoint",
+    name: "init",
     'class: "org.ballerinalang.stdlib.udp.nativeclient.Client"
 } external;
 
