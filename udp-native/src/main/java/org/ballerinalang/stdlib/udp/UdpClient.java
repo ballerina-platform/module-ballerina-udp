@@ -88,20 +88,20 @@ public class UdpClient {
         channel.config().setAutoRead(false);
 
         channelFuture.addListener((ChannelFutureListener) future -> {
-            if (!future.isSuccess()) {
-                callback.complete(Utils.createSocketError("Can't connect to remote host"));
-            } else {
+            if (future.isSuccess()) {
                 callback.complete(null);
+            } else {
+                callback.complete(Utils.createSocketError("Can't connect to remote host"));
             }
         });
     }
 
     public void sendData(DatagramPacket datagram, Future callback) {
         channel.writeAndFlush(datagram).addListener((ChannelFutureListener) future -> {
-            if (!future.isSuccess()) {
-                callback.complete(Utils.createSocketError("Failed to send data"));
-            } else {
+            if (future.isSuccess()) {
                 callback.complete(null);
+            } else {
+                callback.complete(Utils.createSocketError("Failed to send data"));
             }
         });
     }

@@ -66,10 +66,10 @@ public class UdpListener {
 
     public static void send(DatagramPacket datagram, Channel channel, Future callback) {
         channel.writeAndFlush(datagram).addListener((ChannelFutureListener) future -> {
-            if (!future.isSuccess()) {
-                callback.complete(Utils.createSocketError("Failed to send data."));
-            } else {
+            if (future.isSuccess()) {
                 callback.complete(null);
+            } else {
+                callback.complete(Utils.createSocketError("Failed to send data."));
             }
         });
     }
@@ -81,20 +81,20 @@ public class UdpListener {
         channel = channelFuture.channel();
         channel = listenerBootstrap.bind(localAddress).sync().channel();
         channelFuture.addListener((ChannelFutureListener) future -> {
-            if (!future.isSuccess()) {
-                callback.complete(Utils.createSocketError("Can't connect to remote host."));
-            } else {
+            if (future.isSuccess()) {
                 callback.complete(null);
+            } else {
+                callback.complete(Utils.createSocketError("Can't connect to remote host."));
             }
         });
     }
 
     public void close(Future callback) throws InterruptedException {
         channel.close().sync().addListener((ChannelFutureListener) future -> {
-            if (!future.isSuccess()) {
-                callback.complete(Utils.createSocketError("Failed to gracefully shutdown the Listener."));
-            } else {
+            if (future.isSuccess()) {
                 callback.complete(null);
+            } else {
+                callback.complete(Utils.createSocketError("Failed to gracefully shutdown the Listener."));
             }
         });
     }
