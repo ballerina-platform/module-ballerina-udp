@@ -38,7 +38,6 @@ public class UdpCallback implements Callback {
 
     public UdpCallback() {}
 
-
     @Override
     public void notifySuccess(Object o) {
         log.debug("Method successfully dispatched.");

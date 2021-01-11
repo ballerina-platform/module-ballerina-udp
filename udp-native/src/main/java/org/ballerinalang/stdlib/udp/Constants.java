@@ -27,9 +27,6 @@ import static io.ballerina.runtime.api.constants.RuntimeConstants.BALLERINA_BUIL
  */
 public class Constants {
 
-    private Constants() {
-    }
-
     /**
      * udp standard library package ID.
      *
@@ -93,5 +90,4 @@ public class Constants {
             return errorType;
         }
     }
-
 }

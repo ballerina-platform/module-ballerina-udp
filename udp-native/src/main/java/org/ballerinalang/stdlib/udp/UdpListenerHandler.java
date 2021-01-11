@@ -26,7 +26,6 @@ import io.netty.handler.timeout.IdleStateHandler;
 
 import java.util.concurrent.TimeUnit;
 
-
 /**
  * {@link UdpListenerHandler} is a ChannelInboundHandler implementation for udp listener.
  */

@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 
-
 /**
  * Native function implementations of the UDP ConnectionlessClient.
  *

@@ -58,7 +58,6 @@ public class Dispatcher {
         }
     }
 
-
     public static void invokeOnError(UdpService udpService, String message) {
         try {
             Object params[] = getOnErrorSignature(message);
