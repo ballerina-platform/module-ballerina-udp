@@ -54,7 +54,7 @@ function getString(byte[] content, int numberOfBytes = 50) returns @tainted stri
 }
 
 @test:Config {
-    dependsOn: ["testClientEcho"]
+    dependsOn: [testClientEcho]
 }
 function testContentReceive() {
     Client|Error? socketClient = new(localHost = "localhost", timeoutInMillis = 3000);
