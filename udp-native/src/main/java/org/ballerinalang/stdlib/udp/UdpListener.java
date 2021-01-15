@@ -27,11 +27,9 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
-import io.netty.handler.timeout.IdleStateHandler;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.concurrent.TimeUnit;
 
 /**
  * {@link UdpListener} creates the udp client and handles all the network operations.
@@ -52,8 +50,6 @@ public class UdpListener {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
                         ch.pipeline().addLast(Constants.LISTENER_HANDLER, new UdpListenerHandler(udpService));
-                        ch.pipeline().addLast(Constants.READ_TIMEOUT_HANDLER,
-                                new IdleStateHandler(udpService.getTimeout(), 0, 0, TimeUnit.MILLISECONDS));
                     }
                 });
         if (remoteAddress != null) {
