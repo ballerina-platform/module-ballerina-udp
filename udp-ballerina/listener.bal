@@ -39,7 +39,7 @@ public class Listener {
     # + name - Name of the service
     # + return - `()` or else a `udp:Error` upon failure to register
     #             the listener
-    public isolated function attach(Service s, string[]|string? name = ()) returns error? {
+    public isolated function attach(Service s, () name = ()) returns error? {
         return externAttach(self, s);
     }
 
