@@ -50,7 +50,7 @@ public client class Client {
     #
     # + return - The Datagram, or else a `udp:Error` if the data 
     #            can't be read from the remote host
-    isolated remote function receiveDatagram() returns Datagram|Error {
+    isolated remote function receiveDatagram() returns (readonly & Datagram)|Error {
         return externConnectionlessReceive(self);
     }
 
@@ -104,7 +104,7 @@ isolated function externConectionlessClientClose(Client udpClient) returns Error
     'class: "org.ballerinalang.stdlib.udp.nativeclient.Client"
 } external;
 
-isolated function externConnectionlessReceive(Client udpClient) returns Datagram|Error =
+isolated function externConnectionlessReceive(Client udpClient) returns (readonly & Datagram)|Error =
 @java:Method {
     name: "receive",
     'class: "org.ballerinalang.stdlib.udp.nativeclient.Client"

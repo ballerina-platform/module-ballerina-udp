@@ -19,8 +19,6 @@
 package org.ballerinalang.stdlib.udp;
 
 import io.ballerina.runtime.api.Future;
-import io.ballerina.runtime.api.creators.ValueCreator;
-import io.ballerina.runtime.api.values.BArray;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
 
@@ -34,7 +32,7 @@ public class UdpConnectClientHandler extends UdpClientHandler {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
                                 DatagramPacket datagramPacket) throws Exception {
-        callback.complete(getBytesFromDatagram(datagramPacket));
+        callback.complete(Utils.getReadonlyBytesFromDatagram(datagramPacket));
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
     }
 
@@ -44,10 +42,4 @@ public class UdpConnectClientHandler extends UdpClientHandler {
         this.callback = callback;
     }
 
-    private BArray getBytesFromDatagram(DatagramPacket datagramPacket) {
-        byte[] byteContent = new byte[datagramPacket.content().readableBytes()];
-        datagramPacket.content().readBytes(byteContent);
-
-        return ValueCreator.createArrayValue(byteContent);
-    }
 }

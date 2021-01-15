@@ -34,7 +34,7 @@ import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
 /**
- * {@link UdpClient} creates the udp client and handles all the network operations.
+ * {@link UdpListener} creates the udp client and handles all the network operations.
  */
 public class UdpListener {
 

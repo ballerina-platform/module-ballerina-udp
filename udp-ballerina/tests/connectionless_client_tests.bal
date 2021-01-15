@@ -54,7 +54,7 @@ function getString(byte[] content, int numberOfBytes = 50) returns @tainted stri
 }
 
 @test:Config {
-    dependsOn: ["testClientEcho"]
+    dependsOn: [testClientEcho]
 }
 function testContentReceive() {
     Client|Error? socketClient = new(localHost = "localhost", timeoutInMillis = 3000);
@@ -104,7 +104,7 @@ isolated function prepareDatagram(string msg, string remoteHost = "localhost", i
 function receiveClientContent(Client socketClient) returns string {
     string returnStr = "";
     var result = socketClient->receiveDatagram();
-    if (result is Datagram) {
+    if (result is (readonly & Datagram)) {
         var str = getString(result.data);
         if (str is string) {
             returnStr = <@untainted>str;

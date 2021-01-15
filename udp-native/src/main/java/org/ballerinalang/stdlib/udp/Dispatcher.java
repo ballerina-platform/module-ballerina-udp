@@ -80,7 +80,7 @@ public class Dispatcher {
 
     private static Object[] getOnDatagramSignature(DatagramPacket datagramPacket, Channel channel) {
         BObject caller = createClient(datagramPacket, channel);
-        return new Object[]{Utils.createDatagram(datagramPacket), true, caller, true};
+        return new Object[]{Utils.createReadonlyDatagram(datagramPacket), true, caller, true};
     }
 
     private static Object[] getOnErrorSignature(String message) {

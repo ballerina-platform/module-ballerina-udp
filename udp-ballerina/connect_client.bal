@@ -51,7 +51,7 @@ public client class ConnectClient {
     #
     # + return - The byte[], or else a `udp:Error` if the data
     #            can't be read from the remote host
-    isolated remote function readBytes() returns byte[]|Error {
+    isolated remote function readBytes() returns (readonly & byte[])|Error {
         return externConnectClientRead(self);
     }
 
@@ -91,7 +91,7 @@ isolated function externConnectClientClose(ConnectClient connectClient) returns 
     'class: "org.ballerinalang.stdlib.udp.nativeclient.ConnectClient"
 } external;
 
-isolated function externConnectClientRead(ConnectClient connectClient) returns byte[]|Error =
+isolated function externConnectClientRead(ConnectClient connectClient) returns (readonly & byte[])|Error =
 @java:Method {
     name: "read",
     'class: "org.ballerinalang.stdlib.udp.nativeclient.ConnectClient"
