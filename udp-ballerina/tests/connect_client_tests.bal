@@ -19,7 +19,7 @@ import ballerina/test;
 import ballerina/io;
 
 @test:Config {
-     dependsOn: ["testContentReceive"]
+     dependsOn: [testContentReceive]
 }
 function testConnectClientEcho() {
     ConnectClient|Error? socketClient = new("localhost", 48829);
@@ -43,7 +43,7 @@ function testConnectClientEcho() {
 
 
 @test:Config {
-    dependsOn: ["testConnectClientEcho"]
+    dependsOn: [testConnectClientEcho]
 }
 isolated function testConnectClientReadTimeOut() {
     ConnectClient|Error? socketClient = new("www.ballerina.io", 48830, localHost = "localhost", timeoutInMillis = 1000);

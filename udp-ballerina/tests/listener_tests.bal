@@ -19,7 +19,7 @@ import ballerina/test;
 import ballerina/io;
 
 @test:Config {
-    dependsOn: ["testContentReceive"]
+    dependsOn: [testContentReceive]
 }
 function testListenerRead() {
     Client|Error? socketClient = new(localHost = "localhost");
@@ -45,7 +45,7 @@ function testListenerRead() {
 }
 
 @test:Config {
-    dependsOn: ["testListenerRead"]
+    dependsOn: [testListenerRead]
 }
 function testCallerSendBytes() {
     Client|Error? socketClient = new(localHost = "localhost");
@@ -76,7 +76,7 @@ function testCallerSendBytes() {
 }
 
 @test:Config {
-    dependsOn: ["testCallerSendBytes"]
+    dependsOn: [testCallerSendBytes]
 }
 function testCallerSendDatagram() {
     Client|Error? socketClient = new(localHost = "localhost");
