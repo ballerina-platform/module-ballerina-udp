@@ -20,9 +20,9 @@ const int PORT1 = 9000;
 const int PORT2 = 8080;
 const int PORT3 = 9001;
 
-listener Listener logServer = checkpanic new Listener(PORT1);
-listener Listener echoServer = checkpanic new Listener(PORT2);
-listener Listener botServer = checkpanic new Listener(PORT3);
+listener Listener logServer = check new Listener(PORT1);
+listener Listener echoServer = check new Listener(PORT2);
+listener Listener botServer = check new Listener(PORT3);
 
 service on logServer {
 

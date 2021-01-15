@@ -29,6 +29,8 @@ import io.netty.channel.socket.DatagramPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+
 /**
  * Dispatch async methods.
  */
@@ -60,10 +62,13 @@ public class Dispatcher {
 
     public static void invokeOnError(UdpService udpService, String message) {
         try {
-            Object params[] = getOnErrorSignature(message);
-
-            udpService.getRuntime().invokeMethodAsync(udpService.getService(), Constants.ON_ERROR, null, null,
-                    new UdpCallback(udpService), params);
+            MethodType methodType = Arrays.stream(udpService.getService().getType().getMethods()).
+                    filter(m -> m.getName().equals(Constants.ON_ERROR)).findFirst().orElse(null);
+            if (methodType != null) {
+                Object params[] = getOnErrorSignature(message);
+                udpService.getRuntime().invokeMethodAsync(udpService.getService(), Constants.ON_ERROR, null, null,
+                        new UdpCallback(udpService), params);
+            }
         } catch (Throwable t) {
             log.error("Error while executing onError function", t);
         }
