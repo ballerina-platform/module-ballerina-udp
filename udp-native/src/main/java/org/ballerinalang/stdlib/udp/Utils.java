@@ -23,10 +23,14 @@ import io.ballerina.runtime.api.Module;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 import io.netty.channel.socket.DatagramPacket;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.ballerinalang.stdlib.udp.Constants.ErrorType.GenericError;
 
@@ -77,6 +81,25 @@ public class Utils {
         datagram.put(StringUtils.fromString(Constants.DATAGRAM_DATA),
                 ValueCreator.createArrayValue(byteContent));
         return datagram;
+    }
+
+    static BMap<BString, Object> createReadonlyDatagram(DatagramPacket datagramPacket) {
+        byte[] byteContent = new byte[datagramPacket.content().readableBytes()];
+        datagramPacket.content().readBytes(byteContent);
+        Map<String, Object> datagramContent = new HashMap<>();
+        datagramContent.put(Constants.DATAGRAM_REMOTE_PORT, datagramPacket.recipient().getPort());
+        datagramContent.put(Constants.DATAGRAM_REMOTE_HOST, StringUtils
+                .fromString(datagramPacket.recipient().getHostName()));
+        datagramContent.put(Constants.DATAGRAM_DATA, ValueCreator.createArrayValue(byteContent));
+        BMap<BString, Object> datagram = ValueCreator.createReadonlyRecordValue(getUdpPackage(),
+                Constants.DATAGRAM_RECORD, datagramContent);
+        return datagram;
+    }
+
+    static BArray getReadonlyBytesFromDatagram(DatagramPacket datagramPacket) {
+        byte[] byteContent = new byte[datagramPacket.content().readableBytes()];
+        datagramPacket.content().readBytes(byteContent);
+        return ValueCreator.createReadonlyArrayValue(byteContent);
     }
 
     /**

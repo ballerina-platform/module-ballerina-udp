@@ -28,12 +28,10 @@ public class UdpService {
 
     private final Runtime runtime;
     private final BObject service;
-    private final long timeout;
 
-    public UdpService(Runtime runtime, BObject service, long timeout) {
+    public UdpService(Runtime runtime, BObject service) {
         this.runtime = runtime;
         this.service = service;
-        this.timeout = timeout;
     }
 
     public Runtime getRuntime() {
@@ -42,9 +40,5 @@ public class UdpService {
 
     public BObject getService() {
         return service;
-    }
-
-    public long getTimeout() {
-        return timeout;
     }
 }

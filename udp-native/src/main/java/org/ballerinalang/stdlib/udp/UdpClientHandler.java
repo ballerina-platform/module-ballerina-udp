@@ -19,10 +19,6 @@
 package org.ballerinalang.stdlib.udp;
 
 import io.ballerina.runtime.api.Future;
-import io.ballerina.runtime.api.creators.ValueCreator;
-import io.ballerina.runtime.api.utils.StringUtils;
-import io.ballerina.runtime.api.values.BMap;
-import io.ballerina.runtime.api.values.BString;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
@@ -38,7 +34,7 @@ public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
                                 DatagramPacket datagramPacket) throws Exception {
-        callback.complete(returnDatagram(datagramPacket));
+        callback.complete(Utils.createReadonlyDatagram(datagramPacket));
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
     }
 
@@ -60,21 +56,6 @@ public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket
 
     public void setCallback(Future callback) {
         this.callback = callback;
-    }
-
-    private BMap<BString, Object> returnDatagram(DatagramPacket datagramPacket) {
-        byte[] byteContent = new byte[datagramPacket.content().readableBytes()];
-        datagramPacket.content().readBytes(byteContent);
-
-        BMap<BString, Object> datagram = ValueCreator.createRecordValue(Utils.getUdpPackage(),
-                Constants.DATAGRAM_RECORD);
-        datagram.put(StringUtils.fromString(Constants.DATAGRAM_REMOTE_PORT),
-                datagramPacket.recipient().getPort());
-        datagram.put(StringUtils.fromString(Constants.DATAGRAM_REMOTE_HOST),
-                StringUtils.fromString(datagramPacket.recipient().getHostName()));
-        datagram.put(StringUtils.fromString(Constants.DATAGRAM_DATA),
-                ValueCreator.createArrayValue(byteContent));
-        return datagram;
     }
 
 }

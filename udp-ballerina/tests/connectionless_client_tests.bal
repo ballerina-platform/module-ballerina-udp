@@ -104,7 +104,7 @@ isolated function prepareDatagram(string msg, string remoteHost = "localhost", i
 function receiveClientContent(Client socketClient) returns string {
     string returnStr = "";
     var result = socketClient->receiveDatagram();
-    if (result is Datagram) {
+    if (result is (readonly & Datagram)) {
         var str = getString(result.data);
         if (str is string) {
             returnStr = <@untainted>str;

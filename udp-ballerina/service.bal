@@ -16,8 +16,9 @@
 
 # Represent UDP Listener service type.
 public type Service service object {
-  remote function onBytes(readonly & byte[] data, Caller? caller = ()) returns byte[]|Datagram|Error?;
-  remote function onDatagram(Datagram data, Caller? caller = ()) returns byte[]|Datagram|Error?;
-  remote function onError(readonly & Error err) returns Error?;
+  // optional methods that the service can have
+  // remote function onBytes(readonly & byte[] data, Caller? caller = ()) returns byte[]|Datagram|Error?;
+  // remote function onDatagram(Datagram data, Caller? caller = ()) returns byte[]|Datagram|Error?;
+  // remote function onError(readonly & Error err) returns Error?;
 };
 

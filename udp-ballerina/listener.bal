@@ -39,7 +39,7 @@ public class Listener {
     # + name - Name of the service
     # + return - `()` or else a `udp:Error` upon failure to register
     #             the listener
-    public isolated function attach(Service s, string[]|string? name = ()) returns error? {
+    public isolated function attach(Service s, () name = ()) returns error? {
         return externAttach(self, s);
     }
 
@@ -86,14 +86,10 @@ public class Listener {
 # + remotePort - The remote host's port number. if this is not set the server
 #                runs without connecting to a remote host.
 # + localHost - The interface for the server to be bound
-# + timeoutInMillis - The socket reading timeout value to be used
-#                         in milliseconds. If this is not set, the default value
-#                         of 300000 milliseconds (5 minutes) will be used.
 public type ListenerConfig record {
     string? remoteHost = ();
     int? remotePort = ();
     string? localHost = ();
-    int timeoutInMillis = 30000;
 };
 
 isolated function initListener(Listener listenerObj,int localPort, ListenerConfig config) returns error? = @java:Method {

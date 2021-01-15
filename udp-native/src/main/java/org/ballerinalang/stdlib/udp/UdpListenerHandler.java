@@ -21,10 +21,6 @@ package org.ballerinalang.stdlib.udp;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
-import io.netty.handler.timeout.IdleStateEvent;
-import io.netty.handler.timeout.IdleStateHandler;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * {@link UdpListenerHandler} is a ChannelInboundHandler implementation for udp listener.
@@ -41,25 +37,10 @@ public class UdpListenerHandler extends SimpleChannelInboundHandler<DatagramPack
     protected void channelRead0(ChannelHandlerContext ctx,
                                 DatagramPacket datagramPacket) throws Exception {
         Dispatcher.invokeRead(udpService, datagramPacket, ctx.channel());
-        reRegisterReadTimeoutHandler(ctx);
-    }
-
-    @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (evt instanceof IdleStateEvent) {
-            Dispatcher.invokeOnError(udpService, "Read timed out.");
-            reRegisterReadTimeoutHandler(ctx);
-        }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         Dispatcher.invokeOnError(udpService, cause.getMessage());
-    }
-
-    private void reRegisterReadTimeoutHandler(ChannelHandlerContext ctx) {
-        ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
-        ctx.channel().pipeline().addLast(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(udpService.getTimeout(),
-                0, 0, TimeUnit.MILLISECONDS));
     }
 }

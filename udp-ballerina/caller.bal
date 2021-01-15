@@ -25,7 +25,7 @@ public client class Caller {
   public string? remoteHost = ();
   public int? remotePort = ();
 
-  isolated function init(){
+  isolated function init() {
     // package level private init() to prevent object creation
   }
   
