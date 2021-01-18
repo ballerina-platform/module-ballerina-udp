@@ -37,10 +37,9 @@ service on logServer {
 
 service on echoServer {
 
-    remote function onBytes(readonly & byte[] data, Caller caller) returns Error? {
+    remote function onBytes(readonly & byte[] data, Caller caller) returns (readonly & byte[])|Error? {
         io:println("Received by listener:", getString(data));
-        // echo back
-        Error? writeResult = caller->sendBytes(data);
+        return data;
     }
 
     remote function onError(readonly & Error err) {
@@ -55,14 +54,14 @@ map<string> QuestionBank = {
 
 service on botServer {
 
-    remote function onDatagram(Datagram datagram, Caller caller) returns Error? {
+    remote function onDatagram(readonly & Datagram datagram, Caller caller) returns Datagram|Error? {
         string|error? dataString = getString(datagram.data);
         io:println("Received data: ", dataString);
         if (dataString is string && QuestionBank.hasKey(dataString)) {
             string? response = QuestionBank[dataString];
             if (response is string) {
-                Error? res = caller->sendDatagram(prepareDatagram(response, <string>caller.remoteHost,
-                    <int>caller.remotePort));
+                return prepareDatagram(response, <string>caller.remoteHost,
+                    <int>caller.remotePort);
             }
         }
         Error? res = caller->sendDatagram(prepareDatagram("Sorry,I Can’t help you with that",
