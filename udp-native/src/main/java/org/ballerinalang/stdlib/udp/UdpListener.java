@@ -60,12 +60,22 @@ public class UdpListener {
         }
     }
 
+    // invoke when caller call writeBytes() or sendDatagram()
     public static void send(DatagramPacket datagram, Channel channel, Future callback) {
         channel.writeAndFlush(datagram).addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
                 callback.complete(null);
             } else {
                 callback.complete(Utils.createSocketError("Failed to send data."));
+            }
+        });
+    }
+
+    // invoke when service return byte[] or Datagram
+    public static void send(UdpService udpService, DatagramPacket datagram, Channel channel) {
+        channel.writeAndFlush(datagram).addListener((ChannelFutureListener) future -> {
+            if (!future.isSuccess()) {
+                Dispatcher.invokeOnError(udpService, "Failed to send data.");
             }
         });
     }

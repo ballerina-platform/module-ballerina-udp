@@ -43,7 +43,7 @@ public class Dispatcher {
             Object[] params = getOnBytesSignature(datagramPacket, channel);
 
             udpService.getRuntime().invokeMethodAsync(udpService.getService(), Constants.ON_BYTES, null, null,
-                    new UdpCallback(), params);
+                    new UdpCallback(udpService, channel, datagramPacket), params);
         } catch (BError e) {
             Dispatcher.invokeOnError(udpService, e.getMessage());
         }
@@ -54,7 +54,7 @@ public class Dispatcher {
             Object[] params = getOnDatagramSignature(datagramPacket, channel);
 
             udpService.getRuntime().invokeMethodAsync(udpService.getService(), Constants.ON_DATAGRAM, null, null,
-                    new UdpCallback(), params);
+                    new UdpCallback(udpService, channel, datagramPacket), params);
         } catch (BError e) {
             Dispatcher.invokeOnError(udpService, e.getMessage());
         }
