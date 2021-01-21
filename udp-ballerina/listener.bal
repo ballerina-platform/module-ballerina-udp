@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/java;
+import ballerina/jballerina.java;
 
 # This is used for creating UDP server endpoints. A UDP server endpoint
 # is capable of responding to remote callers. The `Listener` is responsible
