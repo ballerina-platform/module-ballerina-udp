@@ -16,7 +16,7 @@
 
 import ballerina/java;
 
-# Initializes the UDP connectionless client based on the provided configurations
+# Initializes the UDP connectionless client based on the provided configurations.
 public client class Client {
    
     # Initializes the UDP connectionless client based on the provided 
@@ -48,13 +48,13 @@ public client class Client {
     # udp:Datagram|udp:Error result = socketClient->receiveDatagram();
     # ```
     #
-    # + return - The Datagram, or else a `udp:Error` if the data 
+    # + return - The udp:Datagram, or else a `udp:Error` if the data 
     #            can't be read from the remote host
     isolated remote function receiveDatagram() returns (readonly & Datagram)|Error {
         return externConnectionlessReceive(self);
     }
 
-    # Free up the occupied socket 
+    # Free up the occupied socket.
     # ```ballerina
     # udp:Error? closeResult = socketClient->close();
     # ```
@@ -70,7 +70,7 @@ public client class Client {
 # to be routed from the source to the destination nodes without reliance
 # on earlier exchanges between the nodes and the transporting network.
 # 
-# + remoteHost - The hostname of the remote host
+# + remoteHost - The hostname or the IP address of the remote host
 # + remotePort - The port number of the remote host
 # + data - The content which needs to be transported to the remote host
 public type Datagram record {|
@@ -79,9 +79,9 @@ public type Datagram record {|
    byte[] data;
 |};
 
-# Configurations for the connectionless udp client
+# Configurations for the connectionless UDP client.
 # 
-# + localHost - Local binding of the interface
+# + localHost - Local binding of the interface.
 # + timeoutInMillis - The socket reading timeout value to be used in 
 #                     milliseconds. If this is not set,the default value of
 #                     300000 milliseconds (5 minutes) will be used.
