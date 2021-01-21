@@ -26,7 +26,7 @@ public client class ConnectClient {
     # udp:ConnectClient|udp:Error? socketClient = new("www.remote.com", 80,
     #                              localHost = "localHost");
     # ```
-    # + remoteHost - The hostname of the remote host
+    # + remoteHost - The hostname or the IP address of the remote host
     # + remotePort - The port number of the remmote host
     # + config - Connection oriented client related configuration
     public isolated function init(string remoteHost, int remotePort, *ConnectClientConfig config) returns Error? {
@@ -68,7 +68,7 @@ public client class ConnectClient {
 
 # Configurations for the connection oriented udp client.
 # 
-# + localHost - Local binding of the interface
+# + localHost - Local binding of the interface.
 # + timeoutInMillis - The socket reading timeout value to be used 
 #                     in milliseconds. If this is not set,the default value
 #                     of 300000 milliseconds (5 minutes) will be used.

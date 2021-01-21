@@ -16,9 +16,9 @@
 
 import ballerina/java;
 
-# Represents caller object in udp service remote methods
+# Represents caller object in UDP service remote methods.
 # 
-# + remoteHost - The hostname of the remote host
+# + remoteHost - The hostname or the IP address of the remote host
 # + remotePort - The port number of the remote host
 public client class Caller {
 
