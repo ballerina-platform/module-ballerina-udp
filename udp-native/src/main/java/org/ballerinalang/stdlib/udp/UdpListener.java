@@ -37,12 +37,10 @@ import java.net.SocketAddress;
 public class UdpListener {
 
     private Channel channel;
-    private final EventLoopGroup group;
     private final Bootstrap listenerBootstrap;
 
     public UdpListener(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
                        EventLoopGroup group, Future callback, UdpService udpService) throws InterruptedException {
-        this.group = group;
         listenerBootstrap = new Bootstrap();
         listenerBootstrap.group(group)
                 .channel(NioDatagramChannel.class)

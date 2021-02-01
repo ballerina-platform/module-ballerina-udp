@@ -75,7 +75,8 @@ public class Listener {
         try {
             UdpService udpService = (UdpService) listener.getNativeData(Constants.SERVICE);
             remoteAddress = getRemoteAddress(remoteHost, remotePort);
-            UdpListener udpListener = UdpFactory.createUdpListener(localAddress, remoteAddress, balFuture, udpService);
+            UdpListener udpListener = UdpFactory.getInstance()
+                    .createUdpListener(localAddress, remoteAddress, balFuture, udpService);
 
             listener.addNativeData(Constants.LISTENER, udpListener);
         } catch (InterruptedException e) {

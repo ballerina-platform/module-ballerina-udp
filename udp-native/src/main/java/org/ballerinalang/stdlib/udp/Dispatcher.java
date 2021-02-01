@@ -111,6 +111,7 @@ public class Dispatcher {
                     Dispatcher.invokeOnDatagram(udpService, datagramPacket,
                             channel);
                     break;
+                default:break;
             }
         }
     }
