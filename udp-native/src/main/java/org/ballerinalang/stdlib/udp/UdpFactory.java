@@ -29,31 +29,31 @@ import java.net.InetSocketAddress;
  */
 public class UdpFactory {
 
-    private static UdpFactory udpFactory;
+    private static volatile UdpFactory udpFactory;
     private EventLoopGroup group;
 
     private UdpFactory() {
         group = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() * 2);
     }
 
-    private static UdpFactory getInstance() {
+    public static UdpFactory getInstance() {
         if (udpFactory == null) {
             udpFactory = new UdpFactory();
         }
         return udpFactory;
     }
 
-    public static UdpClient createUdpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
+    public UdpClient createUdpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
                                             Future callback) throws InterruptedException {
         return new UdpClient(localAddress, remoteAddress, getInstance().group, callback);
     }
 
-    public static UdpClient createUdpClient(InetSocketAddress localAddress,
+    public UdpClient createUdpClient(InetSocketAddress localAddress,
                                             Future callback) throws InterruptedException {
         return new UdpClient(localAddress, getInstance().group, callback);
     }
 
-    public static UdpListener createUdpListener(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
+    public UdpListener createUdpListener(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
                                                 Future callback, UdpService udpService) throws InterruptedException {
         return new UdpListener(localAddress, remoteAddress, getInstance().group, callback, udpService);
     }

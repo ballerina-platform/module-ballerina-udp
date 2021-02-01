@@ -39,13 +39,11 @@ import java.util.concurrent.TimeUnit;
 public class UdpClient {
 
     private Channel channel;
-    private final EventLoopGroup group;
     private final Bootstrap clientBootstrap;
 
     // create connection oriented client
     public UdpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
                      EventLoopGroup group, Future callback) throws  InterruptedException {
-        this.group = group;
         clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioDatagramChannel.class)
@@ -63,7 +61,6 @@ public class UdpClient {
     // create connection less client
     public UdpClient(InetSocketAddress localAddress, EventLoopGroup group,
                      Future callback) throws  InterruptedException {
-        this.group = group;
         clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioDatagramChannel.class)

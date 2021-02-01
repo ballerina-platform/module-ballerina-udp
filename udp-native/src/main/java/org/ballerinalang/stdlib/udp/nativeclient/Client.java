@@ -60,7 +60,7 @@ public class Client {
         client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
 
         try {
-           UdpClient udpClient = UdpFactory.createUdpClient(localAddress, balFuture);
+           UdpClient udpClient = UdpFactory.getInstance().createUdpClient(localAddress, balFuture);
            client.addNativeData(Constants.CONNECTIONLESS_CLIENT, udpClient);
         } catch (InterruptedException e) {
             balFuture.complete(Utils.createSocketError("Unable to initialize the udp client."));
