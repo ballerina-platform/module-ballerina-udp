@@ -35,7 +35,7 @@ public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket
     protected void channelRead0(ChannelHandlerContext ctx,
                                 DatagramPacket datagramPacket) throws Exception {
         if (callback != null) {
-            callback.complete(Utils.createReadonlyDatagram(datagramPacket));
+            callback.complete(Utils.createReadonlyDatagramWithRecipientAddress(datagramPacket));
         }
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
     }
