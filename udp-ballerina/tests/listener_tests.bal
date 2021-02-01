@@ -104,3 +104,27 @@ function testCallerSendDatagram() {
         log:printError("Error initializing UDP Client", err = socketClient);
     }
 }
+
+@test:Config {
+    dependsOn: [testCallerSendDatagram]
+}
+function testReturnDatagram() {
+    Client|Error? socketClient = new(localHost = "localhost");
+    if (socketClient is Client) {
+         string msg = "Hello Ballerina echo";
+        Datagram datagram = prepareDatagram(msg, remotePort = PORT4);
+
+        var sendResult = socketClient->sendDatagram(datagram);
+        if (sendResult is ()) {
+            log:print("Datagram was sent to the remote host.");
+        } else {
+            test:assertFail(msg = sendResult.message());
+        }
+        string readContent = receiveClientContent(socketClient);
+        test:assertEquals(readContent, msg, "Found unexpected output");
+        checkpanic socketClient->close();
+        
+    } else if (socketClient is Error) {
+        log:printError("Error initializing UDP Client", err = socketClient);
+    }
+}

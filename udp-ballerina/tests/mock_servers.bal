@@ -19,6 +19,7 @@ import ballerina/io;
 const int PORT1 = 9000;
 const int PORT2 = 8080;
 const int PORT3 = 9001;
+const int PORT4 = 9002;
 
 listener Listener logServer = new Listener(PORT1);
 listener Listener echoServer = new Listener(PORT2);
@@ -70,5 +71,13 @@ service on botServer {
 
     remote function onError(readonly & Error err) {
         io:println(err);
+    }
+}
+
+service on new Listener(PORT4) {
+     remote function onDatagram(readonly & Datagram datagram, Caller caller) returns Datagram|Error? {
+        string|error? dataString = getString(datagram.data);
+        io:println("datagram.data: ", dataString, " ,datagram.remotePort: ", datagram.remotePort);
+       return datagram;
     }
 }

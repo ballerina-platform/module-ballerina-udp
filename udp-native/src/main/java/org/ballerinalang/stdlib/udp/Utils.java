@@ -68,22 +68,20 @@ public class Utils {
         return ErrorCreator.createDistinctError(type.errorType(), getUdpPackage(), StringUtils.fromString(errMsg));
     }
 
-    public static BMap<BString, Object> createDatagram(DatagramPacket datagramPacket) {
+    public static BMap<BString, Object> createReadOnlyDatagramWithSenderAddress(DatagramPacket datagramPacket) {
         byte[] byteContent = new byte[datagramPacket.content().readableBytes()];
         datagramPacket.content().readBytes(byteContent);
-
-        BMap<BString, Object> datagram = ValueCreator.createRecordValue(getUdpPackage(),
-                Constants.DATAGRAM_RECORD);
-        datagram.put(StringUtils.fromString(Constants.DATAGRAM_REMOTE_PORT),
-                datagramPacket.sender().getPort());
-        datagram.put(StringUtils.fromString(Constants.DATAGRAM_REMOTE_HOST),
-                StringUtils.fromString(datagramPacket.sender().getHostName()));
-        datagram.put(StringUtils.fromString(Constants.DATAGRAM_DATA),
-                ValueCreator.createArrayValue(byteContent));
+        Map<String, Object> datagramContent = new HashMap<>();
+        datagramContent.put(Constants.DATAGRAM_REMOTE_PORT, datagramPacket.sender().getPort());
+        datagramContent.put(Constants.DATAGRAM_REMOTE_HOST, StringUtils
+                .fromString(datagramPacket.sender().getHostName()));
+        datagramContent.put(Constants.DATAGRAM_DATA, ValueCreator.createArrayValue(byteContent));
+        BMap<BString, Object> datagram = ValueCreator.createReadonlyRecordValue(getUdpPackage(),
+                Constants.DATAGRAM_RECORD, datagramContent);
         return datagram;
     }
 
-    static BMap<BString, Object> createReadonlyDatagram(DatagramPacket datagramPacket) {
+    static BMap<BString, Object> createReadonlyDatagramWithRecipientAddress(DatagramPacket datagramPacket) {
         byte[] byteContent = new byte[datagramPacket.content().readableBytes()];
         datagramPacket.content().readBytes(byteContent);
         Map<String, Object> datagramContent = new HashMap<>();
