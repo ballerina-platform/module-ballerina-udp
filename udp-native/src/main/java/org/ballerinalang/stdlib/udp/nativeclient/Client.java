@@ -88,7 +88,6 @@ public class Client {
         byte[] byteContent = data.getBytes();
         DatagramPacket datagramPacket = new DatagramPacket(Unpooled.wrappedBuffer(byteContent),
                 new InetSocketAddress(host, port));
-
         UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECTIONLESS_CLIENT);
         udpClient.sendData(datagramPacket, callback);
 

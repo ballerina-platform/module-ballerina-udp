@@ -77,7 +77,7 @@ public class UdpClient {
     // needed for connection oriented client
     private void connect(SocketAddress remoteAddress, SocketAddress localAddress,
                          Future callback) throws  InterruptedException {
-        clientBootstrap.connect(remoteAddress, localAddress).sync()
+        clientBootstrap.connect(remoteAddress, localAddress)
                 .addListener((ChannelFutureListener) future -> {
                     channel = future.channel();
                     channel.pipeline().replace(Constants.CONNECTIONLESS_CLIENT_HANDLER,
@@ -96,7 +96,7 @@ public class UdpClient {
             if (future.isSuccess()) {
                 callback.complete(null);
             } else {
-                callback.complete(Utils.createSocketError("Failed to send data"));
+                callback.complete(Utils.createSocketError("Failed to send data: " + future.cause().getMessage()));
             }
         });
     }
