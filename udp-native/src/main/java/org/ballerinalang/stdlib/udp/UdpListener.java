@@ -21,7 +21,6 @@ package org.ballerinalang.stdlib.udp;
 import io.ballerina.runtime.api.Future;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -81,9 +80,8 @@ public class UdpListener {
     // only invoke if the listener is a connected listener
     private void connect(SocketAddress remoteAddress, SocketAddress localAddress, Future callback)
             throws InterruptedException {
-        ChannelFuture channelFuture = listenerBootstrap.connect(remoteAddress, localAddress).sync();
-        channel = channelFuture.sync().channel();
-        channelFuture.addListener((ChannelFutureListener) future -> {
+        listenerBootstrap.connect(remoteAddress, localAddress).sync().addListener((ChannelFutureListener) future -> {
+            channel = future.channel();
             if (future.isSuccess()) {
                 callback.complete(null);
             } else {
