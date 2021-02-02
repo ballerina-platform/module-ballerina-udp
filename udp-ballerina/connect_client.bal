@@ -74,7 +74,7 @@ public client class ConnectClient {
 #                     of 300000 milliseconds (5 minutes) will be used.
 public type ConnectClientConfig record {
    int timeoutInMillis = 30000;
-   string? localHost = ();
+   string localHost?;
    // can have other socket options
 };
 

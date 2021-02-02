@@ -87,7 +87,7 @@ public type Datagram record {|
 #                     300000 milliseconds (5 minutes) will be used.
 public type ClientConfig record {
    int timeoutInMillis = 30000;
-   string? localHost = ();
+   string localHost?;
    // can have other socket options
 };
 

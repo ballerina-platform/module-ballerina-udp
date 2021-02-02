@@ -88,9 +88,9 @@ public class Listener {
 #                runs without connecting to a remote host.
 # + localHost - The interface for the server to be bound.
 public type ListenerConfig record {
-    string? remoteHost = ();
-    int? remotePort = ();
-    string? localHost = ();
+    string remoteHost?;
+    int remotePort?;
+    string localHost?;
 };
 
 isolated function initListener(Listener listenerObj,int localPort, ListenerConfig config) returns error? = @java:Method {
