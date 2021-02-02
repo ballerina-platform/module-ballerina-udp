@@ -103,10 +103,8 @@ public class UdpClient {
         });
     }
 
-    public void receiveData(long readTimeout, Future callback)
-            throws InterruptedException {
-
-        channel.pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(0, 0, readTimeout,
+    public void receiveData(long readTimeout, Future callback) {
+        channel.pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(readTimeout, 0, 0,
                 TimeUnit.MILLISECONDS));
 
         if (channel.pipeline().get(Constants.CONNECTIONLESS_CLIENT_HANDLER) != null) {

@@ -77,12 +77,8 @@ public class ConnectClient {
         final Future balFuture = env.markAsync();
 
         long readTimeOut = (long) client.getNativeData(Constants.CONFIG_READ_TIMEOUT);
-        try {
-            UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECT_CLIENT);
-            udpClient.receiveData(readTimeOut, balFuture);
-        } catch (InterruptedException e) {
-            balFuture.complete(Utils.createSocketError("Error while receiving data."));
-        }
+        UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECT_CLIENT);
+        udpClient.receiveData(readTimeOut, balFuture);
 
         return null;
     }
