@@ -27,7 +27,7 @@ function setup() {
 @test:Config {
 }
 function testClientEcho() {
-    Client|Error? socketClient = new(localHost = "localhost");
+    Client|Error? socketClient = new;
     if (socketClient is Client) {
          string msg = "Hello Ballerina echo";
         Datagram datagram = prepareDatagram(msg);
