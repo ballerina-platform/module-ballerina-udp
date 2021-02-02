@@ -81,9 +81,8 @@ public class UdpListener {
     // only invoke if the listener is a connected listener
     private void connect(SocketAddress remoteAddress, SocketAddress localAddress, Future callback)
             throws InterruptedException {
-        ChannelFuture channelFuture = listenerBootstrap.connect(remoteAddress).sync();
-        channel = channelFuture.channel();
-        channel = listenerBootstrap.bind(localAddress).sync().channel();
+        ChannelFuture channelFuture = listenerBootstrap.connect(remoteAddress, localAddress).sync();
+        channel = channelFuture.sync().channel();
         channelFuture.addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
                 callback.complete(null);

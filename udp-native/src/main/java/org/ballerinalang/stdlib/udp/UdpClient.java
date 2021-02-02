@@ -78,8 +78,9 @@ public class UdpClient {
     // needed for connection oriented client
     private void connect(SocketAddress remoteAddress, SocketAddress localAddress,
                          Future callback) throws  InterruptedException {
-        ChannelFuture channelFuture = clientBootstrap.connect(remoteAddress).sync();
-        channel = clientBootstrap.bind(localAddress).sync().channel();
+        ChannelFuture channelFuture = clientBootstrap.connect(remoteAddress, localAddress).sync();
+//        channel = clientBootstrap.bind(localAddress).sync().channel();
+        channel = channelFuture.sync().channel();
         channel.pipeline().replace(Constants.CONNECTIONLESS_CLIENT_HANDLER,
                 Constants.CONNECT_CLIENT_HANDLER, new UdpConnectClientHandler());
         channel.config().setAutoRead(false);
