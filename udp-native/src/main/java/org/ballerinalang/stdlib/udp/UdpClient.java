@@ -20,7 +20,6 @@ package org.ballerinalang.stdlib.udp;
 
 import io.ballerina.runtime.api.Future;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -100,7 +99,8 @@ public class UdpClient {
     }
 
     public void sendData(DatagramPacket datagram, Future callback) {
-        PromiseCombiner promiseCombiner = getPromiseCombiner(datagram);
+        LinkedList<DatagramPacket> fragments = Utils.fragmentDatagram(datagram);
+        PromiseCombiner promiseCombiner = getPromiseCombiner(fragments);
 
         promiseCombiner.finish(channel.newPromise().addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
@@ -112,21 +112,7 @@ public class UdpClient {
         }));
     }
 
-    private PromiseCombiner getPromiseCombiner(DatagramPacket datagram) {
-        ByteBuf content = datagram.content();
-        int contentSize = content.readableBytes();
-        LinkedList<DatagramPacket> fragments = new LinkedList<>();
-
-        while (contentSize > 0) {
-            if (contentSize > Constants.DATAGRAM_DATA_SIZE) {
-                fragments.add(datagram.replace(datagram.content().readBytes(Constants.DATAGRAM_DATA_SIZE)));
-                contentSize -= Constants.DATAGRAM_DATA_SIZE;
-            } else {
-                fragments.add(datagram.replace(datagram.content().readBytes(contentSize)));
-                contentSize = 0;
-            }
-        }
-
+    private PromiseCombiner getPromiseCombiner(LinkedList<DatagramPacket> fragments) {
         PromiseCombiner promiseCombiner = new PromiseCombiner(ImmediateEventExecutor.INSTANCE);
         while (fragments.size() > 0) {
             if (channel.isWritable()) {
