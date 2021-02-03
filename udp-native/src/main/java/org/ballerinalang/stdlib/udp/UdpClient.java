@@ -20,16 +20,22 @@ package org.ballerinalang.stdlib.udp;
 
 import io.ballerina.runtime.api.Future;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.FixedRecvByteBufAllocator;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.concurrent.ImmediateEventExecutor;
+import io.netty.util.concurrent.PromiseCombiner;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,6 +52,7 @@ public class UdpClient {
         clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioDatagramChannel.class)
+                .option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(Constants.DATAGRAM_DATA_SIZE))
                 .handler(new ChannelInitializer<>() {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
@@ -63,6 +70,7 @@ public class UdpClient {
         clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioDatagramChannel.class)
+                .option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(Constants.DATAGRAM_DATA_SIZE))
                 .handler(new ChannelInitializer<>() {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
@@ -92,13 +100,40 @@ public class UdpClient {
     }
 
     public void sendData(DatagramPacket datagram, Future callback) {
-        channel.writeAndFlush(datagram).addListener((ChannelFutureListener) future -> {
+        PromiseCombiner promiseCombiner = getPromiseCombiner(datagram);
+
+        promiseCombiner.finish(channel.newPromise().addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
                 callback.complete(null);
             } else {
-                callback.complete(Utils.createSocketError("Failed to send data: " + future.cause().getMessage()));
+                callback.complete(Utils
+                        .createSocketError("Failed to send data: " + future.cause().getMessage()));
             }
-        });
+        }));
+    }
+
+    private PromiseCombiner getPromiseCombiner(DatagramPacket datagram) {
+        ByteBuf content = datagram.content();
+        int contentSize = content.readableBytes();
+        LinkedList<DatagramPacket> fragments = new LinkedList<>();
+
+        while (contentSize > 0) {
+            if (contentSize > Constants.DATAGRAM_DATA_SIZE) {
+                fragments.add(datagram.replace(datagram.content().readBytes(Constants.DATAGRAM_DATA_SIZE)));
+                contentSize -= Constants.DATAGRAM_DATA_SIZE;
+            } else {
+                fragments.add(datagram.replace(datagram.content().readBytes(contentSize)));
+                contentSize = 0;
+            }
+        }
+
+        PromiseCombiner promiseCombiner = new PromiseCombiner(ImmediateEventExecutor.INSTANCE);
+        while (fragments.size() > 0) {
+            if (channel.isWritable()) {
+                promiseCombiner.add(channel.writeAndFlush(fragments.poll()));
+            }
+        }
+        return promiseCombiner;
     }
 
     public void receiveData(long readTimeout, Future callback) {

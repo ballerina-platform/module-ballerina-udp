@@ -91,6 +91,29 @@ function testContentReceive() {
     }
 }
 
+@test:Config {
+    dependsOn: [testContentReceive]
+}
+function testSendAndReciveLargeDataViaDatagram() returns error? {
+    Client socketClient = check new(localHost = "localhost", timeoutInMillis = 3000);
+
+    byte[] data = [];    
+    data[8191] = <byte>97;
+    data[16383] = <byte>98;
+    data[24575] = <byte>99;
+    check socketClient->sendDatagram({data: data, remoteHost : "localhost", remotePort : PORT4});
+    io:println("Datagram sent with large data.");
+
+    int expectedResponseArrayLengthOfFirstDatagramPacket = 8192;
+    readonly & Datagram response = check socketClient->receiveDatagram();
+    int receivedResponseArrayLenght = response.data.length();
+    io:println("***********************: ", receivedResponseArrayLenght);
+    test:assertTrue(receivedResponseArrayLenght == expectedResponseArrayLengthOfFirstDatagramPacket,
+        msg = "Datagrams not recived properly");
+
+    check socketClient->close();
+}
+
 @test:AfterSuite{}
 function stopAll() {
     var result = stopUdpServer();
