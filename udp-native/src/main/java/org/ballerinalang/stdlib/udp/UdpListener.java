@@ -23,9 +23,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.FixedRecvByteBufAllocator;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.util.concurrent.ImmediateEventExecutor;
@@ -44,11 +42,10 @@ public class UdpListener {
     private final Bootstrap listenerBootstrap;
 
     public UdpListener(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
-                       EventLoopGroup group, Future callback, UdpService udpService) throws InterruptedException {
+                       EventLoopGroup group, Future callback, UdpService udpService) {
         listenerBootstrap = new Bootstrap();
         listenerBootstrap.group(group)
                 .channel(NioDatagramChannel.class)
-                .option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(Constants.DATAGRAM_DATA_SIZE))
                 .handler(new ChannelInitializer<>() {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
@@ -58,8 +55,15 @@ public class UdpListener {
         if (remoteAddress != null) {
             connect(remoteAddress, localAddress, callback);
         } else {
-            channel = listenerBootstrap.bind(localAddress).sync().channel();
-            callback.complete(null);
+            listenerBootstrap.bind(localAddress).addListener((ChannelFutureListener) future -> {
+                channel = future.channel();
+                if (future.isSuccess()) {
+                    callback.complete(null);
+                } else {
+                    callback.complete(Utils.createSocketError("Unable to initialize UDP Listener: " +
+                            future.cause().getMessage()));
+                }
+            });
         }
     }
 
@@ -101,8 +105,7 @@ public class UdpListener {
     }
 
     // only invoke if the listener is a connected listener
-    private void connect(SocketAddress remoteAddress, SocketAddress localAddress, Future callback)
-            throws InterruptedException {
+    private void connect(SocketAddress remoteAddress, SocketAddress localAddress, Future callback) {
         listenerBootstrap.connect(remoteAddress, localAddress).addListener((ChannelFutureListener) future -> {
             channel = future.channel();
             if (future.isSuccess()) {

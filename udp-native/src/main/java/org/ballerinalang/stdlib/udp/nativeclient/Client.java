@@ -30,7 +30,6 @@ import io.netty.channel.socket.DatagramPacket;
 import org.ballerinalang.stdlib.udp.Constants;
 import org.ballerinalang.stdlib.udp.UdpClient;
 import org.ballerinalang.stdlib.udp.UdpFactory;
-import org.ballerinalang.stdlib.udp.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +49,8 @@ public class Client {
         BString host = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
         InetSocketAddress localAddress = null;
         if (host == null) {
-           // A port number of zero will let the system pick up an ephemeral port in a bind operation.
-           localAddress = new InetSocketAddress(0);
+            // A port number of zero will let the system pick up an ephemeral port in a bind operation.
+            localAddress = new InetSocketAddress(0);
         } else {
             localAddress = new InetSocketAddress(host.getValue(), 0);
         }
@@ -59,12 +58,8 @@ public class Client {
         long timeout = config.getIntValue(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT));
         client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
 
-        try {
-           UdpClient udpClient = UdpFactory.getInstance().createUdpClient(localAddress, balFuture);
-           client.addNativeData(Constants.CONNECTIONLESS_CLIENT, udpClient);
-        } catch (InterruptedException e) {
-            balFuture.complete(Utils.createSocketError("Unable to initialize the udp client."));
-        }
+        UdpClient udpClient = UdpFactory.getInstance().createUdpClient(localAddress, balFuture);
+        client.addNativeData(Constants.CONNECTIONLESS_CLIENT, udpClient);
 
         return null;
     }
@@ -93,15 +88,12 @@ public class Client {
 
         return null;
     }
-    
-    public static Object close(BObject client) {
-        try {
+
+    public static Object close(Environment env, BObject client) {
+        final Future callback = env.markAsync();
+
         UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECTIONLESS_CLIENT);
-        udpClient.close();
-        } catch (InterruptedException e) {
-            log.error("Unable to close the UDP client.", e);
-            return Utils.createSocketError("Unable to close the  UDP client. " + e.getMessage());
-        }
+        udpClient.close(callback);
 
         return null;
     }

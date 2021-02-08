@@ -23,9 +23,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.FixedRecvByteBufAllocator;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -38,7 +36,7 @@ import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
 /**
- *  {@link UdpClient} creates the udp client and handles all the network operations.
+ * {@link UdpClient} creates the udp client and handles all the network operations.
  */
 public class UdpClient {
 
@@ -47,11 +45,10 @@ public class UdpClient {
 
     // create connection oriented client
     public UdpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
-                     EventLoopGroup group, Future callback) throws  InterruptedException {
+                     EventLoopGroup group, Future callback) {
         clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioDatagramChannel.class)
-                .option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(Constants.DATAGRAM_DATA_SIZE))
                 .handler(new ChannelInitializer<>() {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
@@ -65,37 +62,42 @@ public class UdpClient {
 
     // create connection less client
     public UdpClient(InetSocketAddress localAddress, EventLoopGroup group,
-                     Future callback) throws  InterruptedException {
+                     Future callback) {
         clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioDatagramChannel.class)
-                .option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(Constants.DATAGRAM_DATA_SIZE))
                 .handler(new ChannelInitializer<>() {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
                         ch.pipeline().addLast(Constants.CONNECTIONLESS_CLIENT_HANDLER, new UdpClientHandler());
                     }
-                });
-        channel = clientBootstrap.bind(localAddress).sync().channel();
-        channel.config().setAutoRead(false);
-        callback.complete(null);
+                }).bind(localAddress).addListener((ChannelFutureListener) future -> {
+            channel = future.channel();
+            channel.config().setAutoRead(false);
+            if (future.isSuccess()) {
+                callback.complete(null);
+            } else {
+                callback.complete(Utils.createSocketError("Error initializing UDP Client"));
+            }
+        });
     }
 
     // needed for connection oriented client
     private void connect(SocketAddress remoteAddress, SocketAddress localAddress,
-                         Future callback) throws  InterruptedException {
+                         Future callback) {
         clientBootstrap.connect(remoteAddress, localAddress)
                 .addListener((ChannelFutureListener) future -> {
                     channel = future.channel();
                     channel.pipeline().replace(Constants.CONNECTIONLESS_CLIENT_HANDLER,
                             Constants.CONNECT_CLIENT_HANDLER, new UdpConnectClientHandler());
                     channel.config().setAutoRead(false);
-            if (future.isSuccess()) {
-                callback.complete(null);
-            } else {
-                callback.complete(Utils.createSocketError("Can't connect to remote host"));
-            }
-        });
+                    if (future.isSuccess()) {
+                        callback.complete(null);
+                    } else {
+                        callback.complete(Utils.createSocketError("Can't connect to remote host: "
+                                + future.cause().getMessage()));
+                    }
+                });
     }
 
     public void sendData(DatagramPacket datagram, Future callback) {
@@ -139,7 +141,14 @@ public class UdpClient {
         channel.read();
     }
 
-    public void close() throws InterruptedException {
-        channel.close().sync();
+    public void close(Future callback) {
+        channel.close().addListener((ChannelFutureListener) future -> {
+            if (future.isSuccess()) {
+                callback.complete(null);
+            } else {
+                callback.complete(Utils.createSocketError("Unable to close the  UDP client. "
+                        + future.cause().getMessage()));
+            }
+        });
     }
 }

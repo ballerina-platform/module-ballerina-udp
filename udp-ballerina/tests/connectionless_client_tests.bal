@@ -26,25 +26,17 @@ function setup() {
 
 @test:Config {
 }
-function testClientEcho() {
-    Client|Error? socketClient = new;
-    if (socketClient is Client) {
-         string msg = "Hello Ballerina echo";
-        Datagram datagram = prepareDatagram(msg);
+function testClientEcho() returns error? {
+    Client socketClient = check new;
+    string msg = "Hello Ballerina echo";
+    Datagram datagram = prepareDatagram(msg);
 
-        var sendResult = socketClient->sendDatagram(datagram);
-        if (sendResult is ()) {
-            log:print("Datagram was sent to the remote host.");
-        } else {
-            test:assertFail(msg = sendResult.message());
-        }
-        string readContent = receiveClientContent(socketClient);
-        test:assertEquals(readContent, msg, "Found unexpected output");
-        checkpanic socketClient->close();
-        
-    } else if (socketClient is Error) {
-        log:printError("Error initializing UDP Client", err = socketClient);
-    }
+    var sendResult = check socketClient->sendDatagram(datagram);
+    log:print("Datagram was sent to the remote host.");
+
+    string readContent = receiveClientContent(socketClient);
+    test:assertEquals(readContent, msg, "Found unexpected output");
+    check socketClient->close();
 }
 
 function getString(byte[] content, int numberOfBytes = 50) returns @tainted string|io:Error {
@@ -104,10 +96,10 @@ function testSendAndReciveLargeDataViaDatagram() returns error? {
     check socketClient->sendDatagram({data: data, remoteHost : "localhost", remotePort : PORT4});
     io:println("Datagram sent with large data.");
 
-    int expectedResponseArrayLengthOfFirstDatagramPacket = 8192;
+    int expectedResponseArrayLengthOfFirstDatagramPacket = 2048;
     readonly & Datagram response = check socketClient->receiveDatagram();
     int receivedResponseArrayLenght = response.data.length();
-    io:println("***********************: ", receivedResponseArrayLenght);
+
     test:assertTrue(receivedResponseArrayLenght == expectedResponseArrayLengthOfFirstDatagramPacket,
         msg = "Datagrams not recived properly");
 

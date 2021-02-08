@@ -43,18 +43,16 @@ public class UdpFactory {
         return udpFactory;
     }
 
-    public UdpClient createUdpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
-                                            Future callback) throws InterruptedException {
+    public UdpClient createUdpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress, Future callback) {
         return new UdpClient(localAddress, remoteAddress, getInstance().group, callback);
     }
 
-    public UdpClient createUdpClient(InetSocketAddress localAddress,
-                                            Future callback) throws InterruptedException {
+    public UdpClient createUdpClient(InetSocketAddress localAddress, Future callback) {
         return new UdpClient(localAddress, getInstance().group, callback);
     }
 
     public UdpListener createUdpListener(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
-                                                Future callback, UdpService udpService) throws InterruptedException {
+                                         Future callback, UdpService udpService) {
         return new UdpListener(localAddress, remoteAddress, getInstance().group, callback, udpService);
     }
 }
