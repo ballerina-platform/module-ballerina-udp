@@ -46,12 +46,12 @@ function testConnectClientEcho() {
     dependsOn: [testConnectClientEcho]
 }
 isolated function testConnectClientReadTimeOut() {
-    ConnectClient|Error? socketClient = new("www.ballerina.io", 48830, localHost = "localhost", timeoutInMillis = 1000);
+    ConnectClient|Error? socketClient = new("localhost", 48830, localHost = "localhost", timeoutInMillis = 1000);
     if (socketClient is ConnectClient) {
         
         var result = socketClient->readBytes();
         if (result is byte[]) {
-            test:assertFail(msg = "No UDP service running on www.ballerina.io, no result should be returned");
+            test:assertFail(msg = "No UDP service running on localhost:45830, no result should be returned");
         } else {
             log:print(result.message());
         }

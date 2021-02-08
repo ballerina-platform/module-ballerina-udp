@@ -72,6 +72,7 @@ public class Constants {
     public static final String SERVICE = "service";
     public static final String LOCAL_PORT = "localPort";
     public static final String CHANNEL = "Channel";
+    public static final int DATAGRAM_DATA_SIZE = 8192;
 
     /**
      * Specifies the error type for udp module.

@@ -32,7 +32,6 @@ import org.ballerinalang.stdlib.udp.nativeclient.Client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.BindException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
@@ -60,7 +59,7 @@ public class Listener {
 
         BString localHost = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
         int localPort = (int) listener.getNativeData(Constants.LOCAL_PORT);
-        InetSocketAddress localAddress = null;
+        InetSocketAddress localAddress;
         if (localHost == null) {
             localAddress = new InetSocketAddress(localPort);
         } else {
@@ -68,7 +67,7 @@ public class Listener {
             localAddress = new InetSocketAddress(hostname, localPort);
         }
 
-        InetSocketAddress remoteAddress = null;
+        InetSocketAddress remoteAddress;
         BString remoteHost = config.getStringValue(StringUtils.fromString(Constants.CONFIG_REMOTE_HOST));
         Long remotePort = config.getIntValue(StringUtils.fromString(Constants.CONFIG_REMOTE_PORT));
 
@@ -77,12 +76,7 @@ public class Listener {
             remoteAddress = getRemoteAddress(remoteHost, remotePort);
             UdpListener udpListener = UdpFactory.getInstance()
                     .createUdpListener(localAddress, remoteAddress, balFuture, udpService);
-
             listener.addNativeData(Constants.LISTENER, udpListener);
-        } catch (InterruptedException e) {
-            balFuture.complete(Utils.createSocketError("Unable to initialize the udp listener."));
-        } catch (BindException e) {
-            balFuture.complete(Utils.createSocketError("Address already in use."));
         } catch (Exception e) {
             balFuture.complete(e.getMessage());
         }

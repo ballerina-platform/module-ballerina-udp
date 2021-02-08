@@ -21,15 +21,17 @@ package org.ballerinalang.stdlib.udp;
 import io.ballerina.runtime.api.Future;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
+import io.netty.util.concurrent.ImmediateEventExecutor;
+import io.netty.util.concurrent.PromiseCombiner;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.LinkedList;
 
 /**
  * {@link UdpListener} creates the udp client and handles all the network operations.
@@ -40,7 +42,7 @@ public class UdpListener {
     private final Bootstrap listenerBootstrap;
 
     public UdpListener(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
-                       EventLoopGroup group, Future callback, UdpService udpService) throws InterruptedException {
+                       EventLoopGroup group, Future callback, UdpService udpService) {
         listenerBootstrap = new Bootstrap();
         listenerBootstrap.group(group)
                 .channel(NioDatagramChannel.class)
@@ -53,38 +55,59 @@ public class UdpListener {
         if (remoteAddress != null) {
             connect(remoteAddress, localAddress, callback);
         } else {
-            channel = listenerBootstrap.bind(localAddress).sync().channel();
-            callback.complete(null);
+            listenerBootstrap.bind(localAddress).addListener((ChannelFutureListener) future -> {
+                channel = future.channel();
+                if (future.isSuccess()) {
+                    callback.complete(null);
+                } else {
+                    callback.complete(Utils.createSocketError("Unable to initialize UDP Listener: " +
+                            future.cause().getMessage()));
+                }
+            });
         }
     }
 
     // invoke when caller call writeBytes() or sendDatagram()
     public static void send(DatagramPacket datagram, Channel channel, Future callback) {
-        channel.writeAndFlush(datagram).addListener((ChannelFutureListener) future -> {
+        LinkedList<DatagramPacket> fragments = Utils.fragmentDatagram(datagram);
+        PromiseCombiner promiseCombiner = getPromiseCombiner(fragments, channel);
+
+        promiseCombiner.finish(channel.newPromise().addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
                 callback.complete(null);
             } else {
-                callback.complete(Utils.createSocketError("Failed to send data."));
+                callback.complete(Utils
+                        .createSocketError("Failed to send data: " + future.cause().getMessage()));
             }
-        });
+        }));
     }
 
     // invoke when service return byte[] or Datagram
     public static void send(UdpService udpService, DatagramPacket datagram, Channel channel) {
-        channel.writeAndFlush(datagram).addListener((ChannelFutureListener) future -> {
+        LinkedList<DatagramPacket> fragments = Utils.fragmentDatagram(datagram);
+        PromiseCombiner promiseCombiner = getPromiseCombiner(fragments, channel);
+
+        promiseCombiner.finish(channel.newPromise().addListener((ChannelFutureListener) future -> {
             if (!future.isSuccess()) {
                 Dispatcher.invokeOnError(udpService, "Failed to send data.");
             }
-        });
+        }));
+    }
+
+    private static PromiseCombiner getPromiseCombiner(LinkedList<DatagramPacket> fragments, Channel channel) {
+        PromiseCombiner promiseCombiner = new PromiseCombiner(ImmediateEventExecutor.INSTANCE);
+        while (fragments.size() > 0) {
+            if (channel.isWritable()) {
+                promiseCombiner.add(channel.writeAndFlush(fragments.poll()));
+            }
+        }
+        return promiseCombiner;
     }
 
     // only invoke if the listener is a connected listener
-    private void connect(SocketAddress remoteAddress, SocketAddress localAddress, Future callback)
-            throws InterruptedException {
-        ChannelFuture channelFuture = listenerBootstrap.connect(remoteAddress).sync();
-        channel = channelFuture.channel();
-        channel = listenerBootstrap.bind(localAddress).sync().channel();
-        channelFuture.addListener((ChannelFutureListener) future -> {
+    private void connect(SocketAddress remoteAddress, SocketAddress localAddress, Future callback) {
+        listenerBootstrap.connect(remoteAddress, localAddress).addListener((ChannelFutureListener) future -> {
+            channel = future.channel();
             if (future.isSuccess()) {
                 callback.complete(null);
             } else {

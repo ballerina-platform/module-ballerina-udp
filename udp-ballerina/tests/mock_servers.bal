@@ -76,8 +76,7 @@ service on botServer {
 
 service on new Listener(PORT4) {
      remote function onDatagram(readonly & Datagram datagram, Caller caller) returns Datagram|Error? {
-        string|error? dataString = getString(datagram.data);
-        io:println("datagram.data: ", dataString, " ,datagram.remotePort: ", datagram.remotePort);
+       io:println("Datagram received by listener datagram data lenght is: ", datagram.data.length());
        return datagram;
     }
 }

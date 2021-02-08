@@ -27,9 +27,11 @@ import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.socket.DatagramPacket;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import static org.ballerinalang.stdlib.udp.Constants.ErrorType.GenericError;
@@ -98,6 +100,23 @@ public class Utils {
         byte[] byteContent = new byte[datagramPacket.content().readableBytes()];
         datagramPacket.content().readBytes(byteContent);
         return ValueCreator.createReadonlyArrayValue(byteContent);
+    }
+
+    static LinkedList<DatagramPacket> fragmentDatagram(DatagramPacket datagram) {
+        ByteBuf content = datagram.content();
+        int contentSize = content.readableBytes();
+        LinkedList<DatagramPacket> fragments = new LinkedList<>();
+
+        while (contentSize > 0) {
+            if (contentSize > Constants.DATAGRAM_DATA_SIZE) {
+                fragments.add(datagram.replace(datagram.content().readBytes(Constants.DATAGRAM_DATA_SIZE)));
+                contentSize -= Constants.DATAGRAM_DATA_SIZE;
+            } else {
+                fragments.add(datagram.replace(datagram.content().readBytes(contentSize)));
+                contentSize = 0;
+            }
+        }
+        return fragments;
     }
 
     /**
