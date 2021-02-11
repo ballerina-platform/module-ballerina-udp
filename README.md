@@ -6,7 +6,7 @@ Ballerina UDP Library
   [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/udp.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fudp)
   [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-The UDP package is one of the standard packages packages of the<a target="_blank" href="https://ballerina.io/"> Ballerina</a> language.
+The UDP package is one of the standard library packages of the<a target="_blank" href="https://ballerina.io/"> Ballerina</a> language.
 
 This package provides an implementation for sending/receiving messages to/from another application process (local or remote) for connectionless protocols. 
 
