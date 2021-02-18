@@ -240,6 +240,9 @@ task ballerinaBuild {
 
 task ballerinaPublish {
     doLast {
+        if (project.version.endsWith('-SNAPSHOT')) {
+            return
+        }
         if (ballerinaCentralAccessToken != null) {
             println("Publishing to the ballerina central..")
             exec {
@@ -251,7 +254,8 @@ task ballerinaPublish {
                     commandLine 'sh', '-c', "$distributionBinPath/bal push"
                 }
             }
-
+        } else {
+            throw new InvalidUserDataException("Central Access Token is Not Present")
         }
     }
 }
