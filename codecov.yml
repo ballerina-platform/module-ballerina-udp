@@ -1,0 +1,5 @@
+fixes:
+- "ballerina/udp/*/::udp-ballerina/"
+
+ignore:
+- "**/test"
