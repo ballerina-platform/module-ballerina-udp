@@ -100,3 +100,37 @@ release {
 task build {
     dependsOn('udp-ballerina:build')
 }
+
+def classFilesArray = []
+
+task copyClassFilePaths {
+    dependsOn('udp-ballerina:extractBallerinaClassFiles')
+
+    subprojects.forEach { subproject -> 
+        if(subproject.name != "udp-test-utils") {
+            fileTree("${subproject.buildDir}/classes").matching {
+            exclude '**/test/*'
+            exclude '**/module-info.class'
+            include '**/*.class'
+        }.each { file -> classFilesArray.push(file) }
+        }
+        
+    }
+}
+
+task codeCoverageReport(type: JacocoReport) {
+    dependsOn(copyClassFilePaths)
+    executionData fileTree(project.rootDir.absolutePath).include("**/target/cache/tests_cache/coverage/ballerina.exec")
+    additionalClassDirs files(classFilesArray)
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+        xml.destination = new File("${buildDir}/reports/jacoco/report.xml")
+        html.destination = new File("${buildDir}/reports/jacoco/report.html")
+    }
+
+    onlyIf = {
+        true
+    }
+}
