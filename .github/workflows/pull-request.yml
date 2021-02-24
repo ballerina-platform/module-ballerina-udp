@@ -21,9 +21,7 @@ jobs:
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-             ./gradlew build --scan --no-daemon
-             ./gradlew codeCoverageReport --no-daemon
+        run: ./gradlew build --scan --no-daemon
       - name: Archive Error Log
         uses: actions/upload-artifact@v2
         if: failure()
@@ -31,14 +29,14 @@ jobs:
             name: Ballerina Internal Log
             path: udp-ballerina/ballerina-internal.log
             if-no-files-found: ignore
+      - name: Generate Codecov Report
+        uses: codecov/codecov-action@v1
       - name: Archive Code Coverage JSON
         uses: actions/upload-artifact@v2
         with:
             name: Code Coverage JSON
             path: udp-ballerina/target/report/test_results.json
             if-no-files-found: ignore
-      - name: Generate Codecov Report
-        uses: codecov/codecov-action@v1 
 
   windows-build:
 
