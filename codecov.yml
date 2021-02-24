@@ -2,7 +2,8 @@ codecov:
   require_ci_to_pass: no
 
 fixes:
-- "ballerina/udp/*/::udp-ballerina/"
+  - "ballerina/udp/*/::udp-ballerina/"
 
 ignore:
-- "**/test"
+  - "**/test"
+  - "**/testutils"
