@@ -100,4 +100,3 @@ release {
 task build {
     dependsOn('udp-ballerina:build')
 }
-
