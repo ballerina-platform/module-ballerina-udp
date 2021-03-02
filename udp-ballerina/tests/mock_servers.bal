@@ -38,7 +38,7 @@ service on logServer {
 
 service on echoServer {
 
-    remote function onBytes(readonly & byte[] data, Caller caller) returns (readonly & byte[])|Error? {
+    remote function onBytes(Caller caller, readonly & byte[] data) returns (readonly & byte[])|Error? {
         io:println("Received by listener:", getString(data));
         return data;
     }
@@ -75,7 +75,7 @@ service on botServer {
 }
 
 service on new Listener(PORT4) {
-     remote function onDatagram(readonly & Datagram datagram, Caller caller) returns Datagram|Error? {
+     remote function onDatagram(readonly & Datagram datagram) returns Datagram|Error? {
        io:println("Datagram received by listener datagram data lenght is: ", datagram.data.length());
        return datagram;
     }
