@@ -49,7 +49,7 @@ function getString(byte[] content, int numberOfBytes = 50) returns @tainted stri
     dependsOn: [testClientEcho]
 }
 function testContentReceive() {
-    Client|Error? socketClient = new(localHost = "localhost", timeoutInMillis = 3000);
+    Client|Error? socketClient = new(localHost = "localhost", timeout = 3);
      if (socketClient is Client) {
         string msg = "Hello server! send me the data";
          Datagram datagram = prepareDatagram(msg);
@@ -87,7 +87,7 @@ function testContentReceive() {
     dependsOn: [testContentReceive]
 }
 function testSendAndReciveLargeDataViaDatagram() returns error? {
-    Client socketClient = check new(localHost = "localhost", timeoutInMillis = 3000);
+    Client socketClient = check new(localHost = "localhost", timeout = 3);
 
     byte[] data = [];    
     data[8191] = <byte>97;

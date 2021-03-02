@@ -124,9 +124,10 @@ public class UdpClient {
         return promiseCombiner;
     }
 
-    public void receiveData(long readTimeout, Future callback) {
-        channel.pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(readTimeout, 0, 0,
-                TimeUnit.MILLISECONDS));
+    public void receiveData(double readTimeoutInSec, Future callback) {
+        long readTimeoutInNano = (long) (readTimeoutInSec * 1_000_000_000);
+        channel.pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(readTimeoutInNano, 0, 0,
+                TimeUnit.NANOSECONDS));
 
         if (channel.pipeline().get(Constants.CONNECTIONLESS_CLIENT_HANDLER) != null) {
             UdpClientHandler handler = (UdpClientHandler) channel.pipeline().

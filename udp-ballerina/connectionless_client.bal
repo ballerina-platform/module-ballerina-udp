@@ -82,11 +82,11 @@ public type Datagram record {|
 # Configurations for the connectionless UDP client.
 # 
 # + localHost - Local binding of the interface.
-# + timeoutInMillis - The socket reading timeout value to be used in 
-#                     milliseconds. If this is not set,the default value of
-#                     300000 milliseconds (5 minutes) will be used.
+# + timeout - The socket reading timeout value to be used 
+#             in seconds. If this is not set,the default value
+#             of 300 seconds (5 minutes) will be used.
 public type ClientConfig record {
-   int timeoutInMillis = 30000;
+   decimal timeout = 300;
    string localHost?;
    // can have other socket options
 };
