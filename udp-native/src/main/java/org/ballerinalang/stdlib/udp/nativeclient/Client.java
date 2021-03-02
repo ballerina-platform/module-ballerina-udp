@@ -22,6 +22,7 @@ import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BArray;
+import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
@@ -55,7 +56,7 @@ public class Client {
             localAddress = new InetSocketAddress(host.getValue(), 0);
         }
 
-        long timeout = config.getIntValue(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT));
+        double timeout = ((BDecimal) config.get(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT))).floatValue();
         client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
 
         UdpClient udpClient = UdpFactory.getInstance().createUdpClient(localAddress, balFuture);
@@ -67,7 +68,7 @@ public class Client {
     public static Object receive(Environment env, BObject client) {
         final Future callback = env.markAsync();
 
-        long readTimeOut = (long) client.getNativeData(Constants.CONFIG_READ_TIMEOUT);
+        double readTimeOut = (double) client.getNativeData(Constants.CONFIG_READ_TIMEOUT);
         UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECTIONLESS_CLIENT);
         udpClient.receiveData(readTimeOut, callback);
 

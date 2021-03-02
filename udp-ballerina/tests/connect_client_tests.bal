@@ -46,7 +46,7 @@ function testConnectClientEcho() {
     dependsOn: [testConnectClientEcho]
 }
 isolated function testConnectClientReadTimeOut() {
-    ConnectClient|Error? socketClient = new("localhost", 48830, localHost = "localhost", timeoutInMillis = 1000);
+    ConnectClient|Error? socketClient = new("localhost", 48830, localHost = "localhost", timeout = 1.5);
     if (socketClient is ConnectClient) {
         
         var result = socketClient->readBytes();
