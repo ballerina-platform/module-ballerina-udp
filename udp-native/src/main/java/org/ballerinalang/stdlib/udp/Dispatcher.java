@@ -20,8 +20,8 @@ package org.ballerinalang.stdlib.udp;
 
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MethodType;
+import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.StringUtils;
-import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
 import io.netty.channel.Channel;
@@ -38,9 +38,10 @@ public class Dispatcher {
 
     private static final Logger log = LoggerFactory.getLogger(Dispatcher.class);
 
-    private static void invokeOnBytes(UdpService udpService, DatagramPacket datagramPacket, Channel channel) {
+    private static void invokeOnBytes(UdpService udpService, DatagramPacket datagramPacket, Channel channel,
+                                      Type[] parameterTypes) {
         try {
-            Object[] params = getOnBytesSignature(datagramPacket, channel);
+            Object[] params = getOnBytesSignature(datagramPacket, channel, parameterTypes);
 
             udpService.getRuntime().invokeMethodAsync(udpService.getService(), Constants.ON_BYTES, null, null,
                     new UdpCallback(udpService, channel, datagramPacket), params);
@@ -49,9 +50,10 @@ public class Dispatcher {
         }
     }
 
-    private static void invokeOnDatagram(UdpService udpService, DatagramPacket datagramPacket, Channel channel) {
+    private static void invokeOnDatagram(UdpService udpService, DatagramPacket datagramPacket, Channel channel,
+                                         Type[] parameterTypes) {
         try {
-            Object[] params = getOnDatagramSignature(datagramPacket, channel);
+            Object[] params = getOnDatagramSignature(datagramPacket, channel, parameterTypes);
 
             udpService.getRuntime().invokeMethodAsync(udpService.getService(), Constants.ON_DATAGRAM, null, null,
                     new UdpCallback(udpService, channel, datagramPacket), params);
@@ -74,18 +76,50 @@ public class Dispatcher {
         }
     }
 
-    private static Object[] getOnBytesSignature(DatagramPacket datagramPacket, Channel channel) {
-        BObject caller = createClient(datagramPacket, channel);
+    private static Object[] getOnBytesSignature(DatagramPacket datagramPacket, Channel channel, Type[] parameterTypes) {
         byte[] byteContent = new byte[datagramPacket.content().readableBytes()];
         datagramPacket.content().readBytes(byteContent);
-        BArray bytes = ValueCreator.createArrayValue(byteContent);
 
-        return new Object[]{bytes, true, caller, true};
+        Object[] bValues = new Object[parameterTypes.length * 2];
+        int index = 0;
+        for (Type param : parameterTypes) {
+            String typeName = param.getName();
+            switch (typeName) {
+                case Constants.READ_ONLY_BYTE_ARRAY:
+                    bValues[index++] = ValueCreator.createArrayValue(byteContent);
+                    bValues[index++] = true;
+                    break;
+                case Constants.CALLER:
+                    bValues[index++] = createClient(datagramPacket, channel);
+                    bValues[index++] = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return bValues;
     }
 
-    private static Object[] getOnDatagramSignature(DatagramPacket datagramPacket, Channel channel) {
-        BObject caller = createClient(datagramPacket, channel);
-        return new Object[]{Utils.createReadOnlyDatagramWithSenderAddress(datagramPacket), true, caller, true};
+    private static Object[] getOnDatagramSignature(DatagramPacket datagramPacket, Channel channel,
+                                                   Type[] parameterTypes) {
+        Object[] bValues = new Object[parameterTypes.length * 2];
+        int index = 0;
+        for (Type param : parameterTypes) {
+            String typeName = param.getName();
+            switch (typeName) {
+                case Constants.READ_ONLY_DATAGRAM:
+                    bValues[index++] = Utils.createReadOnlyDatagramWithSenderAddress(datagramPacket);
+                    bValues[index++] = true;
+                    break;
+                case Constants.CALLER:
+                    bValues[index++] = createClient(datagramPacket, channel);
+                    bValues[index++] = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return bValues;
     }
 
     private static Object[] getOnErrorSignature(String message) {
@@ -105,13 +139,15 @@ public class Dispatcher {
         for (MethodType method : udpService.getService().getType().getMethods()) {
             switch (method.getName()) {
                 case Constants.ON_BYTES:
-                    Dispatcher.invokeOnBytes(udpService, datagramPacket, channel);
+                    Dispatcher.invokeOnBytes(udpService, datagramPacket, channel,
+                            method.getType().getParameterTypes());
                     break;
                 case Constants.ON_DATAGRAM:
-                    Dispatcher.invokeOnDatagram(udpService, datagramPacket,
-                            channel);
+                    Dispatcher.invokeOnDatagram(udpService, datagramPacket, channel,
+                            method.getType().getParameterTypes());
                     break;
-                default:break;
+                default:
+                    break;
             }
         }
     }
