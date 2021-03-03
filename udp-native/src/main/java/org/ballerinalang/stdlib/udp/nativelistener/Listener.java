@@ -78,7 +78,7 @@ public class Listener {
                     .createUdpListener(localAddress, remoteAddress, balFuture, udpService);
             listener.addNativeData(Constants.LISTENER, udpListener);
         } catch (Exception e) {
-            balFuture.complete(e.getMessage());
+            balFuture.complete(Utils.createSocketError(e.getMessage()));
         }
 
         return null;
