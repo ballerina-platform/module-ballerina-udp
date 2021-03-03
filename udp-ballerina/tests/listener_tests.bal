@@ -145,3 +145,32 @@ function testConnectedListener() returns error? {
         log:printError("Error initializing UDP Client", err = socketClient);
     }
 }
+
+@test:Config {dependsOn: [testConnectedListener]}
+function testListenerForSendingMultipleDatagrams() returns error? {
+    Client socketClient = check new (timeout = 0.1);
+
+    string msg = "Send me the data";
+
+    _ = check socketClient->sendDatagram({
+        data: msg.toBytes(),
+        remoteHost: "localhost",
+        remotePort: PORT6
+    });
+
+    int noOfBytesReceived = 0;
+    readonly & Datagram|Error res = socketClient->receiveDatagram();
+
+    while (res is (readonly & Datagram)) {
+        noOfBytesReceived += res.data.length();
+        res = socketClient->receiveDatagram();
+    }
+
+    // listener sending multiple datagrams this client should recive atleast one datagram
+    if (noOfBytesReceived > 0) {
+        io:println("Total number of bytes from received datagrams: ", noOfBytesReceived);
+    } else {
+        test:assertFail(msg = "No datagrams received by the client");
+    }
+    check socketClient->close();
+}
