@@ -73,6 +73,8 @@ public class Constants {
     public static final String LOCAL_PORT = "localPort";
     public static final String CHANNEL = "Channel";
     public static final int DATAGRAM_DATA_SIZE = 8192;
+    public static final String READ_ONLY_BYTE_ARRAY = "(byte[] & readonly)";
+    public static final String READ_ONLY_DATAGRAM = "(udp:Datagram & readonly)";
 
     /**
      * Specifies the error type for udp module.
