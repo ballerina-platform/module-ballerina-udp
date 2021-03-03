@@ -13,13 +13,13 @@
 // KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
 import ballerina/io;
 
 const int PORT1 = 9000;
 const int PORT2 = 8080;
 const int PORT3 = 9001;
 const int PORT4 = 9002;
+const int PORT5 = 9003;
 
 listener Listener logServer = new Listener(PORT1);
 listener Listener echoServer = new Listener(PORT2);
@@ -61,12 +61,11 @@ service on botServer {
         if (dataString is string && QuestionBank.hasKey(dataString)) {
             string? response = QuestionBank[dataString];
             if (response is string) {
-                return prepareDatagram(response, <string>caller.remoteHost,
-                    <int>caller.remotePort);
+                return prepareDatagram(response, <string>caller.remoteHost, <int>caller.remotePort);
             }
         }
-        Error? res = caller->sendDatagram(prepareDatagram("Sorry,I Can’t help you with that",
-        <string>caller.remoteHost, <int>caller.remotePort));
+        Error? res = caller->sendDatagram(
+            prepareDatagram("Sorry,I Can’t help you with that", <string>caller.remoteHost, <int> caller.remotePort));
     }
 
     remote function onError(readonly & Error err) {
@@ -75,8 +74,16 @@ service on botServer {
 }
 
 service on new Listener(PORT4) {
-     remote function onDatagram(readonly & Datagram datagram, Caller caller) returns Datagram|Error? {
-       io:println("Datagram received by listener datagram data lenght is: ", datagram.data.length());
-       return datagram;
+    remote function onDatagram(readonly & Datagram datagram, Caller caller) returns Datagram|Error? {
+        io:println("Datagram received by listener datagram data lenght is: ", datagram.data.length());
+        return datagram;
+    }
+}
+
+// this listener only listen to the client running on localhost:9999
+service on new Listener(PORT5, remoteHost="localhost", remotePort=9999) {
+    remote function onBytes(readonly & byte[] data) returns (readonly & byte[])|Error? {
+        io:println("Received by connected listener:", getString(data));
+        return <byte[] & readonly>("You are running on 9999".toBytes().cloneReadOnly());
     }
 }
