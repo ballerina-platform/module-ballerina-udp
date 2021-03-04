@@ -18,13 +18,11 @@ import ballerina/log;
 import ballerina/test;
 import ballerina/io;
 
-@test:Config {
-     dependsOn: [testContentReceive]
-}
+@test:Config {dependsOn: [testContentReceive]}
 function testConnectClientEcho() {
-    ConnectClient|Error? socketClient = new("localhost", 48829);
+    ConnectClient|Error? socketClient = new ("localhost", 48829);
     if (socketClient is ConnectClient) {
-         string msg = "Echo from connet client";
+        string msg = "Echo from connet client";
 
         var sendResult = socketClient->writeBytes(msg.toBytes());
         if (sendResult is ()) {
@@ -35,20 +33,25 @@ function testConnectClientEcho() {
         string readContent = readConnectClientContent(socketClient);
         test:assertEquals(readContent, msg, "Found unexpected output");
         checkpanic socketClient->close();
-        
     } else if (socketClient is Error) {
         log:printError("Error initializing UDP Client", err = socketClient);
     }
 }
 
-
-@test:Config {
-    dependsOn: [testConnectClientEcho]
-}
-isolated function testConnectClientReadTimeOut() {
-    ConnectClient|Error? socketClient = new("localhost", 48830, localHost = "localhost", timeout = 1.5);
+@test:Config {dependsOn: [testConnectClientEcho]}
+isolated function testInvalidLocalHostInConnectClient() {
+    ConnectClient|Error? socketClient = new ("localhost", 48830, localHost = "invalid", timeout = 1.5);
     if (socketClient is ConnectClient) {
-        
+        test:assertFail(msg = "Provided invalid value for localHost this should return an Error");
+    } else if (socketClient is Error) {
+        log:print("Error initializing UDP Client");
+    }
+}
+
+@test:Config {dependsOn: [testInvalidLocalHostInConnectClient]}
+isolated function testConnectClientReadTimeOut() {
+    ConnectClient|Error? socketClient = new ("localhost", 48830, localHost = "localhost", timeout = 1.5);
+    if (socketClient is ConnectClient) {
         var result = socketClient->readBytes();
         if (result is byte[]) {
             test:assertFail(msg = "No UDP service running on localhost:45830, no result should be returned");
@@ -57,7 +60,6 @@ isolated function testConnectClientReadTimeOut() {
         }
 
         checkpanic socketClient->close();
-        
     } else if (socketClient is Error) {
         log:printError("Error initializing UDP Client", err = socketClient);
     }

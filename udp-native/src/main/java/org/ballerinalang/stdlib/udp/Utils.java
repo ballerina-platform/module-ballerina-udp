@@ -109,7 +109,7 @@ public class Utils {
 
         while (contentSize > 0) {
             if (contentSize > Constants.DATAGRAM_DATA_SIZE) {
-                fragments.add(datagram.replace(datagram.content().readBytes(Constants.DATAGRAM_DATA_SIZE)));
+                fragments.add(datagram.replace(content.readBytes(Constants.DATAGRAM_DATA_SIZE)));
                 contentSize -= Constants.DATAGRAM_DATA_SIZE;
             } else {
                 fragments.add(datagram.replace(datagram.content().readBytes(contentSize)));

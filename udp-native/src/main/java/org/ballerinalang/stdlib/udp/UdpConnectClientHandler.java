@@ -18,7 +18,6 @@
 
 package org.ballerinalang.stdlib.udp;
 
-import io.ballerina.runtime.api.Future;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
 
@@ -26,8 +25,6 @@ import io.netty.channel.socket.DatagramPacket;
  *  {@link UdpConnectClientHandler} ia a ChannelInboundHandler implementation for udp connection oriented client.
  */
 public class UdpConnectClientHandler extends UdpClientHandler {
-
-    private Future callback;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
@@ -37,11 +34,4 @@ public class UdpConnectClientHandler extends UdpClientHandler {
         }
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
     }
-
-    @Override
-    public void setCallback(Future callback) {
-        super.setCallback(callback);
-        this.callback = callback;
-    }
-
 }

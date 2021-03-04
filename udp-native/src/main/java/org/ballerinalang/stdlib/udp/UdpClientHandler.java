@@ -24,40 +24,46 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.timeout.IdleStateEvent;
 
+import java.net.PortUnreachableException;
+
 /**
  * {@link UdpClientHandler} ia a ChannelInboundHandler implementation for udp client.
  */
 public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
-    private Future callback;
+    protected Future callback;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
                                 DatagramPacket datagramPacket) throws Exception {
+        ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
         if (callback != null) {
             callback.complete(Utils.createReadonlyDatagramWithRecipientAddress(datagramPacket));
         }
-        ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
     }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
+            ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
             // return timeout error
             if (callback != null) {
                 callback.complete(Utils.createSocketError(Constants.ErrorType.ReadTimedOutError,
                         "Read timed out"));
             }
-            ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (callback != null) {
-            callback.complete(Utils.createSocketError(cause.getMessage()));
-        }
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
+        if (callback != null) {
+            String errorMsg = cause.getMessage();
+            if (cause instanceof PortUnreachableException) {
+                errorMsg = "Port unreachable (" + ctx.channel().remoteAddress() + ")";
+            }
+            callback.complete(Utils.createSocketError(errorMsg));
+        }
     }
 
     public void setCallback(Future callback) {

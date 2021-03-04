@@ -48,7 +48,7 @@ public class Client {
         final Future balFuture = env.markAsync();
 
         BString host = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
-        InetSocketAddress localAddress = null;
+        InetSocketAddress localAddress;
         if (host == null) {
             // A port number of zero will let the system pick up an ephemeral port in a bind operation.
             localAddress = new InetSocketAddress(0);
