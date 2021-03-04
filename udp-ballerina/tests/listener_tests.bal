@@ -146,7 +146,7 @@ function testConnectedListener() returns error? {
     }
 }
 
-@test:Config {dependsOn: [testConnectedListener], enable:false}
+@test:Config {dependsOn: [testConnectedListener], enable:true}
 function testListenerForSendingMultipleDatagrams() returns error? {
     Client socketClient = check new (timeout = 0.1);
 
