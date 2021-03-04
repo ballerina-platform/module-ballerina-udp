@@ -55,7 +55,11 @@ public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (callback != null) {
-            callback.complete(Utils.createSocketError(cause.getMessage()));
+            String errorMsg = cause.getMessage();
+            if (cause instanceof PortUnreachableException) {
+                errorMsg = "Port unreachable (" + ctx.channel().remoteAddress() + ")";
+            }
+            callback.complete(Utils.createSocketError(errorMsg));
         }
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
     }
