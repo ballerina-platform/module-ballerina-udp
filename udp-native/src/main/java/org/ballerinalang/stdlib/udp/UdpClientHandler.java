@@ -29,7 +29,7 @@ import io.netty.handler.timeout.IdleStateEvent;
  */
 public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
-    private Future callback;
+    protected Future callback;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
