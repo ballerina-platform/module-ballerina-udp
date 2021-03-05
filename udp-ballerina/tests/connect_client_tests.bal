@@ -40,7 +40,7 @@ function testConnectClientEcho() {
 
 @test:Config {dependsOn: [testConnectClientEcho]}
 isolated function testInvalidLocalHostInConnectClient() {
-    ConnectClient|Error? socketClient = new ("localhost", 48830, localHost = "invalid", timeout = 1.5);
+    ConnectClient|Error? socketClient = new ("localhost", 48830, localHost = "200.200.200.200", timeout = 1.5);
     if (socketClient is ConnectClient) {
         test:assertFail(msg = "Provided invalid value for localHost this should return an Error");
     } else if (socketClient is Error) {
