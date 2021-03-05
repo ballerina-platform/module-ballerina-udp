@@ -72,9 +72,9 @@ public class UdpClient {
                         ch.pipeline().addLast(Constants.CONNECTIONLESS_CLIENT_HANDLER, new UdpClientHandler());
                     }
                 }).bind(localAddress).addListener((ChannelFutureListener) future -> {
-            channel = future.channel();
-            channel.config().setAutoRead(false);
             if (future.isSuccess()) {
+                channel = future.channel();
+                channel.config().setAutoRead(false);
                 callback.complete(null);
             } else {
                 callback.complete(Utils.createSocketError("Error initializing UDP Client"));
@@ -87,11 +87,11 @@ public class UdpClient {
                          Future callback) {
         clientBootstrap.connect(remoteAddress, localAddress)
                 .addListener((ChannelFutureListener) future -> {
-                    channel = future.channel();
-                    channel.pipeline().replace(Constants.CONNECTIONLESS_CLIENT_HANDLER,
-                            Constants.CONNECT_CLIENT_HANDLER, new UdpConnectClientHandler());
-                    channel.config().setAutoRead(false);
                     if (future.isSuccess()) {
+                        channel = future.channel();
+                        channel.pipeline().replace(Constants.CONNECTIONLESS_CLIENT_HANDLER,
+                                Constants.CONNECT_CLIENT_HANDLER, new UdpConnectClientHandler());
+                        channel.config().setAutoRead(false);
                         callback.complete(null);
                     } else {
                         callback.complete(Utils.createSocketError("Can't connect to remote host: "

@@ -56,8 +56,8 @@ public class UdpListener {
             connect(remoteAddress, localAddress, callback);
         } else {
             listenerBootstrap.bind(localAddress).addListener((ChannelFutureListener) future -> {
-                channel = future.channel();
                 if (future.isSuccess()) {
+                    channel = future.channel();
                     callback.complete(null);
                 } else {
                     callback.complete(Utils.createSocketError("Unable to initialize UDP Listener: " +
