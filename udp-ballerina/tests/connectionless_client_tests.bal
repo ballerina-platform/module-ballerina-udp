@@ -31,7 +31,7 @@ function testClientEcho() returns error? {
     Datagram datagram = prepareDatagram(msg);
 
     var sendResult = check socketClient->sendDatagram(datagram);
-    log:print("Datagram was sent to the remote host.");
+    log:printInfo("Datagram was sent to the remote host.");
 
     string readContent = receiveClientContent(socketClient);
     test:assertEquals(readContent, msg, "Found unexpected output");
@@ -44,7 +44,7 @@ isolated function testInvalidLocalHostInClient() {
     if (socketClient is Client) {
         test:assertFail(msg = "Provided invalid value for localHost this should return an Error");
     } else if (socketClient is Error) {
-        log:print("Error initializing UDP Client");
+        log:printInfo("Error initializing UDP Client");
     }
 }
 
@@ -63,7 +63,7 @@ function testContentReceive() {
 
         var sendResult = socketClient->sendDatagram(datagram);
         if (sendResult is ()) {
-            log:print("Datagram was sent to the remote host.");
+            log:printInfo("Datagram was sent to the remote host.");
         } else {
             test:assertFail(msg = sendResult.message());
         }
@@ -75,7 +75,7 @@ function testContentReceive() {
         // repeating the send and receive
         sendResult = socketClient->sendDatagram(datagram);
         if (sendResult is ()) {
-            log:print("Datagram was sent to the remote host.");
+            log:printInfo("Datagram was sent to the remote host.");
         } else {
             test:assertFail(msg = sendResult.message());
         }
@@ -86,7 +86,7 @@ function testContentReceive() {
         checkpanic socketClient->close();
 
     } else if (socketClient is Error) {
-        log:printError("Error initializing UDP Client", err = socketClient);
+        log:printError("Error initializing UDP Client", 'error = socketClient);
     }
 }
 
