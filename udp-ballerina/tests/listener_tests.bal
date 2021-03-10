@@ -12,7 +12,8 @@
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
-// under the License.import ballerina/log;
+// under the License.
+
 import ballerina/log;
 import ballerina/test;
 import ballerina/io;
@@ -28,7 +29,7 @@ function testListenerRead() {
 
             var sendResult = socketClient->sendDatagram(datagram);
             if (sendResult is ()) {
-                log:print("Datagram was sent to the remote host.");
+                log:printInfo("Datagram was sent to the remote host.");
             } else {
                 test:assertFail(msg = sendResult.message());
             }
@@ -37,7 +38,7 @@ function testListenerRead() {
         checkpanic socketClient->close();
 
     } else if (socketClient is Error) {
-        log:printError("Error initializing UDP Client", err = socketClient);
+        log:printError("Error initializing UDP Client", 'error = socketClient);
     }
 }
 
@@ -52,7 +53,7 @@ function testCallerSendBytes() {
 
             var sendResult = socketClient->sendDatagram(datagram);
             if (sendResult is ()) {
-                log:print("Datagram was sent to the remote host.");
+                log:printInfo("Datagram was sent to the remote host.");
             } else {
                 test:assertFail(msg = sendResult.message());
             }
@@ -66,7 +67,7 @@ function testCallerSendBytes() {
         checkpanic socketClient->close();
 
     } else if (socketClient is Error) {
-        log:printError("Error initializing UDP Client", err = socketClient);
+        log:printError("Error initializing UDP Client", 'error = socketClient);
     }
 }
 
@@ -81,7 +82,7 @@ function testCallerSendDatagram() {
 
             var sendResult = socketClient->sendDatagram(datagram);
             if (sendResult is ()) {
-                log:print("Datagram was sent to the remote host.");
+                log:printInfo("Datagram was sent to the remote host.");
             } else {
                 test:assertFail(msg = sendResult.message());
             }
@@ -94,7 +95,7 @@ function testCallerSendDatagram() {
         checkpanic socketClient->close();
 
     } else if (socketClient is Error) {
-        log:printError("Error initializing UDP Client", err = socketClient);
+        log:printError("Error initializing UDP Client", 'error = socketClient);
     }
 }
 
@@ -107,7 +108,7 @@ function testReturnDatagram() {
 
         var sendResult = socketClient->sendDatagram(datagram);
         if (sendResult is ()) {
-            log:print("Datagram was sent to the remote host.");
+            log:printInfo("Datagram was sent to the remote host.");
         } else {
             test:assertFail(msg = sendResult.message());
         }
@@ -116,7 +117,7 @@ function testReturnDatagram() {
         checkpanic socketClient->close();
 
     } else if (socketClient is Error) {
-        log:printError("Error initializing UDP Client", err = socketClient);
+        log:printError("Error initializing UDP Client", 'error = socketClient);
     }
 }
 
@@ -128,7 +129,7 @@ function testConnectedListener() returns error? {
 
         var sendResult = socketClient->writeBytes(msg.toBytes());
         if (sendResult is ()) {
-            log:print("Data was sent to the remote host.");
+            log:printInfo("Data was sent to the remote host.");
         } else {
             test:assertFail(msg = sendResult.message());
         }
@@ -142,7 +143,7 @@ function testConnectedListener() returns error? {
         }
         check socketClient->close();
     } else if (socketClient is Error) {
-        log:printError("Error initializing UDP Client", err = socketClient);
+        log:printError("Error initializing UDP Client", 'error = socketClient);
     }
 }
 

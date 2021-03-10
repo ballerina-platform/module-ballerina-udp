@@ -26,7 +26,7 @@ function testConnectClientEcho() {
 
         var sendResult = socketClient->writeBytes(msg.toBytes());
         if (sendResult is ()) {
-            log:print("Data was sent to the remote host.");
+            log:printInfo("Data was sent to the remote host.");
         } else {
             test:assertFail(msg = sendResult.message());
         }
@@ -34,7 +34,7 @@ function testConnectClientEcho() {
         test:assertEquals(readContent, msg, "Found unexpected output");
         checkpanic socketClient->close();
     } else if (socketClient is Error) {
-        log:printError("Error initializing UDP Client", err = socketClient);
+        log:printError("Error initializing UDP Client", 'error = socketClient);
     }
 }
 
@@ -44,7 +44,7 @@ isolated function testInvalidLocalHostInConnectClient() {
     if (socketClient is ConnectClient) {
         test:assertFail(msg = "Provided invalid value for localHost this should return an Error");
     } else if (socketClient is Error) {
-        log:print("Error initializing UDP Client");
+        log:printInfo("Error initializing UDP Client");
     }
 }
 
@@ -56,12 +56,12 @@ isolated function testConnectClientReadTimeOut() {
         if (result is byte[]) {
             test:assertFail(msg = "No UDP service running on localhost:45830, no result should be returned");
         } else {
-            log:print(result.message());
+            log:printInfo(result.message());
         }
 
         checkpanic socketClient->close();
     } else if (socketClient is Error) {
-        log:printError("Error initializing UDP Client", err = socketClient);
+        log:printError("Error initializing UDP Client", 'error = socketClient);
     }
 }
 
