@@ -92,7 +92,7 @@ service on new Listener(PORT5, remoteHost = "localhost", remotePort = 9999) {
 
 //
 service on new Listener(PORT6) {
-    remote function onDatagram(readonly & Datagram datagram, Caller caller) returns Error? {
+    remote function onDatagram(Caller caller, readonly & Datagram datagram) returns Error? {
         io:println("Datagram received by listener: ", getString(datagram.data));
         // return large data this will break the data in to multiple datagram and send it to client
         byte[] response = [];

@@ -29,7 +29,7 @@ public client class ConnectClient {
     # + remoteHost - The hostname or the IP address of the remote host
     # + remotePort - The port number of the remmote host
     # + config - Connection oriented client related configuration
-    public isolated function init(string remoteHost, int remotePort, *ConnectClientConfig config) returns Error? {
+    public isolated function init(string remoteHost, int remotePort, *ConnectClientConfiguration config) returns Error? {
         return initConnectClient(self, remoteHost, remotePort, config);
     }
 
@@ -72,14 +72,14 @@ public client class ConnectClient {
 # + timeout - The socket reading timeout value to be used 
 #             in seconds. If this is not set,the default value
 #             of 300 seconds (5 minutes) will be used.
-public type ConnectClientConfig record {
+public type ConnectClientConfiguration record {
    decimal timeout = 300;
    string localHost?;
    // can have other socket options
 };
 
 
-isolated function initConnectClient(ConnectClient connectClient, string remoteHost, int remotePort, ConnectClientConfig config) returns Error? =
+isolated function initConnectClient(ConnectClient connectClient, string remoteHost, int remotePort, ConnectClientConfiguration config) returns Error? =
 @java:Method {
     name: "init",
     'class: "org.ballerinalang.stdlib.udp.nativeclient.ConnectClient"
