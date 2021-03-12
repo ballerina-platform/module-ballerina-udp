@@ -13,7 +13,6 @@
 // KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
 import ballerina/io;
 
 const int PORT1 = 9000;
@@ -30,7 +29,7 @@ listener Listener botServer = new Listener(PORT3);
 service on logServer {
 
     remote function onBytes(readonly & byte[] data) returns Error? {
-        io:println(getString(data));
+        io:println(string:fromBytes(data));
     }
 
     remote function onError(readonly & Error err) {
@@ -41,7 +40,7 @@ service on logServer {
 service on echoServer {
 
     remote function onBytes(readonly & byte[] data) returns (readonly & byte[])|Error? {
-        io:println("Received by listener:", getString(data));
+        io:println("Received by listener:", string:fromBytes(data));
         return data;
     }
 
@@ -58,7 +57,7 @@ map<string> QuestionBank = {
 service on botServer {
 
     remote function onDatagram(readonly & Datagram datagram, Caller caller) returns Datagram|Error? {
-        string|error? dataString = getString(datagram.data);
+        string|error? dataString = string:fromBytes(datagram.data);
         io:println("Received data: ", dataString);
         if (dataString is string && QuestionBank.hasKey(dataString)) {
             string? response = QuestionBank[dataString];
@@ -85,15 +84,14 @@ service on new Listener(PORT4) {
 // this listener only listen to the client running on localhost:9999
 service on new Listener(PORT5, remoteHost = "localhost", remotePort = 9999) {
     remote function onBytes(readonly & byte[] data) returns (readonly & byte[])|Error? {
-        io:println("Received by connected listener:", getString(data));
+        io:println("Received by connected listener:", string:fromBytes(data));
         return <byte[] & readonly>("You are running on 9999".toBytes().cloneReadOnly());
     }
 }
 
-//
 service on new Listener(PORT6) {
     remote function onDatagram(Caller caller, readonly & Datagram datagram) returns Error? {
-        io:println("Datagram received by listener: ", getString(datagram.data));
+        io:println("Datagram received by listener: ", string:fromBytes(datagram.data));
         // return large data this will break the data in to multiple datagram and send it to client
         byte[] response = [];
         response[80000] = 97;

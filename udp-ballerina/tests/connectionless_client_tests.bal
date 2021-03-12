@@ -30,11 +30,12 @@ function testClientEcho() returns error? {
     string msg = "Hello Ballerina echo";
     Datagram datagram = prepareDatagram(msg);
 
-    var sendResult = check socketClient->sendDatagram(datagram);
+    check socketClient->sendDatagram(datagram);
     log:printInfo("Datagram was sent to the remote host.");
 
-    string readContent = receiveClientContent(socketClient);
-    test:assertEquals(readContent, msg, "Found unexpected output");
+    readonly & Datagram response = check socketClient->receiveDatagram();
+    test:assertEquals(string:fromBytes(response.data), msg, "Found an unexpected output");
+
     check socketClient->close();
 }
 
@@ -48,46 +49,28 @@ isolated function testInvalidLocalHostInClient() {
     }
 }
 
-function getString(byte[] content, int numberOfBytes = 50) returns @tainted string|io:Error {
-    io:ReadableByteChannel byteChannel = check io:createReadableChannel(content);
-    io:ReadableCharacterChannel characterChannel = new io:ReadableCharacterChannel(byteChannel, "UTF-8");
-    return check characterChannel.read(numberOfBytes);
-}
-
 @test:Config {dependsOn: [testInvalidLocalHostInClient]}
-function testContentReceive() {
-    Client|Error? socketClient = new (localHost = "localhost", timeout = 3);
-    if (socketClient is Client) {
-        string msg = "Hello server! send me the data";
-        Datagram datagram = prepareDatagram(msg);
+function testContentReceive() returns error? {
+    Client socketClient = check new (localHost = "localhost", timeout = 3);
 
-        var sendResult = socketClient->sendDatagram(datagram);
-        if (sendResult is ()) {
-            log:printInfo("Datagram was sent to the remote host.");
-        } else {
-            test:assertFail(msg = sendResult.message());
-        }
+    string msg = "Hello server! send me the data";
+    Datagram datagram = prepareDatagram(msg);
 
-        string readContent = receiveClientContent(socketClient);
-        string expectedResponse = "Hi client! here is your data";
-        test:assertEquals(readContent, expectedResponse, "Found an unexpected output");
+    check socketClient->sendDatagram(datagram);
+    log:printInfo("Datagram was sent to the remote host.");
 
-        // repeating the send and receive
-        sendResult = socketClient->sendDatagram(datagram);
-        if (sendResult is ()) {
-            log:printInfo("Datagram was sent to the remote host.");
-        } else {
-            test:assertFail(msg = sendResult.message());
-        }
+    readonly & Datagram response = check socketClient->receiveDatagram();
+    string expectedResponseString = "Hi client! here is your data";
+    test:assertEquals(string:fromBytes(response.data), expectedResponseString, "Found an unexpected output");
 
-        readContent = receiveClientContent(socketClient);
-        test:assertEquals(readContent, expectedResponse, "Found an unexpected output");
+    // repeating the send and receive
+    check socketClient->sendDatagram(datagram);
+    log:printInfo("Datagram was sent to the remote host.");
 
-        checkpanic socketClient->close();
+    response = check socketClient->receiveDatagram();
+    test:assertEquals(string:fromBytes(response.data), expectedResponseString, "Found an unexpected output");
 
-    } else if (socketClient is Error) {
-        log:printError("Error initializing UDP Client", 'error = socketClient);
-    }
+    check socketClient->close();
 }
 
 @test:Config {dependsOn: [testContentReceive]}
@@ -127,23 +110,6 @@ isolated function prepareDatagram(string msg, string remoteHost = "localhost", i
         remoteHost: remoteHost,
         remotePort: remotePort
     };
-}
-
-function receiveClientContent(Client socketClient) returns string {
-    string returnStr = "";
-    var result = socketClient->receiveDatagram();
-    if (result is (readonly & Datagram)) {
-        var str = getString(result.data);
-        if (str is string) {
-            returnStr = <@untainted>str;
-            io:println("Response is :", returnStr);
-        } else {
-            test:assertFail(msg = str.message());
-        }
-    } else {
-        test:assertFail(msg = "Failed to receive the datagram");
-    }
-    return returnStr;
 }
 
 public function startUdpServer() returns Error? = @java:Method 

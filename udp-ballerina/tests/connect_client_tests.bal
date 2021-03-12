@@ -16,26 +16,19 @@
 
 import ballerina/log;
 import ballerina/test;
-import ballerina/io;
 
 @test:Config {dependsOn: [testContentReceive]}
-function testConnectClientEcho() {
-    ConnectClient|Error? socketClient = new ("localhost", 48829);
-    if (socketClient is ConnectClient) {
-        string msg = "Echo from connet client";
+function testConnectClientEcho() returns error? {
+    ConnectClient socketClient = check new ("localhost", 48829);
 
-        var sendResult = socketClient->writeBytes(msg.toBytes());
-        if (sendResult is ()) {
-            log:printInfo("Data was sent to the remote host.");
-        } else {
-            test:assertFail(msg = sendResult.message());
-        }
-        string readContent = readConnectClientContent(socketClient);
-        test:assertEquals(readContent, msg, "Found unexpected output");
-        checkpanic socketClient->close();
-    } else if (socketClient is Error) {
-        log:printError("Error initializing UDP Client", 'error = socketClient);
-    }
+    string msg = "Echo from connet client";
+    check socketClient->writeBytes(msg.toBytes());
+    log:printInfo("Data was sent to the remote host.");
+
+    readonly & byte[] response = check socketClient->readBytes();
+    test:assertEquals(string:fromBytes(response), msg, "Found unexpected output");
+
+    check socketClient->close();
 }
 
 @test:Config {dependsOn: [testConnectClientEcho]}
@@ -49,35 +42,15 @@ isolated function testInvalidLocalHostInConnectClient() {
 }
 
 @test:Config {dependsOn: [testInvalidLocalHostInConnectClient]}
-isolated function testConnectClientReadTimeOut() {
-    ConnectClient|Error? socketClient = new ("localhost", 48830, localHost = "localhost", timeout = 1.5);
-    if (socketClient is ConnectClient) {
-        var result = socketClient->readBytes();
-        if (result is byte[]) {
-            test:assertFail(msg = "No UDP service running on localhost:45830, no result should be returned");
-        } else {
-            log:printInfo(result.message());
-        }
+isolated function testConnectClientReadTimeOut() returns error? {
+    ConnectClient socketClient = check new ("localhost", 48830, localHost = "localhost", timeout = 1.5);
 
-        checkpanic socketClient->close();
-    } else if (socketClient is Error) {
-        log:printError("Error initializing UDP Client", 'error = socketClient);
-    }
-}
-
-function readConnectClientContent(ConnectClient socketClient) returns string {
-    string returnStr = "";
     var result = socketClient->readBytes();
     if (result is byte[]) {
-        var str = getString(result, 50);
-        if (str is string) {
-            returnStr = <@untainted>str;
-            io:println("Response is :", returnStr);
-        } else {
-            test:assertFail(msg = str.message());
-        }
+        test:assertFail(msg = "No UDP service running on localhost:45830, no result should be returned");
     } else {
-        test:assertFail(msg = "Failed to receive the data");
+        log:printInfo(result.message());
     }
-    return returnStr;
+
+    check socketClient->close();
 }
