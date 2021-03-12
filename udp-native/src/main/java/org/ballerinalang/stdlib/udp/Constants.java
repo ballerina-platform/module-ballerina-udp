@@ -46,7 +46,7 @@ public class Constants {
     public static final String LISTENER = "listener";
 
     // Constant related to ballerina ClientConfiguration/ConnectClientConfiguration record
-    public static final String LISTENER_CONFIG = "ListenerConfig";
+    public static final String LISTENER_CONFIG = "ListenerConfiguration";
     public static final String CONFIG_READ_TIMEOUT = "timeout";
     public static final String CONFIG_LOCALHOST = "localHost";
     public static final String CONFIG_REMOTE_HOST = "remoteHost";
