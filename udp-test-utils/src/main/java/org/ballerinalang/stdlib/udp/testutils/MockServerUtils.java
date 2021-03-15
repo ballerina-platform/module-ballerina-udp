@@ -66,7 +66,7 @@ public class MockServerUtils {
                 Thread.sleep(500);
             }
         } catch (IOException | InterruptedException e) {
-            return Utils.createSocketError("write failed. " + e.getMessage());
+            return Utils.createUdpError("write failed. " + e.getMessage());
         }
         return null;
     }

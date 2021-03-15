@@ -123,7 +123,7 @@ public class Dispatcher {
     }
 
     private static Object[] getOnErrorSignature(String message) {
-        return new Object[]{Utils.createSocketError(message), true};
+        return new Object[]{Utils.createUdpError(message), true};
     }
 
     private static BObject createClient(DatagramPacket datagramPacket, Channel channel) {

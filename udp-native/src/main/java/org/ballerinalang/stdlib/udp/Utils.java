@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import static org.ballerinalang.stdlib.udp.Constants.ErrorType.GenericError;
+import static org.ballerinalang.stdlib.udp.Constants.ErrorType.Error;
 
 /**
  * Represents the util functions of Socket operations.
@@ -48,26 +48,8 @@ public class Utils {
      */
     private static Module udpModule = null;
 
-    /**
-     * Create Generic udp error with given error message.
-     *
-     * @param errMsg the error message
-     * @return BError instance which contains the error details
-     */
-    public static BError createSocketError(String errMsg) {
-        return ErrorCreator.createDistinctError(GenericError.errorType(), getUdpPackage(),
-                StringUtils.fromString(errMsg));
-    }
-
-    /**
-     * Create udp error with given error type and message.
-     *
-     * @param type   the error type which cause for this error
-     * @param errMsg the error message
-     * @return BError instance which contains the error details
-     */
-    public static BError createSocketError(Constants.ErrorType type, String errMsg) {
-        return ErrorCreator.createDistinctError(type.errorType(), getUdpPackage(), StringUtils.fromString(errMsg));
+    public static BError createUdpError(String errMsg) {
+        return ErrorCreator.createError(getUdpPackage(), Error.errorType(), StringUtils.fromString(errMsg), null, null);
     }
 
     public static BMap<BString, Object> createReadOnlyDatagramWithSenderAddress(DatagramPacket datagramPacket) {

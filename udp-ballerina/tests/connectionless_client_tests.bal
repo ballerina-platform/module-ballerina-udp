@@ -112,11 +112,11 @@ isolated function prepareDatagram(string msg, string remoteHost = "localhost", i
     };
 }
 
-public function startUdpServer() returns Error? = @java:Method 
+public function startUdpServer() returns error? = @java:Method 
 {'class: "org/ballerinalang/stdlib/udp/testutils/MockServerUtils"} external;
 
-public function stopUdpServer() returns Error? = @java:Method 
+public function stopUdpServer() returns error? = @java:Method 
 {'class: "org/ballerinalang/stdlib/udp/testutils/MockServerUtils"} external;
 
-public function passUdpContent(string content, int port) returns Error? = @java:Method 
+public function passUdpContent(string content, int port) returns error? = @java:Method 
 {'class: "org/ballerinalang/stdlib/udp/testutils/MockServerUtils"} external;

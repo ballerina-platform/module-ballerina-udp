@@ -60,7 +60,7 @@ public class UdpListener {
                     channel = future.channel();
                     callback.complete(null);
                 } else {
-                    callback.complete(Utils.createSocketError("Unable to initialize UDP Listener: " +
+                    callback.complete(Utils.createUdpError("Unable to initialize UDP Listener: " +
                             future.cause().getMessage()));
                 }
             });
@@ -77,7 +77,7 @@ public class UdpListener {
                 callback.complete(null);
             } else {
                 callback.complete(Utils
-                        .createSocketError("Failed to send data: " + future.cause().getMessage()));
+                        .createUdpError("Failed to send data: " + future.cause().getMessage()));
             }
         }));
     }
@@ -111,7 +111,7 @@ public class UdpListener {
             if (future.isSuccess()) {
                 callback.complete(null);
             } else {
-                callback.complete(Utils.createSocketError("Can't connect to remote host."));
+                callback.complete(Utils.createUdpError("Can't connect to remote host."));
             }
         });
     }
@@ -121,7 +121,7 @@ public class UdpListener {
             if (future.isSuccess()) {
                 callback.complete(null);
             } else {
-                callback.complete(Utils.createSocketError("Failed to gracefully shutdown the Listener."));
+                callback.complete(Utils.createUdpError("Failed to gracefully shutdown the Listener."));
             }
         });
     }

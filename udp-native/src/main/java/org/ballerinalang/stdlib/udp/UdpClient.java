@@ -77,7 +77,7 @@ public class UdpClient {
                 channel.config().setAutoRead(false);
                 callback.complete(null);
             } else {
-                callback.complete(Utils.createSocketError("Error initializing UDP Client"));
+                callback.complete(Utils.createUdpError("Error initializing UDP Client"));
             }
         });
     }
@@ -94,7 +94,7 @@ public class UdpClient {
                         channel.config().setAutoRead(false);
                         callback.complete(null);
                     } else {
-                        callback.complete(Utils.createSocketError("Can't connect to remote host: "
+                        callback.complete(Utils.createUdpError("Can't connect to remote host: "
                                 + future.cause().getMessage()));
                     }
                 });
@@ -109,7 +109,7 @@ public class UdpClient {
                 callback.complete(null);
             } else {
                 callback.complete(Utils
-                        .createSocketError("Failed to send data: " + future.cause().getMessage()));
+                        .createUdpError("Failed to send data: " + future.cause().getMessage()));
             }
         }));
     }
@@ -147,7 +147,7 @@ public class UdpClient {
             if (future.isSuccess()) {
                 callback.complete(null);
             } else {
-                callback.complete(Utils.createSocketError("Unable to close the  UDP client. "
+                callback.complete(Utils.createUdpError("Unable to close the  UDP client. "
                         + future.cause().getMessage()));
             }
         });
