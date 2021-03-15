@@ -78,7 +78,7 @@ public class Listener {
                     .createUdpListener(localAddress, remoteAddress, balFuture, udpService);
             listener.addNativeData(Constants.LISTENER, udpListener);
         } catch (Exception e) {
-            balFuture.complete(Utils.createSocketError(e.getMessage()));
+            balFuture.complete(Utils.createUdpError(e.getMessage()));
         }
 
         return null;
@@ -101,10 +101,10 @@ public class Listener {
             if (udpListener != null) {
                 udpListener.close(balFuture);
             } else {
-                balFuture.complete(Utils.createSocketError("Unable to initialize the udp listener."));
+                balFuture.complete(Utils.createUdpError("Unable to initialize the udp listener."));
             }
         } catch (InterruptedException e) {
-            balFuture.complete(Utils.createSocketError("Failed to gracefully shutdown the Listener."));
+            balFuture.complete(Utils.createUdpError("Failed to gracefully shutdown the Listener."));
         }
 
         return null;

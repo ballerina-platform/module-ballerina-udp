@@ -48,8 +48,7 @@ public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
             // return timeout error
             if (callback != null) {
-                callback.complete(Utils.createSocketError(Constants.ErrorType.ReadTimedOutError,
-                        "Read timed out"));
+                callback.complete(Utils.createUdpError("Read timed out"));
             }
         }
     }
@@ -62,7 +61,7 @@ public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             if (cause instanceof PortUnreachableException) {
                 errorMsg = "Port unreachable (" + ctx.channel().remoteAddress() + ")";
             }
-            callback.complete(Utils.createSocketError(errorMsg));
+            callback.complete(Utils.createUdpError(errorMsg));
         }
     }
 

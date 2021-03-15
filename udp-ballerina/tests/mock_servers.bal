@@ -32,7 +32,7 @@ service on logServer {
         io:println(string:fromBytes(data));
     }
 
-    remote function onError(readonly & Error err) {
+    remote function onError(Error err) {
         io:println(err.message());
     }
 }
@@ -44,7 +44,7 @@ service on echoServer {
         return data;
     }
 
-    remote function onError(readonly & Error err) {
+    remote function onError(Error err) {
         io:println(err);
     }
 }
@@ -69,7 +69,7 @@ service on botServer {
         caller.remotePort));
     }
 
-    remote function onError(readonly & Error err) {
+    remote function onError(Error err) {
         io:println(err);
     }
 }
