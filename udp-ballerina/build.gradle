@@ -26,12 +26,14 @@ def snapshotVersion = "-SNAPSHOT"
 def tomlVersion = project.version.replace("${snapshotVersion}", "")
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
 def ballerinaDependencyFile = new File("$project.projectDir/Dependencies.toml")
+def compilerPluginTomlFile = new File("$project.projectDir/CompilerPlugin.toml")
 def artifactBallerinaDocs = file("$project.projectDir/build/docs_parent/")
 def artifactCacheParent = file("$project.projectDir/build/cache_parent/")
 def artifactLibParent = file("$project.projectDir/build/lib_parent/")
 def ballerinaCentralAccessToken = System.getenv('BALLERINA_CENTRAL_ACCESS_TOKEN')
 def originalConfig = ballerinaConfigFile.text
 def originalDependencies = ballerinaDependencyFile.text
+def originalCompilerPluginToml = compilerPluginTomlFile.text
 def distributionBinPath =  project.projectDir.absolutePath + "/build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}/bin"
 
 configurations {
@@ -125,6 +127,9 @@ task updateTomlFile {
         def newDependencyConfig = ballerinaDependencyFile.text.replace("@stdlib.io.version@", stdlibDependentIoVersion)
         newDependencyConfig = newDependencyConfig.replace("@stdlib.log.version@", stdlibDependentLogVersion)
         ballerinaDependencyFile.text = newDependencyConfig
+
+        def newCompilerPluginToml = compilerPluginTomlFile.text.replace("@project.version@", project.version)
+        compilerPluginTomlFile.text = newCompilerPluginToml
     }
 }
 
@@ -132,6 +137,7 @@ task revertTomlFile {
     doLast {
         ballerinaConfigFile.text = originalConfig
         ballerinaDependencyFile.text = originalDependencies
+        compilerPluginTomlFile.text = originalCompilerPluginToml
     }
 }
 
@@ -296,6 +302,7 @@ ballerinaTest.dependsOn updateTomlFile
 ballerinaTest.dependsOn initializeVariables
 ballerinaTest.dependsOn ":${packageName}-native:build"
 ballerinaTest.dependsOn ":${packageName}-test-utils:build"
+ballerinaTest.dependsOn ":${packageName}-compiler-plugin:build"
 ballerinaTest.finalizedBy revertTomlFile
 test.dependsOn ballerinaTest
 
@@ -304,10 +311,12 @@ ballerinaBuild.dependsOn updateTomlFile
 ballerinaBuild.dependsOn initializeVariables
 ballerinaBuild.dependsOn ":${packageName}-native:build"
 ballerinaBuild.dependsOn ":${packageName}-test-utils:build"
+ballerinaTest.dependsOn ":${packageName}-compiler-plugin:build"
 ballerinaBuild.finalizedBy revertTomlFile
 build.dependsOn ballerinaBuild
 
 ballerinaPublish.dependsOn ":${packageName}-native:build"
+ballerinaTest.dependsOn ":${packageName}-compiler-plugin:build"
 ballerinaPublish.dependsOn ballerinaBuild
 ballerinaPublish.dependsOn updateTomlFile
 ballerinaPublish.dependsOn initializeVariables
