@@ -209,7 +209,7 @@ task ballerinaBuild {
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
                 commandLine 'cmd', '/c', "$balJavaDebugParam $distributionBinPath/bal.bat build -c ${testParams} ${debugParams} && exit %%ERRORLEVEL%%"
             } else {
-                commandLine 'sh', '-c', "$balJavaDebugParam $distributionBinPath/bal build -c ${testParams} ${debugParams}"
+                commandLine 'sh', '-c', "$balJavaDebugParam $distributionBinPath/bal build -c ${testParams} ${debugParams} && $distributionBinPath/bal push --repository=local"
             }
         }
         // extract bala file to artifact cache directory
@@ -311,12 +311,12 @@ ballerinaBuild.dependsOn updateTomlFile
 ballerinaBuild.dependsOn initializeVariables
 ballerinaBuild.dependsOn ":${packageName}-native:build"
 ballerinaBuild.dependsOn ":${packageName}-test-utils:build"
-ballerinaTest.dependsOn ":${packageName}-compiler-plugin:build"
+ballerinaBuild.dependsOn ":${packageName}-compiler-plugin:build"
 ballerinaBuild.finalizedBy revertTomlFile
 build.dependsOn ballerinaBuild
 
 ballerinaPublish.dependsOn ":${packageName}-native:build"
-ballerinaTest.dependsOn ":${packageName}-compiler-plugin:build"
+ballerinaPublish.dependsOn ":${packageName}-compiler-plugin:build"
 ballerinaPublish.dependsOn ballerinaBuild
 ballerinaPublish.dependsOn updateTomlFile
 ballerinaPublish.dependsOn initializeVariables

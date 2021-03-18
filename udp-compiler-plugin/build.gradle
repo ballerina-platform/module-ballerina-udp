@@ -31,7 +31,7 @@ dependencies {
     implementation group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
     implementation group: 'org.ballerinalang', name: 'ballerina-tools-api', version: "${ballerinaLangVersion}"
     implementation group: 'org.ballerinalang', name: 'ballerina-parser', version: "${ballerinaLangVersion}"
-    compile project(":udp-native")
+    implementation project(":udp-native")
 }
 
 def excludePattern = '**/module-info.java'
@@ -40,7 +40,7 @@ tasks.withType(Checkstyle) {
 }
 
 checkstyle {
-    toolVersion "${project.puppycrawlCheckstyleVersion}"
+    toolVersion "${project.checkstyleToolVersion}"
     configFile rootProject.file("build-config/checkstyle/build/checkstyle.xml")
     configProperties = ["suppressionFile" : file("${rootDir}/build-config/checkstyle/build/suppressions.xml")]
 }
@@ -59,10 +59,6 @@ spotbugsMain {
     if(excludeFile.exists()) {
         excludeFilter = excludeFile
     }
-}
-
-spotbugsTest {
-    enabled = false
 }
 
 compileJava {
