@@ -25,10 +25,10 @@ import io.ballerina.projects.plugins.CodeAnalyzer;
 /**
  * Class to analyze the ballerina UDP service.
  */
-public class ServiceAnalyzer extends CodeAnalyzer {
+public class UdpServiceAnalyzer extends CodeAnalyzer {
 
     @Override
     public void init(CodeAnalysisContext codeAnalysisContext) {
-        codeAnalysisContext.addSyntaxNodeAnalysisTask(new ServiceValidatorTask(), SyntaxKind.SERVICE_DECLARATION);
+        codeAnalysisContext.addSyntaxNodeAnalysisTask(new UdpServiceValidatorTask(), SyntaxKind.SERVICE_DECLARATION);
     }
 }
