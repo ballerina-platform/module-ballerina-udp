@@ -40,6 +40,7 @@ public class ServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisCont
     private FunctionDefinitionNode onDatagramFunctionNode;
     private FunctionDefinitionNode onBytesFunctionNode;
     private FunctionDefinitionNode onErrorFunctionNode;
+    private static final String code = "UDP_101";
 
     @Override
     public void perform(SyntaxNodeAnalysisContext ctx) {
@@ -76,14 +77,14 @@ public class ServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisCont
     private void checkOnBytesAndOnDatagramFunctionExistence(SyntaxNodeAnalysisContext ctx) {
         if (onBytesFunctionNode != null && onDatagramFunctionNode != null) {
             // Service shouldn't contain both onDatagram, onBytes method
-            DiagnosticInfo diagnosticInfo = new DiagnosticInfo("code",
+            DiagnosticInfo diagnosticInfo = new DiagnosticInfo(code,
                     "Service cannot contain both `onDatagram` {0} and `onBytes` {1} functions.",
                     DiagnosticSeverity.ERROR);
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo, ctx.node().location(),
                     onDatagramFunctionNode.location().lineRange(), onBytesFunctionNode.location().lineRange()));
         } else if (onBytesFunctionNode == null && onDatagramFunctionNode == null) {
             // At-least service should contain onDatagram method or onBytes method
-            DiagnosticInfo diagnosticInfo = new DiagnosticInfo("code",
+            DiagnosticInfo diagnosticInfo = new DiagnosticInfo(code,
                     "Service does not contain `onDatagram` or `onBytes` function.",
                     DiagnosticSeverity.ERROR);
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
@@ -97,7 +98,7 @@ public class ServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisCont
         boolean hasRemoteKeyword = functionDefinitionNode.qualifierList().stream()
                 .filter(q -> q.kind() == SyntaxKind.REMOTE_KEYWORD).toArray().length == 1;
         if (!hasRemoteKeyword) {
-            DiagnosticInfo diagnosticInfo = new DiagnosticInfo("code",
+            DiagnosticInfo diagnosticInfo = new DiagnosticInfo(code,
                     "`remote` keyword expected in `{0}` function signature.",
                     DiagnosticSeverity.ERROR);
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
@@ -110,7 +111,7 @@ public class ServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisCont
                                     FunctionDefinitionNode functionDefinitionNode,
                                     String functionName) {
         if (parameterNodes.isEmpty()) {
-            DiagnosticInfo diagnosticInfo = new DiagnosticInfo("code",
+            DiagnosticInfo diagnosticInfo = new DiagnosticInfo(code,
                     "No parameter provided for `{0}`," +
                             " function expects `{1}` as a parameter.",
                     DiagnosticSeverity.ERROR);
@@ -130,7 +131,6 @@ public class ServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisCont
             RequiredParameterNode requiredParameterNode = (RequiredParameterNode) parameterNode;
             Node typeName = requiredParameterNode.typeName();
             DiagnosticInfo diagnosticInfo;
-            String code = "UDP_101";
             if (functionName.equals(Constants.ON_DATAGRAM)
                     && ((typeName.kind() == SyntaxKind.INTERSECTION_TYPE_DESC
                     && !typeName.toString().contains(Constants.DATAGRAM_RECORD))
