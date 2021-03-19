@@ -18,16 +18,49 @@
 
 package io.ballerina.stdlib.udp.compiler;
 
+import io.ballerina.projects.DiagnosticResult;
+import io.ballerina.projects.Package;
+import io.ballerina.projects.PackageCompilation;
+import io.ballerina.projects.ProjectEnvironmentBuilder;
+import io.ballerina.projects.directory.BuildProject;
+import io.ballerina.projects.environment.Environment;
+import io.ballerina.projects.environment.EnvironmentBuilder;
+import io.ballerina.tools.diagnostics.Diagnostic;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * This class includes tests for Ballerina UDP compiler plugin.
  */
 public class CompilerPluginTest {
 
+    private static final Path RESOURCE_DIRECTORY = Paths.get("src", "test", "resources", "ballerina_sources")
+            .toAbsolutePath();
+    private static final Path DISTRIBUTION_PATH = Paths.get("build", "target", "ballerina-distribution")
+            .toAbsolutePath();
+
     @Test
-    public void testCompilerPlugin() {
-        Assert.assertEquals(true, true);
+    public void testServiceWithOnDatagramAndOnBytes() {
+        Package currentPackage = loadPackage("sample_package_1");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        String expectedMsgFormat = "Service cannot contain both `onDatagram` {0} and `onBytes` {1} functions.";
+        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(), expectedMsgFormat);
+    }
+
+    private Package loadPackage(String path) {
+        Path projectDirPath = RESOURCE_DIRECTORY.resolve(path);
+        BuildProject project = BuildProject.load(getEnvironmentBuilder(), projectDirPath);
+        return project.currentPackage();
+    }
+
+    private static ProjectEnvironmentBuilder getEnvironmentBuilder() {
+        Environment environment = EnvironmentBuilder.getBuilder().setBallerinaHome(DISTRIBUTION_PATH).build();
+        return ProjectEnvironmentBuilder.getBuilder(environment);
     }
 }
