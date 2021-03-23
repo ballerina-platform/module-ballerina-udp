@@ -22,14 +22,18 @@ import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
 import io.ballerina.compiler.syntax.tree.Node;
 import io.ballerina.compiler.syntax.tree.ParameterNode;
 import io.ballerina.compiler.syntax.tree.RequiredParameterNode;
+import io.ballerina.compiler.syntax.tree.ReturnTypeDescriptorNode;
 import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
+import io.ballerina.compiler.syntax.tree.UnionTypeDescriptorNode;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import io.ballerina.tools.diagnostics.DiagnosticFactory;
 import io.ballerina.tools.diagnostics.DiagnosticInfo;
 import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 import org.ballerinalang.stdlib.udp.Constants;
+
+import java.util.Optional;
 
 /**
  * Class to Validate UDP services.
@@ -55,12 +59,15 @@ public class UdpServiceValidator {
             = "Invalid parameter `{0}` provided for `{1}`, function expects `{2}`.";
     public static final String INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION
             = "Invalid parameter `{0}` provided for `{1}` function.";
+    public static final String INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2
+            = "Invalid return type `{0}` provided for function `{1}`, return type should be a subtype of `{2}`";
 
-    // expected parameters
+    // expected parameters and return types
     public static final String READONLY_INTERSECTION = "readonly & ";
     public static final String DATAGRAM = "Datagram";
     public static final String BYTE_ARRAY = "byte[]";
     public static final String ERROR = "Error";
+    public static final String OPTIONAL = "?";
 
     public UdpServiceValidator(SyntaxNodeAnalysisContext syntaxNodeAnalysisContext, String modulePrefixOrModuleName) {
         ctx = syntaxNodeAnalysisContext;
@@ -83,7 +90,6 @@ public class UdpServiceValidator {
         validateFunctionSignature(onDatagramFunctionNode, Constants.ON_DATAGRAM);
         validateFunctionSignature(onBytesFunctionNode, Constants.ON_BYTES);
         validateFunctionSignature(onErrorFunctionNode, Constants.ON_ERROR);
-
     }
 
     private void validateFunctionSignature(FunctionDefinitionNode functionDefinitionNode, String functionName) {
@@ -94,6 +100,7 @@ public class UdpServiceValidator {
                 return;
             }
             validateParameter(parameterNodes, functionName);
+            validateFunctionReturnTypeDesc(functionDefinitionNode, functionName);
         }
     }
 
@@ -213,6 +220,82 @@ public class UdpServiceValidator {
                             requiredParameterNode.location(), requiredParameterNode, functionName));
                 }
             }
+        }
+    }
+
+    private void validateFunctionReturnTypeDesc(FunctionDefinitionNode functionDefinitionNode, String functionName) {
+        Optional<ReturnTypeDescriptorNode> returnTypeDescriptorNode = functionDefinitionNode
+                .functionSignature().returnTypeDesc();
+        if (returnTypeDescriptorNode.isEmpty()) {
+            return;
+        }
+
+        Node returnTypeDescriptor = returnTypeDescriptorNode.get().type();
+        String returnTypeDescWithoutTrailingSpace = returnTypeDescriptor.toString().split(" ")[0];
+        boolean isOnBytesOrOnDatagram = functionName.equals(Constants.ON_DATAGRAM)
+                || functionName.equals(Constants.ON_BYTES);
+
+        if (isOnBytesOrOnDatagram && returnTypeDescriptor.kind() == SyntaxKind.ARRAY_TYPE_DESC
+                && returnTypeDescWithoutTrailingSpace.compareTo(BYTE_ARRAY) == 0) {
+            return;
+        }
+
+        if (isOnBytesOrOnDatagram && returnTypeDescriptor.kind() == SyntaxKind.QUALIFIED_NAME_REFERENCE
+                && returnTypeDescWithoutTrailingSpace.compareTo(modulePrefix + DATAGRAM) == 0) {
+            return;
+        }
+
+        if (isOnBytesOrOnDatagram && returnTypeDescriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
+                && (returnTypeDescWithoutTrailingSpace.compareTo(modulePrefix + ERROR + OPTIONAL) == 0
+                || returnTypeDescWithoutTrailingSpace.compareTo(modulePrefix + DATAGRAM + OPTIONAL) == 0
+                || returnTypeDescWithoutTrailingSpace.compareTo(BYTE_ARRAY + OPTIONAL) == 0)) {
+            return;
+        }
+
+        if (functionName.equals(Constants.ON_ERROR) && returnTypeDescriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
+                && returnTypeDescWithoutTrailingSpace.compareTo(modulePrefix + ERROR + OPTIONAL) == 0) {
+            return;
+        }
+
+        if (returnTypeDescriptor.kind() == SyntaxKind.NIL_TYPE_DESC) {
+            return;
+        }
+
+        boolean hasInvalidUnionTypeDesc = false;
+        boolean isUnionTypeDesc = false;
+        if (isOnBytesOrOnDatagram && returnTypeDescriptor.kind() == SyntaxKind.UNION_TYPE_DESC) {
+            isUnionTypeDesc = true;
+            UnionTypeDescriptorNode unionTypeDescriptorNode = (UnionTypeDescriptorNode) returnTypeDescriptor;
+            for (Node descriptor : unionTypeDescriptorNode.children()) {
+                String descriptorWithoutTrailingSpace = descriptor.toString().split(" ")[0];
+                if (descriptor.kind() == SyntaxKind.PIPE_TOKEN) {
+                    continue;
+                } else if (descriptor.kind() == SyntaxKind.ARRAY_TYPE_DESC
+                        && descriptorWithoutTrailingSpace.compareTo(BYTE_ARRAY) == 0) {
+                    continue;
+                } else if (descriptor.kind() == SyntaxKind.QUALIFIED_NAME_REFERENCE
+                        && descriptorWithoutTrailingSpace.compareTo(modulePrefix + DATAGRAM) == 0) {
+                    continue;
+                } else if (descriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
+                        && descriptorWithoutTrailingSpace.compareTo(modulePrefix + ERROR + OPTIONAL) == 0) {
+                } else if (descriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
+                        && (descriptorWithoutTrailingSpace.compareTo(modulePrefix + ERROR + OPTIONAL) == 0
+                        || descriptorWithoutTrailingSpace.compareTo(modulePrefix + DATAGRAM + OPTIONAL) == 0
+                        || descriptorWithoutTrailingSpace.compareTo(BYTE_ARRAY + OPTIONAL) == 0)) {
+                    continue;
+                } else {
+                    hasInvalidUnionTypeDesc = true;
+                }
+            }
+        }
+
+        if (hasInvalidUnionTypeDesc || !isUnionTypeDesc) {
+            DiagnosticInfo diagnosticInfo = new DiagnosticInfo(CODE,
+                    INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2,
+                    DiagnosticSeverity.ERROR);
+            ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
+                    returnTypeDescriptor.location(), returnTypeDescriptor.toString(), functionName,
+                    BYTE_ARRAY + " | " + modulePrefix + DATAGRAM + " | " + modulePrefix + ERROR + OPTIONAL));
         }
     }
 }

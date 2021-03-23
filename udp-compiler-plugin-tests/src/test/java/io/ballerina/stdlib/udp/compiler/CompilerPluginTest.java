@@ -151,6 +151,17 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
     }
 
+    @Test
+    public void testWithInvalidReturnType() {
+        Package currentPackage = loadPackage("sample_package_11");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 3);
+        for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
+            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                    UdpServiceValidator.INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2);
+        }
+    }
 
     private Package loadPackage(String path) {
         Path projectDirPath = RESOURCE_DIRECTORY.resolve(path);

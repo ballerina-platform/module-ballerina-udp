@@ -20,6 +20,7 @@ package io.ballerina.stdlib.udp.compiler;
 
 import io.ballerina.compiler.syntax.tree.ExplicitNewExpressionNode;
 import io.ballerina.compiler.syntax.tree.ExpressionNode;
+import io.ballerina.compiler.syntax.tree.ImportDeclarationNode;
 import io.ballerina.compiler.syntax.tree.ModulePartNode;
 import io.ballerina.compiler.syntax.tree.Node;
 import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
@@ -30,8 +31,6 @@ import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import org.ballerinalang.stdlib.udp.Constants;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 /**
  * Class to filter UDP services.
  */
@@ -41,34 +40,34 @@ public class UdpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
     public void perform(SyntaxNodeAnalysisContext ctx) {
         ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) ctx.node();
         SeparatedNodeList<ExpressionNode> expressions = serviceDeclarationNode.expressions();
-        AtomicReference<UdpServiceValidator> udpServiceValidator = new AtomicReference<>();
-        expressions.forEach(expressionNode -> {
+        UdpServiceValidator udpServiceValidator = null;
+        for (ExpressionNode expressionNode : expressions) {
             if (expressionNode.kind() == SyntaxKind.EXPLICIT_NEW_EXPRESSION) {
                 TypeDescriptorNode typeDescriptorNode = ((ExplicitNewExpressionNode) expressionNode).typeDescriptor();
                 Node moduleIdentifierTokenOfListener = typeDescriptorNode.children().get(0);
                 if (moduleIdentifierTokenOfListener.syntaxTree().rootNode().kind() == SyntaxKind.MODULE_PART) {
                     ModulePartNode modulePartNode = moduleIdentifierTokenOfListener.syntaxTree().rootNode();
-                    modulePartNode.imports().forEach(importDeclaration -> {
+                    for (ImportDeclarationNode importDeclaration : modulePartNode.imports()) {
                         if (importDeclaration.moduleName().get(0).toString()
                                 .split(" ")[0].compareTo(Constants.UDP) == 0) {
                             if (importDeclaration.prefix().isEmpty()
                                     && moduleIdentifierTokenOfListener.toString().compareTo(Constants.UDP) == 0) {
-                                udpServiceValidator.set(new UdpServiceValidator(ctx, Constants.UDP + ":"));
+                                udpServiceValidator = new UdpServiceValidator(ctx, Constants.UDP + ":");
                             } else if (importDeclaration.prefix().isPresent()
                                     && moduleIdentifierTokenOfListener.toString().
                                     compareTo(importDeclaration.prefix().get().children().get(1).toString()) == 0) {
                                 String modulePrefix = importDeclaration.prefix().get()
                                         .children().get(1).toString() + ":";
-                                udpServiceValidator.set(new UdpServiceValidator(ctx, modulePrefix));
+                                udpServiceValidator = new UdpServiceValidator(ctx, modulePrefix);
                             }
                         }
-                    });
+                    }
                 }
             }
-        });
+        }
 
-        if (udpServiceValidator.get() != null) {
-            udpServiceValidator.get().validate();
+        if (udpServiceValidator != null) {
+            udpServiceValidator.validate();
         }
     }
 }
