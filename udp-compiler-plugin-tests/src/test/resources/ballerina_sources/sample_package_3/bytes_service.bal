@@ -2,7 +2,7 @@ import ballerina/udp;
 
 service on  new udp:Listener(8000) {
 
-    function onBytes(readonly & byte[] data) returns readonly & byte[] {
+    function onBytes(readonly & byte[] data) returns byte[] {
         return data;
     }
 
