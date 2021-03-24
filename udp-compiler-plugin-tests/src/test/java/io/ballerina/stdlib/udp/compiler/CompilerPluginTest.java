@@ -163,6 +163,18 @@ public class CompilerPluginTest {
         }
     }
 
+    @Test
+    public void testWithUnSupportedFunctionNames() {
+        Package currentPackage = loadPackage("sample_package_12");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 2);
+        for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
+            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                    UdpServiceValidator.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
+        }
+    }
+
     private Package loadPackage(String path) {
         Path projectDirPath = RESOURCE_DIRECTORY.resolve(path);
         BuildProject project = BuildProject.load(getEnvironmentBuilder(), projectDirPath);

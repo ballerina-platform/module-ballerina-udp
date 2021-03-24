@@ -61,6 +61,7 @@ public class UdpServiceValidator {
             = "Invalid parameter `{0}` provided for `{1}` function.";
     public static final String INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2
             = "Invalid return type `{0}` provided for function `{1}`, return type should be a subtype of `{2}`";
+    public static final String FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE = "Function `{0}` not accepted by the service";
 
     // expected parameters and return types
     public static final String READONLY_INTERSECTION = "readonly & ";
@@ -79,17 +80,30 @@ public class UdpServiceValidator {
         serviceDeclarationNode.members().stream()
                 .filter(child -> child.kind() == SyntaxKind.OBJECT_METHOD_DEFINITION).forEach(node -> {
             FunctionDefinitionNode functionDefinitionNode = (FunctionDefinitionNode) node;
-            onDatagramFunctionNode = functionDefinitionNode.functionName().toString()
-                    .compareTo(Constants.ON_DATAGRAM) == 0 ? functionDefinitionNode : onDatagramFunctionNode;
-            onBytesFunctionNode = functionDefinitionNode.functionName()
-                    .toString().compareTo(Constants.ON_BYTES) == 0 ? functionDefinitionNode : onBytesFunctionNode;
-            onErrorFunctionNode = functionDefinitionNode.functionName()
-                    .toString().compareTo(Constants.ON_ERROR) == 0 ? functionDefinitionNode : onErrorFunctionNode;
+            String functionName = functionDefinitionNode.functionName().toString();
+            if (functionName.compareTo(Constants.ON_DATAGRAM) != 0 && functionName.compareTo(Constants.ON_BYTES) != 0
+                    && functionName.compareTo(Constants.ON_ERROR) != 0) {
+                reportInvalidFunction(functionDefinitionNode);
+            } else {
+                onDatagramFunctionNode = functionName.compareTo(Constants.ON_DATAGRAM) == 0 ? functionDefinitionNode
+                        : onDatagramFunctionNode;
+                onBytesFunctionNode = functionName.compareTo(Constants.ON_BYTES) == 0 ? functionDefinitionNode
+                        : onBytesFunctionNode;
+                onErrorFunctionNode = functionName.compareTo(Constants.ON_ERROR) == 0 ? functionDefinitionNode
+                        : onErrorFunctionNode;
+            }
         });
         checkOnBytesAndOnDatagramFunctionExistence();
         validateFunctionSignature(onDatagramFunctionNode, Constants.ON_DATAGRAM);
         validateFunctionSignature(onBytesFunctionNode, Constants.ON_BYTES);
         validateFunctionSignature(onErrorFunctionNode, Constants.ON_ERROR);
+    }
+
+    private void reportInvalidFunction(FunctionDefinitionNode functionDefinitionNode) {
+        DiagnosticInfo diagnosticInfo = new DiagnosticInfo(CODE, FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE,
+                DiagnosticSeverity.ERROR);
+        ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
+                functionDefinitionNode.location(), functionDefinitionNode.functionName().toString()));
     }
 
     private void validateFunctionSignature(FunctionDefinitionNode functionDefinitionNode, String functionName) {
