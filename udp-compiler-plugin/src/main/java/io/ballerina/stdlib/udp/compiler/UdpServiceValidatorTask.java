@@ -40,28 +40,27 @@ public class UdpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
     public void perform(SyntaxNodeAnalysisContext ctx) {
         ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) ctx.node();
         SeparatedNodeList<ExpressionNode> expressions = serviceDeclarationNode.expressions();
+
+        String modulePrefix = Constants.UDP;
+        ModulePartNode modulePartNode = ctx.syntaxTree().rootNode();
+        for (ImportDeclarationNode importDeclaration : modulePartNode.imports()) {
+            if (importDeclaration.moduleName().get(0).toString().split(" ")[0].compareTo(Constants.UDP) == 0) {
+                if (importDeclaration.prefix().isPresent()) {
+                    modulePrefix = importDeclaration.prefix().get().children().get(1).toString();
+                }
+                break;
+            }
+        }
+
         UdpServiceValidator udpServiceValidator = null;
         for (ExpressionNode expressionNode : expressions) {
             if (expressionNode.kind() == SyntaxKind.EXPLICIT_NEW_EXPRESSION) {
+
                 TypeDescriptorNode typeDescriptorNode = ((ExplicitNewExpressionNode) expressionNode).typeDescriptor();
                 Node moduleIdentifierTokenOfListener = typeDescriptorNode.children().get(0);
-                if (moduleIdentifierTokenOfListener.syntaxTree().rootNode().kind() == SyntaxKind.MODULE_PART) {
-                    ModulePartNode modulePartNode = moduleIdentifierTokenOfListener.syntaxTree().rootNode();
-                    for (ImportDeclarationNode importDeclaration : modulePartNode.imports()) {
-                        if (importDeclaration.moduleName().get(0).toString()
-                                .split(" ")[0].compareTo(Constants.UDP) == 0) {
-                            if (importDeclaration.prefix().isEmpty()
-                                    && moduleIdentifierTokenOfListener.toString().compareTo(Constants.UDP) == 0) {
-                                udpServiceValidator = new UdpServiceValidator(ctx, Constants.UDP + ":");
-                            } else if (importDeclaration.prefix().isPresent()
-                                    && moduleIdentifierTokenOfListener.toString().
-                                    compareTo(importDeclaration.prefix().get().children().get(1).toString()) == 0) {
-                                String modulePrefix = importDeclaration.prefix().get()
-                                        .children().get(1).toString() + ":";
-                                udpServiceValidator = new UdpServiceValidator(ctx, modulePrefix);
-                            }
-                        }
-                    }
+                if (moduleIdentifierTokenOfListener.toString().compareTo(modulePrefix) == 0) {
+                    udpServiceValidator = new UdpServiceValidator(ctx, modulePrefix
+                            + SyntaxKind.COLON_TOKEN.stringValue());
                 }
             }
         }
