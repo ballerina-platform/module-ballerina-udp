@@ -69,6 +69,7 @@ public class UdpServiceValidator {
     public static final String BYTE_ARRAY = "byte[]";
     public static final String ERROR = "Error";
     public static final String OPTIONAL = "?";
+    public static final String NILL = "()";
 
     public UdpServiceValidator(SyntaxNodeAnalysisContext syntaxNodeAnalysisContext, String modulePrefixOrModuleName) {
         ctx = syntaxNodeAnalysisContext;
@@ -154,8 +155,7 @@ public class UdpServiceValidator {
                                     String functionName) {
         if (parameterNodes.isEmpty()) {
             DiagnosticInfo diagnosticInfo = new DiagnosticInfo(CODE,
-                    NO_PARAMETER_PROVIDED_FOR_0_FUNCTION_EXPECTS_1_AS_A_PARAMETER,
-                    DiagnosticSeverity.ERROR);
+                    NO_PARAMETER_PROVIDED_FOR_0_FUNCTION_EXPECTS_1_AS_A_PARAMETER, DiagnosticSeverity.ERROR);
             String expectedParameter = functionName.equals(Constants.ON_BYTES) ?
                     READONLY_INTERSECTION + BYTE_ARRAY : functionName.equals(Constants.ON_ERROR) ?
                     modulePrefix + ERROR : READONLY_INTERSECTION + modulePrefix + DATAGRAM;
@@ -178,15 +178,13 @@ public class UdpServiceValidator {
                     && !parameterTypeName.toString().contains(Constants.CALLER)))) {
                 if (parameterTypeName.toString().contains(Constants.DATAGRAM_RECORD)) {
                     diagnosticInfo = new DiagnosticInfo(CODE,
-                            INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2,
-                            DiagnosticSeverity.ERROR);
+                            INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2, DiagnosticSeverity.ERROR);
                     ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                             requiredParameterNode.location(), requiredParameterNode,
                             functionName, READONLY_INTERSECTION + modulePrefix + DATAGRAM));
                 } else {
                     diagnosticInfo = new DiagnosticInfo(CODE,
-                            INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION,
-                            DiagnosticSeverity.ERROR);
+                            INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION, DiagnosticSeverity.ERROR);
                     ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                             requiredParameterNode.location(), requiredParameterNode, functionName));
                 }
@@ -196,15 +194,13 @@ public class UdpServiceValidator {
                     || (parameterTypeName.kind() == SyntaxKind.QUALIFIED_NAME_REFERENCE
                     && !parameterTypeName.toString().contains(Constants.CALLER)))) {
                 diagnosticInfo = new DiagnosticInfo(CODE,
-                        INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION,
-                        DiagnosticSeverity.ERROR);
+                        INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION, DiagnosticSeverity.ERROR);
                 ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                         requiredParameterNode.location(), requiredParameterNode, functionName));
             } else if (functionName.equals(Constants.ON_ERROR)
                     && !parameterTypeName.toString().contains(Constants.ERROR)) {
                 diagnosticInfo = new DiagnosticInfo(CODE,
-                        INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2,
-                        DiagnosticSeverity.ERROR);
+                        INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2, DiagnosticSeverity.ERROR);
                 ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                         requiredParameterNode.location(), requiredParameterNode, functionName,
                         modulePrefix + ERROR));
@@ -213,23 +209,20 @@ public class UdpServiceValidator {
                 if (functionName.equals(Constants.ON_BYTES)
                         && parameterTypeName.toString().contains(Constants.BYTE_ARRAY)) {
                     diagnosticInfo = new DiagnosticInfo(CODE,
-                            INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2,
-                            DiagnosticSeverity.ERROR);
+                            INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2, DiagnosticSeverity.ERROR);
                     ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                             requiredParameterNode.location(), requiredParameterNode, functionName,
                             READONLY_INTERSECTION + modulePrefix + BYTE_ARRAY));
                 } else if (functionName.equals(Constants.ON_DATAGRAM)
                         && parameterTypeName.toString().contains(Constants.DATAGRAM_RECORD)) {
                     diagnosticInfo = new DiagnosticInfo(CODE,
-                            INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2,
-                            DiagnosticSeverity.ERROR);
+                            INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2, DiagnosticSeverity.ERROR);
                     ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                             requiredParameterNode.location(), requiredParameterNode, functionName,
                             READONLY_INTERSECTION + modulePrefix + DATAGRAM));
                 } else {
                     diagnosticInfo = new DiagnosticInfo(CODE,
-                            INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION,
-                            DiagnosticSeverity.ERROR);
+                            INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION, DiagnosticSeverity.ERROR);
                     ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                             requiredParameterNode.location(), requiredParameterNode, functionName));
                 }
@@ -303,13 +296,16 @@ public class UdpServiceValidator {
             }
         }
 
-        if (hasInvalidUnionTypeDesc || !isUnionTypeDesc) {
-            DiagnosticInfo diagnosticInfo = new DiagnosticInfo(CODE,
-                    INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2,
-                    DiagnosticSeverity.ERROR);
+        DiagnosticInfo diagnosticInfo = new DiagnosticInfo(CODE,
+                INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2, DiagnosticSeverity.ERROR);
+        if (isOnBytesOrOnDatagram && (hasInvalidUnionTypeDesc || !isUnionTypeDesc)) {
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                     returnTypeDescriptor.location(), returnTypeDescriptor.toString(), functionName,
                     BYTE_ARRAY + " | " + modulePrefix + DATAGRAM + " | " + modulePrefix + ERROR + OPTIONAL));
+        } else if (hasInvalidUnionTypeDesc || !isUnionTypeDesc) {
+            ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
+                    returnTypeDescriptor.location(), returnTypeDescriptor.toString(), functionName,
+                    modulePrefix + ERROR + " | " + NILL));
         }
     }
 }
