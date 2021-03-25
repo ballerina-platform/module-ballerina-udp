@@ -79,7 +79,8 @@ public class UdpServiceValidator {
     public void validate() {
         ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) ctx.node();
         serviceDeclarationNode.members().stream()
-                .filter(child -> child.kind() == SyntaxKind.OBJECT_METHOD_DEFINITION).forEach(node -> {
+                .filter(child -> child.kind() == SyntaxKind.OBJECT_METHOD_DEFINITION
+                        || child.kind() == SyntaxKind.RESOURCE_ACCESSOR_DEFINITION).forEach(node -> {
             FunctionDefinitionNode functionDefinitionNode = (FunctionDefinitionNode) node;
             String functionName = functionDefinitionNode.functionName().toString();
             if (functionName.compareTo(Constants.ON_DATAGRAM) != 0 && functionName.compareTo(Constants.ON_BYTES) != 0
