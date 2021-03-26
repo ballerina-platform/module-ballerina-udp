@@ -175,6 +175,18 @@ public class CompilerPluginTest {
         }
     }
 
+    @Test
+    public void testWithMoreThanExpectedParameterCount() {
+        Package currentPackage = loadPackage("sample_package_13");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 3);
+        for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
+            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                    UdpServiceValidator.PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS);
+        }
+    }
+
     private Package loadPackage(String path) {
         Path projectDirPath = RESOURCE_DIRECTORY.resolve(path);
         BuildProject project = BuildProject.load(getEnvironmentBuilder(), projectDirPath);
