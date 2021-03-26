@@ -49,7 +49,7 @@ public class Listener {
     # + return - An `error` if an error occurred during the listener 
     #            starting process
     public isolated function 'start() returns error? {
-        var e = externStart(self);
+        return externStart(self);
     }
 
     # Stops the service listener gracefully. Already-accepted requests will be
