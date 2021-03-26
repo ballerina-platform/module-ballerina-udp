@@ -40,7 +40,6 @@ public class UdpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
     public void perform(SyntaxNodeAnalysisContext ctx) {
         ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) ctx.node();
         SeparatedNodeList<ExpressionNode> expressions = serviceDeclarationNode.expressions();
-
         String modulePrefix = Constants.UDP;
         ModulePartNode modulePartNode = ctx.syntaxTree().rootNode();
         for (ImportDeclarationNode importDeclaration : modulePartNode.imports()) {
@@ -55,7 +54,6 @@ public class UdpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
         UdpServiceValidator udpServiceValidator = null;
         for (ExpressionNode expressionNode : expressions) {
             if (expressionNode.kind() == SyntaxKind.EXPLICIT_NEW_EXPRESSION) {
-
                 TypeDescriptorNode typeDescriptorNode = ((ExplicitNewExpressionNode) expressionNode).typeDescriptor();
                 Node moduleIdentifierTokenOfListener = typeDescriptorNode.children().get(0);
                 if (moduleIdentifierTokenOfListener.toString().compareTo(modulePrefix) == 0) {
