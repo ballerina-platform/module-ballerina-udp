@@ -176,6 +176,7 @@ public class UdpServiceValidator {
                 Node parameterTypeName = requiredParameterNode.typeName();
                 boolean hasDatagram = parameterTypeName.toString().contains(modulePrefix + DATAGRAM);
                 boolean hasCaller = parameterTypeName.toString().contains(modulePrefix + CALLER);
+                boolean hasByteArray = parameterTypeName.toString().contains(BYTE_ARRAY);
                 DiagnosticInfo diagnosticInfo;
 
                 if (functionName.equals(Constants.ON_DATAGRAM)
@@ -193,43 +194,35 @@ public class UdpServiceValidator {
                         ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                                 requiredParameterNode.location(), requiredParameterNode, functionName));
                     }
-                } else if (functionName.equals(Constants.ON_BYTES)
-                        && ((parameterTypeName.kind() == SyntaxKind.INTERSECTION_TYPE_DESC
-                        && !parameterTypeName.toString().contains(BYTE_ARRAY))
-                        || (parameterTypeName.kind() == SyntaxKind.QUALIFIED_NAME_REFERENCE
-                        && !hasCaller))) {
-                    diagnosticInfo = new DiagnosticInfo(CODE, INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION,
-                            DiagnosticSeverity.ERROR);
-                    ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                            requiredParameterNode.location(), requiredParameterNode, functionName));
-                } else if (functionName.equals(Constants.ON_ERROR)
-                        && !parameterTypeName.toString().contains(modulePrefix + ERROR)) {
-                    diagnosticInfo = new DiagnosticInfo(CODE,
-                            INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2, DiagnosticSeverity.ERROR);
-                    ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                            requiredParameterNode.location(), requiredParameterNode, functionName,
-                            modulePrefix + ERROR));
-                } else if (parameterTypeName.kind() != SyntaxKind.QUALIFIED_NAME_REFERENCE
-                        && parameterTypeName.kind() != SyntaxKind.INTERSECTION_TYPE_DESC) {
+                } else {
                     if (functionName.equals(Constants.ON_BYTES)
-                            && parameterTypeName.toString().contains(BYTE_ARRAY)) {
-                        diagnosticInfo = new DiagnosticInfo(CODE,
-                                INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2, DiagnosticSeverity.ERROR);
-                        ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                                requiredParameterNode.location(), requiredParameterNode, functionName,
-                                READONLY_INTERSECTION + modulePrefix + BYTE_ARRAY));
-                    } else if (functionName.equals(Constants.ON_DATAGRAM)
-                            && hasDatagram) {
-                        diagnosticInfo = new DiagnosticInfo(CODE,
-                                INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2, DiagnosticSeverity.ERROR);
-                        ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
-                                requiredParameterNode.location(), requiredParameterNode, functionName,
-                                READONLY_INTERSECTION + modulePrefix + DATAGRAM));
-                    } else {
+                            && ((parameterTypeName.kind() == SyntaxKind.INTERSECTION_TYPE_DESC && !hasByteArray)
+                            || (parameterTypeName.kind() == SyntaxKind.QUALIFIED_NAME_REFERENCE && !hasCaller))) {
                         diagnosticInfo = new DiagnosticInfo(CODE, INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION,
                                 DiagnosticSeverity.ERROR);
                         ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                                 requiredParameterNode.location(), requiredParameterNode, functionName));
+                    } else if (functionName.equals(Constants.ON_ERROR)
+                            && !parameterTypeName.toString().contains(modulePrefix + ERROR)) {
+                        diagnosticInfo = new DiagnosticInfo(CODE,
+                                INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2, DiagnosticSeverity.ERROR);
+                        ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
+                                requiredParameterNode.location(), requiredParameterNode, functionName,
+                                modulePrefix + ERROR));
+                    } else if (parameterTypeName.kind() != SyntaxKind.QUALIFIED_NAME_REFERENCE
+                            && parameterTypeName.kind() != SyntaxKind.INTERSECTION_TYPE_DESC) {
+                        if (functionName.equals(Constants.ON_BYTES) && hasByteArray) {
+                            diagnosticInfo = new DiagnosticInfo(CODE,
+                                    INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2, DiagnosticSeverity.ERROR);
+                            ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
+                                    requiredParameterNode.location(), requiredParameterNode, functionName,
+                                    READONLY_INTERSECTION + modulePrefix + BYTE_ARRAY));
+                        } else {
+                            diagnosticInfo = new DiagnosticInfo(CODE, INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION,
+                                    DiagnosticSeverity.ERROR);
+                            ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
+                                    requiredParameterNode.location(), requiredParameterNode, functionName));
+                        }
                     }
                 }
             }
