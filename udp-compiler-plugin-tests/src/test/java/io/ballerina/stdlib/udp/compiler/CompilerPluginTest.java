@@ -47,10 +47,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_package_1");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                UdpServiceValidator.SERVICE_CANNOT_CONTAIN_BOTH_ON_DATAGRAM_0_AND_ON_BYTES_1_FUNCTIONS);
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 2);
+        for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
+            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                    UdpServiceValidator.SERVICE_CANNOT_CONTAIN_BOTH_ON_DATAGRAM_0_AND_ON_BYTES_1_FUNCTIONS);
+        }
     }
 
     @Test
@@ -137,10 +138,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_package_9");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
-                UdpServiceValidator.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 2);
+        for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
+            Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
+                    UdpServiceValidator.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
+        }
     }
 
     @Test
