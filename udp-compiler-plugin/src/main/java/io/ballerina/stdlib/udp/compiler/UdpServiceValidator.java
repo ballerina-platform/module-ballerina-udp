@@ -39,6 +39,7 @@ import java.util.Optional;
  * Class to Validate UDP services.
  */
 public class UdpServiceValidator {
+
     private FunctionDefinitionNode onDatagramFunctionNode;
     private FunctionDefinitionNode onBytesFunctionNode;
     private FunctionDefinitionNode onErrorFunctionNode;
@@ -72,7 +73,7 @@ public class UdpServiceValidator {
     public static final String BYTE_ARRAY = "byte[]";
     public static final String ERROR = "Error";
     public static final String OPTIONAL = "?";
-    public static final String NILL = "()";
+    public static final String NIL = "()";
 
     public UdpServiceValidator(SyntaxNodeAnalysisContext syntaxNodeAnalysisContext, String modulePrefixOrModuleName) {
         ctx = syntaxNodeAnalysisContext;
@@ -86,15 +87,15 @@ public class UdpServiceValidator {
                         || child.kind() == SyntaxKind.RESOURCE_ACCESSOR_DEFINITION).forEach(node -> {
             FunctionDefinitionNode functionDefinitionNode = (FunctionDefinitionNode) node;
             String functionName = functionDefinitionNode.functionName().toString();
-            if (functionName.compareTo(Constants.ON_DATAGRAM) != 0 && functionName.compareTo(Constants.ON_BYTES) != 0
-                    && functionName.compareTo(Constants.ON_ERROR) != 0) {
+            if (!Utils.equals(functionName, Constants.ON_DATAGRAM) && !Utils.equals(functionName, Constants.ON_BYTES)
+                    && !Utils.equals(functionName, Constants.ON_ERROR)) {
                 reportInvalidFunction(functionDefinitionNode);
             } else {
-                onDatagramFunctionNode = functionName.compareTo(Constants.ON_DATAGRAM) == 0 ? functionDefinitionNode
+                onDatagramFunctionNode = Utils.equals(functionName, Constants.ON_DATAGRAM) ? functionDefinitionNode
                         : onDatagramFunctionNode;
-                onBytesFunctionNode = functionName.compareTo(Constants.ON_BYTES) == 0 ? functionDefinitionNode
+                onBytesFunctionNode = Utils.equals(functionName, Constants.ON_BYTES) ? functionDefinitionNode
                         : onBytesFunctionNode;
-                onErrorFunctionNode = functionName.compareTo(Constants.ON_ERROR) == 0 ? functionDefinitionNode
+                onErrorFunctionNode = Utils.equals(functionName, Constants.ON_ERROR) ? functionDefinitionNode
                         : onErrorFunctionNode;
             }
         });
@@ -115,10 +116,9 @@ public class UdpServiceValidator {
         if (functionDefinitionNode != null) {
             hasRemoteKeyword(functionDefinitionNode, functionName);
             SeparatedNodeList<ParameterNode> parameterNodes = functionDefinitionNode.functionSignature().parameters();
-            if (hasNoParameters(parameterNodes, functionDefinitionNode, functionName)) {
-                return;
+            if (!hasNoParameters(parameterNodes, functionDefinitionNode, functionName)) {
+                validateParameter(parameterNodes, functionName);
             }
-            validateParameter(parameterNodes, functionName);
             validateFunctionReturnTypeDesc(functionDefinitionNode, functionName);
         }
     }
@@ -262,29 +262,29 @@ public class UdpServiceValidator {
         }
 
         Node returnTypeDescriptor = returnTypeDescriptorNode.get().type();
-        String returnTypeDescWithoutTrailingSpace = returnTypeDescriptor.toString().split(" ")[0];
+        String returnTypeDescriptorType = returnTypeDescriptor.toString().stripTrailing();
         boolean isOnBytesOrOnDatagram = functionName.equals(Constants.ON_DATAGRAM)
                 || functionName.equals(Constants.ON_BYTES);
 
         if (isOnBytesOrOnDatagram && returnTypeDescriptor.kind() == SyntaxKind.ARRAY_TYPE_DESC
-                && returnTypeDescWithoutTrailingSpace.compareTo(BYTE_ARRAY) == 0) {
+                && Utils.equals(returnTypeDescriptorType, BYTE_ARRAY)) {
             return;
         }
 
         if (isOnBytesOrOnDatagram && returnTypeDescriptor.kind() == SyntaxKind.QUALIFIED_NAME_REFERENCE
-                && returnTypeDescWithoutTrailingSpace.compareTo(modulePrefix + DATAGRAM) == 0) {
+                && Utils.equals(returnTypeDescriptorType, modulePrefix + DATAGRAM)) {
             return;
         }
 
         if (isOnBytesOrOnDatagram && returnTypeDescriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                && (returnTypeDescWithoutTrailingSpace.compareTo(modulePrefix + ERROR + OPTIONAL) == 0
-                || returnTypeDescWithoutTrailingSpace.compareTo(modulePrefix + DATAGRAM + OPTIONAL) == 0
-                || returnTypeDescWithoutTrailingSpace.compareTo(BYTE_ARRAY + OPTIONAL) == 0)) {
+                && (Utils.equals(returnTypeDescriptorType, modulePrefix + ERROR + OPTIONAL)
+                || Utils.equals(returnTypeDescriptorType, modulePrefix + DATAGRAM + OPTIONAL)
+                || Utils.equals(returnTypeDescriptorType, BYTE_ARRAY + OPTIONAL))) {
             return;
         }
 
         if (functionName.equals(Constants.ON_ERROR) && returnTypeDescriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                && returnTypeDescWithoutTrailingSpace.compareTo(modulePrefix + ERROR + OPTIONAL) == 0) {
+                && Utils.equals(returnTypeDescriptorType, modulePrefix + ERROR + OPTIONAL)) {
             return;
         }
 
@@ -298,22 +298,22 @@ public class UdpServiceValidator {
             isUnionTypeDesc = true;
             UnionTypeDescriptorNode unionTypeDescriptorNode = (UnionTypeDescriptorNode) returnTypeDescriptor;
             for (Node descriptor : unionTypeDescriptorNode.children()) {
-                String descriptorWithoutTrailingSpace = descriptor.toString().split(" ")[0];
+                String descriptorType = descriptor.toString().stripTrailing();
                 if (descriptor.kind() == SyntaxKind.PIPE_TOKEN) {
                     continue;
                 } else if (descriptor.kind() == SyntaxKind.ARRAY_TYPE_DESC
-                        && descriptorWithoutTrailingSpace.compareTo(BYTE_ARRAY) == 0) {
+                        && Utils.equals(descriptorType, BYTE_ARRAY)) {
                     continue;
                 } else if (descriptor.kind() == SyntaxKind.QUALIFIED_NAME_REFERENCE
-                        && descriptorWithoutTrailingSpace.compareTo(modulePrefix + DATAGRAM) == 0) {
+                        && Utils.equals(descriptorType, modulePrefix + DATAGRAM)) {
                     continue;
                 } else if (descriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                        && descriptorWithoutTrailingSpace.compareTo(modulePrefix + ERROR + OPTIONAL) == 0) {
+                        && Utils.equals(descriptorType, modulePrefix + ERROR + OPTIONAL)) {
                     continue;
                 } else if (descriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                        && (descriptorWithoutTrailingSpace.compareTo(modulePrefix + ERROR + OPTIONAL) == 0
-                        || descriptorWithoutTrailingSpace.compareTo(modulePrefix + DATAGRAM + OPTIONAL) == 0
-                        || descriptorWithoutTrailingSpace.compareTo(BYTE_ARRAY + OPTIONAL) == 0)) {
+                        && (Utils.equals(descriptorType, modulePrefix + ERROR + OPTIONAL)
+                        || Utils.equals(descriptorType, modulePrefix + DATAGRAM + OPTIONAL)
+                        || Utils.equals(descriptorType, BYTE_ARRAY + OPTIONAL))) {
                     continue;
                 } else {
                     hasInvalidUnionTypeDesc = true;
@@ -330,7 +330,8 @@ public class UdpServiceValidator {
         } else if (!isUnionTypeDesc) {
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                     returnTypeDescriptor.location(), returnTypeDescriptor.toString(), functionName,
-                    modulePrefix + ERROR + " | " + NILL));
+                    modulePrefix + ERROR + " | " + NIL));
         }
     }
+
 }

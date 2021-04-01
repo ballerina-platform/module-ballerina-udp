@@ -46,36 +46,34 @@ public class UdpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
         String modulePrefix = getPrefix(ctx);
 
         Optional<Symbol> serviceDeclarationSymbol = ctx.semanticModel().symbol(serviceDeclarationNode);
-        UdpServiceValidator udpServiceValidator = null;
+        UdpServiceValidator udpServiceValidator;
         if (serviceDeclarationSymbol.isPresent()) {
             List<TypeSymbol> listenerTypes = ((ServiceDeclarationSymbol) serviceDeclarationSymbol.get())
                     .listenerTypes();
             for (TypeSymbol listenerType : listenerTypes) {
                 if (listenerType.typeKind() == TypeDescKind.UNION
-                        && ((UnionTypeSymbol) listenerType).memberTypeDescriptors().get(0).getModule()
-                        .flatMap(Symbol::getName).orElse("").compareTo(Constants.UDP) == 0) {
+                        && Utils.equals(((UnionTypeSymbol) listenerType).memberTypeDescriptors().get(0).getModule()
+                        .flatMap(Symbol::getName).orElse(""), Constants.UDP)) {
                     udpServiceValidator = new UdpServiceValidator(ctx, modulePrefix
                             + SyntaxKind.COLON_TOKEN.stringValue());
-                    break;
+                    udpServiceValidator.validate();
+                    return;
                 } else if (listenerType.typeKind() == TypeDescKind.TYPE_REFERENCE
-                        && ((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule()
-                        .flatMap(Symbol::getName).orElse("").compareTo(Constants.UDP) == 0) {
+                        && Utils.equals(((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule()
+                        .flatMap(Symbol::getName).orElse(""), Constants.UDP)) {
                     udpServiceValidator = new UdpServiceValidator(ctx, modulePrefix
                             + SyntaxKind.COLON_TOKEN.stringValue());
-                    break;
+                    udpServiceValidator.validate();
+                    return;
                 }
             }
-        }
-
-        if (udpServiceValidator != null) {
-            udpServiceValidator.validate();
         }
     }
 
     private String getPrefix(SyntaxNodeAnalysisContext ctx) {
         ModulePartNode modulePartNode = ctx.syntaxTree().rootNode();
         for (ImportDeclarationNode importDeclaration : modulePartNode.imports()) {
-            if (importDeclaration.moduleName().get(0).toString().split(" ")[0].compareTo(Constants.UDP) == 0) {
+            if (Utils.equals(importDeclaration.moduleName().get(0).toString().stripTrailing(), Constants.UDP)) {
                 if (importDeclaration.prefix().isPresent()) {
                     return importDeclaration.prefix().get().children().get(1).toString();
                 }
