@@ -308,9 +308,6 @@ public class UdpServiceValidator {
                         && Utils.equals(descriptorType, modulePrefix + DATAGRAM)) {
                     continue;
                 } else if (descriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                        && Utils.equals(descriptorType, modulePrefix + ERROR + OPTIONAL)) {
-                    continue;
-                } else if (descriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
                         && (Utils.equals(descriptorType, modulePrefix + ERROR + OPTIONAL)
                         || Utils.equals(descriptorType, modulePrefix + DATAGRAM + OPTIONAL)
                         || Utils.equals(descriptorType, BYTE_ARRAY + OPTIONAL))) {
