@@ -20,8 +20,8 @@ import ballerina/test;
 import ballerina/io;
 
 @test:BeforeSuite
-function setup() {
-    var result = startUdpServer();
+function setup() returns error? {
+    check startUdpServer();
 }
 
 @test:Config {}
@@ -99,8 +99,8 @@ function testSendAndReciveLargeDataViaDatagram() returns error? {
 }
 
 @test:AfterSuite {}
-function stopAll() {
-    var result = stopUdpServer();
+function stopAll() returns error? {
+    check stopUdpServer();
 }
 
 isolated function prepareDatagram(string msg, string remoteHost = "localhost", int remotePort = 48829) returns Datagram {
