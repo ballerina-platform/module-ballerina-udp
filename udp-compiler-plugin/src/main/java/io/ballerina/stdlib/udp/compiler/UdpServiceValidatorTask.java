@@ -18,6 +18,7 @@
 
 package io.ballerina.stdlib.udp.compiler;
 
+import io.ballerina.compiler.api.symbols.ModuleSymbol;
 import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
 import io.ballerina.compiler.api.symbols.Symbol;
 import io.ballerina.compiler.api.symbols.TypeDescKind;
@@ -40,6 +41,8 @@ import java.util.Optional;
  */
 public class UdpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisContext> {
 
+    private static final String ORG_NAME = "ballerina";
+
     @Override
     public void perform(SyntaxNodeAnalysisContext ctx) {
         ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) ctx.node();
@@ -52,15 +55,14 @@ public class UdpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
                     .listenerTypes();
             for (TypeSymbol listenerType : listenerTypes) {
                 if (listenerType.typeKind() == TypeDescKind.UNION
-                        && Utils.equals(((UnionTypeSymbol) listenerType).memberTypeDescriptors().get(0).getModule()
-                        .flatMap(Symbol::getName).orElse(""), Constants.UDP)) {
+                        && isUdpModule(((UnionTypeSymbol) listenerType).memberTypeDescriptors()
+                        .get(0).getModule().get())) {
                     udpServiceValidator = new UdpServiceValidator(ctx, modulePrefix
                             + SyntaxKind.COLON_TOKEN.stringValue());
                     udpServiceValidator.validate();
                     return;
                 } else if (listenerType.typeKind() == TypeDescKind.TYPE_REFERENCE
-                        && Utils.equals(((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule()
-                        .flatMap(Symbol::getName).orElse(""), Constants.UDP)) {
+                        && isUdpModule(((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule().get())) {
                     udpServiceValidator = new UdpServiceValidator(ctx, modulePrefix
                             + SyntaxKind.COLON_TOKEN.stringValue());
                     udpServiceValidator.validate();
@@ -81,5 +83,10 @@ public class UdpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
             }
         }
         return Constants.UDP;
+    }
+
+    private boolean isUdpModule(ModuleSymbol moduleSymbol) {
+        return Utils.equals(moduleSymbol.getName().get(), Constants.UDP)
+                && Utils.equals(moduleSymbol.id().orgName(), ORG_NAME);
     }
 }
