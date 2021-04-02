@@ -87,7 +87,9 @@ public class UdpServiceValidator {
                         || child.kind() == SyntaxKind.RESOURCE_ACCESSOR_DEFINITION).forEach(node -> {
             FunctionDefinitionNode functionDefinitionNode = (FunctionDefinitionNode) node;
             String functionName = functionDefinitionNode.functionName().toString();
-            if (!Utils.equals(functionName, Constants.ON_DATAGRAM) && !Utils.equals(functionName, Constants.ON_BYTES)
+            if (hasRemoteKeyword(functionDefinitionNode) &&
+                    !Utils.equals(functionName, Constants.ON_DATAGRAM)
+                    && !Utils.equals(functionName, Constants.ON_BYTES)
                     && !Utils.equals(functionName, Constants.ON_ERROR)) {
                 reportInvalidFunction(functionDefinitionNode);
             } else {
@@ -142,9 +144,8 @@ public class UdpServiceValidator {
 
     }
 
-    private void hasRemoteKeyword(FunctionDefinitionNode functionDefinitionNode, String functionName) {
-        boolean hasRemoteKeyword = functionDefinitionNode.qualifierList().stream()
-                .filter(q -> q.kind() == SyntaxKind.REMOTE_KEYWORD).toArray().length == 1;
+    private boolean hasRemoteKeyword(FunctionDefinitionNode functionDefinitionNode, String functionName) {
+        boolean hasRemoteKeyword = hasRemoteKeyword(functionDefinitionNode);
         if (!hasRemoteKeyword) {
             DiagnosticInfo diagnosticInfo = new DiagnosticInfo(CODE,
                     REMOTE_KEYWORD_EXPECTED_IN_0_FUNCTION_SIGNATURE,
@@ -152,6 +153,12 @@ public class UdpServiceValidator {
             ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(diagnosticInfo,
                     functionDefinitionNode.functionKeyword().location(), functionName));
         }
+        return hasRemoteKeyword;
+    }
+
+    private boolean hasRemoteKeyword(FunctionDefinitionNode functionDefinitionNode) {
+        return functionDefinitionNode.qualifierList().stream()
+                .filter(q -> q.kind() == SyntaxKind.REMOTE_KEYWORD).toArray().length == 1;
     }
 
     private boolean hasNoParameters(SeparatedNodeList<ParameterNode> parameterNodes,
@@ -314,6 +321,7 @@ public class UdpServiceValidator {
                     continue;
                 } else {
                     hasInvalidUnionTypeDesc = true;
+                    break;
                 }
             }
         }
