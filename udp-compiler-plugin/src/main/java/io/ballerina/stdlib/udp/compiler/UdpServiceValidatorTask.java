@@ -54,15 +54,7 @@ public class UdpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
             List<TypeSymbol> listenerTypes = ((ServiceDeclarationSymbol) serviceDeclarationSymbol.get())
                     .listenerTypes();
             for (TypeSymbol listenerType : listenerTypes) {
-                if (listenerType.typeKind() == TypeDescKind.UNION
-                        && isUdpModule(((UnionTypeSymbol) listenerType).memberTypeDescriptors()
-                        .get(0).getModule().get())) {
-                    udpServiceValidator = new UdpServiceValidator(ctx, modulePrefix
-                            + SyntaxKind.COLON_TOKEN.stringValue());
-                    udpServiceValidator.validate();
-                    return;
-                } else if (listenerType.typeKind() == TypeDescKind.TYPE_REFERENCE
-                        && isUdpModule(((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule().get())) {
+                if (isListenerBelongsToUdpModule(listenerType)) {
                     udpServiceValidator = new UdpServiceValidator(ctx, modulePrefix
                             + SyntaxKind.COLON_TOKEN.stringValue());
                     udpServiceValidator.validate();
@@ -88,5 +80,20 @@ public class UdpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
     private boolean isUdpModule(ModuleSymbol moduleSymbol) {
         return Utils.equals(moduleSymbol.getName().get(), Constants.UDP)
                 && Utils.equals(moduleSymbol.id().orgName(), ORG_NAME);
+    }
+
+    private boolean isListenerBelongsToUdpModule(TypeSymbol listenerType) {
+        if (listenerType.typeKind() == TypeDescKind.UNION) {
+            return ((UnionTypeSymbol) listenerType).memberTypeDescriptors().stream()
+                    .filter(typeDescriptor -> typeDescriptor instanceof TypeReferenceTypeSymbol)
+                    .map(typeReferenceTypeSymbol -> (TypeReferenceTypeSymbol) typeReferenceTypeSymbol)
+                    .anyMatch(typeReferenceTypeSymbol -> isUdpModule(typeReferenceTypeSymbol.getModule().get()));
+        }
+
+        if (listenerType.typeKind() == TypeDescKind.TYPE_REFERENCE) {
+            return isUdpModule(((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule().get());
+        }
+
+        return false;
     }
 }
