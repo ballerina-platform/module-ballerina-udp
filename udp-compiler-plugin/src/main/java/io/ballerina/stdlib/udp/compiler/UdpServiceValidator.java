@@ -85,26 +85,29 @@ public class UdpServiceValidator {
         serviceDeclarationNode.members().stream()
                 .filter(child -> child.kind() == SyntaxKind.OBJECT_METHOD_DEFINITION
                         || child.kind() == SyntaxKind.RESOURCE_ACCESSOR_DEFINITION).forEach(node -> {
-            FunctionDefinitionNode functionDefinitionNode = (FunctionDefinitionNode) node;
-            String functionName = functionDefinitionNode.functionName().toString();
-            if (hasRemoteKeyword(functionDefinitionNode) &&
-                    !Utils.equals(functionName, Constants.ON_DATAGRAM)
-                    && !Utils.equals(functionName, Constants.ON_BYTES)
-                    && !Utils.equals(functionName, Constants.ON_ERROR)) {
-                reportInvalidFunction(functionDefinitionNode);
-            } else {
-                onDatagramFunctionNode = Utils.equals(functionName, Constants.ON_DATAGRAM) ? functionDefinitionNode
-                        : onDatagramFunctionNode;
-                onBytesFunctionNode = Utils.equals(functionName, Constants.ON_BYTES) ? functionDefinitionNode
-                        : onBytesFunctionNode;
-                onErrorFunctionNode = Utils.equals(functionName, Constants.ON_ERROR) ? functionDefinitionNode
-                        : onErrorFunctionNode;
-            }
+            filterRemoteMethods((FunctionDefinitionNode) node);
         });
         checkOnBytesAndOnDatagramFunctionExistence();
         validateFunctionSignature(onDatagramFunctionNode, Constants.ON_DATAGRAM);
         validateFunctionSignature(onBytesFunctionNode, Constants.ON_BYTES);
         validateFunctionSignature(onErrorFunctionNode, Constants.ON_ERROR);
+    }
+
+    private void filterRemoteMethods(FunctionDefinitionNode functionDefinitionNode) {
+        String functionName = functionDefinitionNode.functionName().toString();
+        if (hasRemoteKeyword(functionDefinitionNode) &&
+                !Utils.equals(functionName, Constants.ON_DATAGRAM)
+                && !Utils.equals(functionName, Constants.ON_BYTES)
+                && !Utils.equals(functionName, Constants.ON_ERROR)) {
+            reportInvalidFunction(functionDefinitionNode);
+        } else {
+            onDatagramFunctionNode = Utils.equals(functionName, Constants.ON_DATAGRAM) ? functionDefinitionNode
+                    : onDatagramFunctionNode;
+            onBytesFunctionNode = Utils.equals(functionName, Constants.ON_BYTES) ? functionDefinitionNode
+                    : onBytesFunctionNode;
+            onErrorFunctionNode = Utils.equals(functionName, Constants.ON_ERROR) ? functionDefinitionNode
+                    : onErrorFunctionNode;
+        }
     }
 
     private void reportInvalidFunction(FunctionDefinitionNode functionDefinitionNode) {
