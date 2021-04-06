@@ -51,6 +51,7 @@ public class CompilerPluginTest {
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
             Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
                     UdpServiceValidator.SERVICE_CANNOT_CONTAIN_BOTH_ON_DATAGRAM_0_AND_ON_BYTES_1_FUNCTIONS);
+            Assert.assertEquals(diagnostic.diagnosticInfo().code(), UdpServiceValidator.CODE_102);
         }
     }
 
@@ -63,6 +64,7 @@ public class CompilerPluginTest {
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
                 UdpServiceValidator.SERVICE_DOES_NOT_CONTAIN_ON_DATAGRAM_OR_ON_BYTES_FUNCTION);
+        Assert.assertEquals(diagnostic.diagnosticInfo().code(), UdpServiceValidator.CODE_102);
     }
 
     @Test
@@ -74,6 +76,7 @@ public class CompilerPluginTest {
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
             Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
                     UdpServiceValidator.REMOTE_KEYWORD_EXPECTED_IN_0_FUNCTION_SIGNATURE);
+            Assert.assertEquals(diagnostic.diagnosticInfo().code(), UdpServiceValidator.CODE_101);
         }
     }
 
@@ -86,6 +89,7 @@ public class CompilerPluginTest {
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
             Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
                     UdpServiceValidator.NO_PARAMETER_PROVIDED_FOR_0_FUNCTION_EXPECTS_1_AS_A_PARAMETER);
+            Assert.assertEquals(diagnostic.diagnosticInfo().code(), UdpServiceValidator.CODE_104);
         }
     }
 
@@ -98,6 +102,7 @@ public class CompilerPluginTest {
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
             Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
                     UdpServiceValidator.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION);
+            Assert.assertEquals(diagnostic.diagnosticInfo().code(), UdpServiceValidator.CODE_104);
         }
     }
 
@@ -110,6 +115,7 @@ public class CompilerPluginTest {
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
                 UdpServiceValidator.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
+        Assert.assertEquals(diagnostic.diagnosticInfo().code(), UdpServiceValidator.CODE_104);
     }
 
     @Test(description = "test onBytes and onDatagram function with byte[] and udp:Datagram parameters," +
@@ -122,6 +128,7 @@ public class CompilerPluginTest {
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
             Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
                     UdpServiceValidator.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
+            Assert.assertEquals(diagnostic.diagnosticInfo().code(), UdpServiceValidator.CODE_104);
         }
     }
 
@@ -142,6 +149,7 @@ public class CompilerPluginTest {
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
             Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
                     UdpServiceValidator.INVALID_PARAMETER_0_PROVIDED_FOR_1_FUNCTION_EXPECTS_2);
+            Assert.assertEquals(diagnostic.diagnosticInfo().code(), UdpServiceValidator.CODE_104);
         }
     }
 
@@ -162,6 +170,7 @@ public class CompilerPluginTest {
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
             Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
                     UdpServiceValidator.INVALID_RETURN_TYPE_0_FUNCTION_1_RETURN_TYPE_SHOULD_BE_A_SUBTYPE_OF_2);
+            Assert.assertEquals(diagnostic.diagnosticInfo().code(), UdpServiceValidator.CODE_105);
         }
     }
 
@@ -174,6 +183,7 @@ public class CompilerPluginTest {
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
             Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
                     UdpServiceValidator.FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE);
+            Assert.assertEquals(diagnostic.diagnosticInfo().code(), UdpServiceValidator.CODE_103);
         }
     }
 
@@ -186,6 +196,7 @@ public class CompilerPluginTest {
         for (Diagnostic diagnostic : diagnosticResult.diagnostics()) {
             Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
                     UdpServiceValidator.PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS);
+            Assert.assertEquals(diagnostic.diagnosticInfo().code(), UdpServiceValidator.CODE_104);
         }
     }
 
