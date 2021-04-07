@@ -46,23 +46,24 @@ public function main() returns error? {
 #### Listener
 The `udp:Listener` is used to listen to the incoming socket request.<br/>
 
-The `udp:Listener` can have following methods<br/>
-`onBytes(readonly & byte[] data, udp:Caller caller)` or `onDatagram(readonly & udp:Datagram, udp:Caller)` - These remote method gets invoked once the content is received from the client. The client is represented using the `udp:Caller`.<br/>
-`onError(readonly & udp:Error err)` - This remote method is invoked in an error situation.
+The `udp:Listener` can have following methods
+- `onBytes(readonly & byte[] data, udp:Caller caller)` or `onDatagram(readonly & udp:Datagram, udp:Caller)` - These remote method gets invoked once the content is received from the client. The client is represented using the `udp:Caller`.
+- `onError(readonly & udp:Error err)` - This remote method is invoked in an error situation.
 
 A `udp:Listener`can be defined as follows:
 
 ```ballerina
 import ballerina/udp;
+import ballerina/log;
 
 service on new udp:Listener(48829) {
-    remote function onBytes(readonly & byte[] data, udp:Caller caller) 
-            returns (readonly & byte[])|udp:Error? {
+    remote function onDatagram(readonly & udp:Datagram datagram) 
+            returns udp:Datagram|udp:Error? {
         // echo back the data to the same caller
-        return data;
+        return datagram;
     }
 
-    remote function onError(readonly & udp:Error err) {
+    remote function onError(udp:Error err) {
         log:printError("An error occured", 'error = err);
     }
 }
