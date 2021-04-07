@@ -4,11 +4,11 @@ listener u:Listener 'listener = new u:Listener(8000);
 
 service on 'listener {
 
-   remote function onBytes(readonly & byte[] data) returns byte[] | u:Error? {
+    remote function onBytes(readonly & byte[] data) returns byte[]|u:Error? {
 
-   }
+    }
 
-   remote function onError(int err) {
+    remote function onError(int err) {
 
-   }
+    }
 }

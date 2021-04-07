@@ -26,5 +26,4 @@ public class Listener {
 }
 
 public type Service service object {
-
 };
