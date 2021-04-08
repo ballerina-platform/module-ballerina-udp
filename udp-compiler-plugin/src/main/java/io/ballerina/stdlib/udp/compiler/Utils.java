@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,14 +16,14 @@
  * under the License.
  */
 
-module io.ballerina.stdlib.udp {
-    requires io.ballerina.runtime;
-    requires io.ballerina.lang;
-    requires io.ballerina.tools.api;
-    requires org.slf4j;
-    requires io.netty.transport;
-    requires io.netty.handler;
-    requires io.netty.buffer;
-    requires io.netty.common;
-    exports org.ballerinalang.stdlib.udp;
+package io.ballerina.stdlib.udp.compiler;
+
+/**
+ * Compiler-plugin utility class.
+ */
+public class Utils {
+
+    public static boolean equals(String actual, String expected) {
+        return actual.compareTo(expected) == 0;
+    }
 }
