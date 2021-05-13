@@ -13,9 +13,6 @@ This package provides an implementation for sending/receiving messages to/from a
 
 For more information on the operations supported go to [The UDP Package](https://docs.central.ballerina.io/ballerina/udp/latest).
 
-For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/learn/by-example/udp-listener.html).
-
-
 ## Issues and Projects 
 
 Issues and Projects tabs are disabled for this repository as this is part of the Ballerina Standard Library. To report bugs, request new features, start new discussions, view project boards, etc. please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library). 

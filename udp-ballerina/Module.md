@@ -1,6 +1,6 @@
 ## Overview
 
-This module provides an implementation for sending/receiving messages to/from another application process (local or remote) for connectionless protocols.
+This module provides an implementation for sending/receiving datagrams to/from another application process (local or remote) using UDP.
 
 #### Client
 The `udp:Client` is used to interact with the remote UDP host and it can be defined as follows:
@@ -60,8 +60,3 @@ service on new udp:Listener(48829) {
     }
 }
 ```
-
-For information on the operations, which you can perform with this module, see the below **Functions**. For examples on the usage of the operations, see the following.
- * [Basic UDP Client Example](https://ballerina.io/learn/by-example/udp-client.html)
- * [Basic UDP ConnectClient Example](https://ballerina.io/learn/by-example/udp-connect-client.html)
- * [Basic UDP Listener Example](https://ballerina.io/learn/by-example/udp-listener.html)
