@@ -4,8 +4,6 @@ The UDP library is one of the standard library packages of the<a target="_blank"
 
 It provides an implementation for sending and receiving data with UDP over the network.
 
-For more information go to [The UDP Package](https://docs.central.ballerina.io/ballerina/udp/latest).
-
 ## Report Issues
 
 To report bugs, request new features, start new discussions, view project boards, etc. Please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library).
