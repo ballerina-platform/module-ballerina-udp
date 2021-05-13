@@ -10,7 +10,7 @@ For example demonstrations of the usage, go to [Ballerina By Examples](https://b
 
 ## Report Issues
 
-To report bugs, request new features, start new discussions, view project boards, etc. please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library).
+To report bugs, request new features, start new discussions, view project boards, etc. Please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library).
 
 ## Useful Links
 
