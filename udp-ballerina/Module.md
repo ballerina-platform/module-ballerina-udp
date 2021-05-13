@@ -49,18 +49,14 @@ The `udp:Listener` can have following methods
 A `udp:Listener`can be defined as follows:
 
 ```ballerina
-import ballerina/udp;
-import ballerina/log;
-
 service on new udp:Listener(48829) {
     remote function onDatagram(readonly & udp:Datagram datagram)
             returns udp:Datagram|udp:Error? {
-        // echo back the data to the same caller
-        return datagram;
+        // Handle the content received from the client
     }
 
     remote function onError(udp:Error err) {
-        log:printError("An error occured", 'error = err);
+        // Handle the error situation
     }
 }
 ```
