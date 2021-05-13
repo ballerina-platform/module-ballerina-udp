@@ -6,41 +6,33 @@ This module provides an implementation for sending/receiving messages to/from an
 The `udp:Client` is used to interact with the remote UDP host and it can be defined as follows:
 
 ```ballerina
-import ballerina/udp;
+udp:Client socketClient = check new;
 
-public function main() returns error? {
-    udp:Client socketClient = check new;
+udp:Datagram datagram = {
+    remoteHost: "localhost",
+    remotePort : 48829,
+    data : "Hello Ballerina".toBytes()
+};
 
-    udp:Datagram datagram = {
-        remoteHost: "localhost",
-        remotePort : 48829,
-        data : "Hello Ballerina".toBytes()
-    };
+check socketClient->sendDatagram(datagram);
 
-    check socketClient->sendDatagram(datagram);
+readonly & udp:Datagram result = check socketClient->receiveDatagram();
 
-    readonly & udp:Datagram result = check socketClient->receiveDatagram();
-
-    check socketClient->close();
-}
+check socketClient->close();
 ```
 
 #### ConnectClient
 The `udp:ConnectClient` is configured by providing `remoteHost` and `remotePort`; so that it only receives data from, and sends data to, the configured remote host. Once connected, data may not be received from or sent to any other hosts. The client remains connected until it is explicitly it is closed.
 
 ```ballerina
-import ballerina/udp;
+udp:ConnectClient socketClient = check new("localhost", 48829);
 
-public function main() returns error? {
-    udp:ConnectClient socketClient = check new("localhost", 48829);
+string msg = "Hello Ballerina";
+check socketClient->writeBytes(msg.toBytes());
 
-    string msg = "Hello Ballerina";
-    check socketClient->writeBytes(msg.toBytes());
+readonly & byte[] result = check socketClient->readBytes();
 
-    readonly & byte[] result = check socketClient->readBytes();
-
-    check socketClient->close();
-}
+check socketClient->close();
 ```
 
 #### Listener
