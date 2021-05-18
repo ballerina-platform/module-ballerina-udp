@@ -14,9 +14,6 @@
  * limitations under the License.
  *
  */
-
-import org.apache.tools.ant.taskdefs.condition.Os
-
 buildscript {
     repositories {
         maven {
@@ -46,7 +43,7 @@ def originalCompilerPluginToml = compilerPluginTomlFile.text
 
 def stripBallerinaExtensionVersion(String extVersion) {
     if (extVersion.matches(project.ext.timestampedVersionRegex)) {
-        def splitVersion = extVersion.split('-');
+        def splitVersion = extVersion.split('-')
         if (splitVersion.length > 3) {
             def strippedValues = splitVersion[0..-4]
             return strippedValues.join('-')
@@ -61,7 +58,7 @@ def stripBallerinaExtensionVersion(String extVersion) {
 
 apply plugin: 'io.ballerina.plugin'
 
-ballerina{
+ballerina {
     module = packageName
     langVersion = ballerinaLangVersion
 }
@@ -71,19 +68,19 @@ configurations {
 }
 
 dependencies {
-    externalJars (group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}") {
+    externalJars(group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}") {
         transitive = false
     }
-    externalJars (group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}") {
+    externalJars(group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}") {
         transitive = false
     }
-    externalJars (group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}") {
+    externalJars(group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}") {
         transitive = false
     }
-    externalJars (group: 'io.netty', name: 'netty-common', version: "${nettyVersion}") {
+    externalJars(group: 'io.netty', name: 'netty-common', version: "${nettyVersion}") {
         transitive = false
     }
-    externalJars (group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}") {
+    externalJars(group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}") {
         transitive = false
     }
 }
