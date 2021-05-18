@@ -16,7 +16,7 @@
 
 import ballerina/jballerina.java;
 
-# This is used for creating UDP server endpoints. A UDP server endpoint
+# This is used for creating the UDP server endpoints. A UDP server endpoint
 # is capable of responding to remote callers. The `udp:Listener` is
 # responsible for initializing the endpoint using the provided
 # configurations.
@@ -85,7 +85,7 @@ public class Listener {
 # Represents the UDP listener configuration.
 #
 # + remoteHost - The hostname or the IP address of the remote host
-# + remotePort - The remote host's port number. If this is not set the server
+# + remotePort - The remote host's port number. If this is not set, the server
 #                runs without connecting to a remote host
 # + localHost - The interface for the server to be bound
 public type ListenerConfiguration record {

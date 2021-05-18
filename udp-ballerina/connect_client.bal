@@ -49,7 +49,7 @@ public client class ConnectClient {
     # udp:Datagram|udp:Error result = socketClient->receiveDatagram();
     # ```
     #
-    # + return - A `byte[]`, or else an `udp:Error` if the data
+    # + return - A `byte[]` or else a `udp:Error` if the data
     #            cannot be read from the remote host
     isolated remote function readBytes() returns (readonly & byte[])|Error {
         return externConnectClientRead(self);
