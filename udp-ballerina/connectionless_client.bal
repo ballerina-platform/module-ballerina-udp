@@ -25,7 +25,8 @@ public client class Client {
     # udp:Client|udp:Error? socketClient = new(localHost = "localhost");
     # ```
     #
-    # + config - Connectionless client related configuration
+    # + config - Connectionless client-related configuration
+    # + return - `()` or else a `udp:Error` if the given data cannot be sent
     public isolated function init(*ClientConfiguration config) returns Error? {
         return initConnectionlessClient(self, config);
     }
@@ -38,7 +39,7 @@ public client class Client {
     #
     # + datagram - Contains the data to be sent to the remote host
     #              and the address of the remote host
-    # + return - () or else a `udp:Error` if the given data can't be sent
+    # + return - `()` or else a `udp:Error` if the given data cannot be sent
     isolated remote function sendDatagram(Datagram datagram) returns Error? {
         return externConnectionlessSend(self, datagram);
     }
@@ -48,8 +49,8 @@ public client class Client {
     # udp:Datagram|udp:Error result = socketClient->receiveDatagram();
     # ```
     #
-    # + return - The udp:Datagram, or else a `udp:Error` if the data 
-    #            can't be read from the remote host
+    # + return - A `udp:Datagram` or else a `udp:Error` if the data
+    #            cannot be read from the remote host
     isolated remote function receiveDatagram() returns (readonly & Datagram)|Error {
         return externConnectionlessReceive(self);
     }
@@ -81,10 +82,10 @@ public type Datagram record {|
 
 # Configurations for the connectionless UDP client.
 # 
-# + localHost - Local binding of the interface.
-# + timeout - The socket reading timeout value to be used 
+# + localHost - Local binding of the interface
+# + timeout - The socket-reading timeout value to be used 
 #             in seconds. If this is not set,the default value
-#             of 300 seconds (5 minutes) will be used.
+#             of 300 seconds (5 minutes) will be used
 public type ClientConfiguration record {
    decimal timeout = 300;
    string localHost?;
@@ -115,4 +116,3 @@ isolated function externConnectionlessSend(Client udpClient, Datagram datagram) 
     name: "send",
     'class: "org.ballerinalang.stdlib.udp.nativeclient.Client"
 } external;
-

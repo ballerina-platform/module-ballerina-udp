@@ -39,7 +39,7 @@ public client class ConnectClient {
     # ```
     #
     # + data - The data need to be sent to the connected remote host
-    # + return - () or else a `udp:Error` if the given data can't be sent
+    # + return - `()` or else a `udp:Error` if the given data can't be sent
     isolated remote function writeBytes(byte[] data) returns Error? {
         return externConnectClientWrite(self, data);
     }
@@ -49,8 +49,8 @@ public client class ConnectClient {
     # udp:Datagram|udp:Error result = socketClient->receiveDatagram();
     # ```
     #
-    # + return - The byte[], or else a `udp:Error` if the data
-    #            can't be read from the remote host
+    # + return - A `byte[]` or else a `udp:Error` if the data
+    #            cannot be read from the remote host
     isolated remote function readBytes() returns (readonly & byte[])|Error {
         return externConnectClientRead(self);
     }

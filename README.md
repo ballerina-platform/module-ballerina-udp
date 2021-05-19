@@ -11,10 +11,7 @@ The UDP package is one of the standard library packages of the<a target="_blank"
 
 This package provides an implementation for sending/receiving messages to/from another application process (local or remote) for connectionless protocols. 
 
-For more information on the operations supported go to [The UDP Package](https://ballerina.io/learn/api-docs/ballerina/udp/).
-
-For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/learn/by-example/udp-listener.html).
-
+For more information on the operations supported, go to the [`udp` package](https://docs.central.ballerina.io/ballerina/udp/latest).
 
 ## Issues and Projects 
 
