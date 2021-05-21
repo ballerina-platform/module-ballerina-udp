@@ -17,7 +17,7 @@
 import ballerina/jballerina.java;
 
 # Initializes the UDP connectionless client based on the provided configurations.
-public client class Client {
+public isolated client class Client {
    
     # Initializes the UDP connectionless client based on the provided 
     # configurations.
