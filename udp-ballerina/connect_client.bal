@@ -18,7 +18,7 @@ import ballerina/jballerina.java;
 
 # Initializes the UDP connection oriented client based on the 
 # provided configurations.
-public client class ConnectClient {
+public isolated client class ConnectClient {
    
     # Initializes the UDP connect client based on the 
     # provided configurations.
