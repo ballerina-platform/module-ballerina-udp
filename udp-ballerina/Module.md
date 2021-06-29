@@ -43,8 +43,10 @@ check socketClient->close();
 The `udp:Listener` is used to listen to the incoming socket request.<br/>
 
 The `udp:Listener` can have the following methods.
-- `onBytes(readonly & byte[] data, udp:Caller caller)` or `onDatagram(readonly & udp:Datagram, udp:Caller)` - These remote methods get invoked once the content is received from the client. The client is represented using the `udp:Caller`.
-- `onError(readonly & udp:Error err)` - This remote method is invoked in an error situation.
+
+**`onBytes(readonly & byte[] data, udp:Caller caller)` or `onDatagram(readonly & udp:Datagram, udp:Caller)`**: These remote methods get invoked once the content is received from the client. The client is represented using the `udp:Caller`.
+
+**`onError(readonly & udp:Error err)`**: This remote method is invoked in an error situation.
 
 A `udp:Listener`can be defined as follows:
 
