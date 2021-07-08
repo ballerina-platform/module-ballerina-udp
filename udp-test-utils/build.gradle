@@ -22,10 +22,10 @@ plugins {
 description = 'Ballerina - UDP Java Utils'
 
 dependencies {
-    compile group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
-    compile group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
-    compile "org.slf4j:slf4j-jdk14:${slf4jVersion}"
-    compile project(":udp-native")
+    implementation group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
+    implementation group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
+    implementation "org.slf4j:slf4j-jdk14:${slf4jVersion}"
+    implementation project(":udp-native")
 }
 
 compileJava {
