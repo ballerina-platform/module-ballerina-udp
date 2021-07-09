@@ -23,7 +23,7 @@ plugins {
 }
 
 allprojects {
-    group = 'io.ballerina.stdlib'
+    group = project.group
     version = project.version
 
     apply plugin: 'jacoco'
