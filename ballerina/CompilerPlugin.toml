@@ -3,4 +3,4 @@ id = "udp-plugin"
 class = "io.ballerina.stdlib.udp.compiler.UdpCompilerPlugin"
 
 [[dependency]]
-path = "../compiler-plugin/build/libs/udp-compiler-plugin-0.9.0-beta.3-SNAPSHOT.jar"
+path = "../compiler-plugin/build/libs/udp-compiler-plugin-@project.version@.jar"
