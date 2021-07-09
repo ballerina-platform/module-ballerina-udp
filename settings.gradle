@@ -12,8 +12,21 @@ plugins {
 }
 
 rootProject.name = 'udp'
-include(':build-config:checkstyle')
-include ':udp-native', ':udp-test-utils', 'udp-compiler-plugin', ':udp-ballerina', 'udp-compiler-plugin-tests'
+
+include ':checkstyle'
+include ':udp-native'
+include ':udp-test-utils'
+include ':udp-ballerina'
+include ':udp-compiler-plugin'
+include ':udp-compiler-plugin-tests'
+
+project(':checkstyle').projectDir = file("build-config${File.separator}checkstyle")
+project(':udp-native').projectDir = file('native')
+project(':udp-ballerina').projectDir = file('ballerina')
+project(':udp-test-utils').projectDir = file('test-utils')
+project(':udp-compiler-plugin').projectDir = file('compiler-plugin')
+project(':udp-compiler-plugin-tests').projectDir = file('compiler-plugin-tests')
+
 
 gradleEnterprise {
     buildScan {
