@@ -22,6 +22,8 @@ plugins {
    id "net.researchgate.release" version "${researchgateReleaseVersion}"
 }
 
+
+
 allprojects {
     group = project.group
     version = project.version
