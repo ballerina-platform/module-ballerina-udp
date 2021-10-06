@@ -1,10 +1,10 @@
 coverage:
   precision: 2
   round: down
-  range: "60...80"
+  range: "60...79"
   status:
     project:
       default:
-        target: 80
+        target: 79
 ignore:
   - "**/testutils"
