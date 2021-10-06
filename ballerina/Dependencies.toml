@@ -11,7 +11,6 @@ org = "ballerina"
 name = "io"
 version = "1.0.0"
 scope = "testOnly"
-transitive = false
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "lang.value"}
@@ -24,7 +23,6 @@ modules = [
 org = "ballerina"
 name = "jballerina.java"
 version = "0.0.0"
-transitive = false
 modules = [
 	{org = "ballerina", packageName = "jballerina.java", moduleName = "jballerina.java"}
 ]
@@ -34,7 +32,6 @@ org = "ballerina"
 name = "lang.value"
 version = "0.0.0"
 scope = "testOnly"
-transitive = true
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
@@ -44,9 +41,10 @@ org = "ballerina"
 name = "log"
 version = "2.0.0"
 scope = "testOnly"
-transitive = false
 dependencies = [
+	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "lang.value"},
 	{org = "ballerina", name = "observe"}
 ]
 modules = [
@@ -56,9 +54,8 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "observe"
-version = "0.9.0"
+version = "1.0.0"
 scope = "testOnly"
-transitive = true
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
@@ -68,12 +65,25 @@ org = "ballerina"
 name = "test"
 version = "0.0.0"
 scope = "testOnly"
-transitive = false
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
 modules = [
 	{org = "ballerina", packageName = "test", moduleName = "test"}
+]
+
+[[package]]
+org = "ballerina"
+name = "udp"
+version = "1.0.0"
+dependencies = [
+	{org = "ballerina", name = "io"},
+	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "log"},
+	{org = "ballerina", name = "test"}
+]
+modules = [
+	{org = "ballerina", packageName = "udp", moduleName = "udp"}
 ]
 
 
