@@ -7,6 +7,6 @@ service on new udp:Listener(9000) {
     }
 
     remote function onError(udp:Error err) returns int|float? {
-
+        return ();
     }
 }
