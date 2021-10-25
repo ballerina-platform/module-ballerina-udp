@@ -32,6 +32,8 @@ import io.ballerina.compiler.syntax.tree.SyntaxKind;
 import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import io.ballerina.stdlib.udp.Constants;
+import io.ballerina.tools.diagnostics.Diagnostic;
+import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +47,12 @@ public class UdpServiceValidatorTask implements AnalysisTask<SyntaxNodeAnalysisC
 
     @Override
     public void perform(SyntaxNodeAnalysisContext ctx) {
+        List<Diagnostic> diagnostics = ctx.semanticModel().diagnostics();
+        for (Diagnostic diagnostic : diagnostics) {
+            if (diagnostic.diagnosticInfo().severity() == DiagnosticSeverity.ERROR) {
+                return;
+            }
+        }
         ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) ctx.node();
         String modulePrefix = getPrefix(ctx);
 
