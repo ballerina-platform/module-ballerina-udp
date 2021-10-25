@@ -3,6 +3,10 @@ org = "ballerina"
 name = "udp"
 version = "1.0.1"
 distribution = "slbeta3"
+authors = ["Ballerina"]
+keywords = ["UDP", "datagram", "transport"]
+repository = "https://github.com/ballerina-platform/module-ballerina-udp"
+license = ["Apache-2.0"]
 
 [[platform.java11.dependency]]
 path = "../native/build/libs/udp-native-1.0.1-SNAPSHOT.jar"
