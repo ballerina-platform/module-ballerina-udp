@@ -2,6 +2,10 @@
 org = "ballerina"
 name = "udp"
 version = "@toml.version@"
+authors = ["Ballerina"]
+keywords = ["UDP", "datagram", "transport"]
+repository = "https://github.com/ballerina-platform/module-ballerina-udp"
+license = ["Apache-2.0"]
 distribution = "slbeta3"
 
 [[platform.java11.dependency]]
