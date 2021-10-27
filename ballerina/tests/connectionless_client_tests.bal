@@ -36,7 +36,7 @@ function testClientEcho() returns error? {
     readonly & Datagram response = check socketClient->receiveDatagram();
     test:assertEquals(string:fromBytes(response.data), msg, "Found an unexpected output");
 
-    check socketClient->close();
+    return check socketClient->close();
 }
 
 @test:Config {dependsOn: [testClientEcho]}
@@ -70,7 +70,7 @@ function testContentReceive() returns error? {
     response = check socketClient->receiveDatagram();
     test:assertEquals(string:fromBytes(response.data), expectedResponseString, "Found an unexpected output");
 
-    check socketClient->close();
+    return check socketClient->close();
 }
 
 @test:Config {dependsOn: [testContentReceive]}
@@ -95,7 +95,7 @@ function testSendAndReciveLargeDataViaDatagram() returns error? {
     test:assertTrue(receivedResponseArrayLenght == expectedResponseArrayLengthOfFirstDatagramPacket, 
     msg = "Datagrams not recived properly");
 
-    check socketClient->close();
+    return check socketClient->close();
 }
 
 @test:AfterSuite {}
