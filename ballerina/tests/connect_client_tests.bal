@@ -28,7 +28,7 @@ function testConnectClientEcho() returns error? {
     readonly & byte[] response = check socketClient->readBytes();
     test:assertEquals(string:fromBytes(response), msg, "Found unexpected output");
 
-    check socketClient->close();
+    return check socketClient->close();
 }
 
 @test:Config {dependsOn: [testConnectClientEcho]}
@@ -52,5 +52,5 @@ isolated function testConnectClientReadTimeOut() returns error? {
         log:printInfo(result.message());
     }
 
-    check socketClient->close();
+    return check socketClient->close();
 }

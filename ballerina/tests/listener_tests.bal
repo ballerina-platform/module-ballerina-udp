@@ -30,7 +30,7 @@ function testListenerRead() returns error? {
         log:printInfo("Datagram was sent to the remote host.");
     }
 
-    check socketClient->close();
+    return check socketClient->close();
 }
 
 @test:Config {dependsOn: [testListenerRead]}
@@ -50,7 +50,7 @@ function testCallerSendBytes() returns error? {
         test:assertEquals(string:fromBytes(response.data), msg, "Found unexpected output");
     }
 
-    check socketClient->close();
+    return check socketClient->close();
 }
 
 @test:Config {dependsOn: [testCallerSendBytes]}
@@ -74,7 +74,7 @@ function testCallerSendDatagram() returns error? {
         }
     }
 
-    check socketClient->close();
+    return check socketClient->close();
 }
 
 @test:Config {dependsOn: [testCallerSendDatagram]}
@@ -90,7 +90,7 @@ function testReturnDatagram() returns error? {
     readonly & Datagram response = check socketClient->receiveDatagram();
     test:assertEquals(string:fromBytes(response.data), msg, "Found unexpected output");
 
-    check socketClient->close();
+    return check socketClient->close();
 }
 
 @test:Config {dependsOn: [testReturnDatagram]}
@@ -109,7 +109,7 @@ function testConnectedListener() returns error? {
         // this read will result in a timeout error
         io:println("This client is not running on port 9999");
     }
-    check socketClient->close();
+    return check socketClient->close();
 }
 
 @test:Config {dependsOn: [testConnectedListener]}
@@ -138,5 +138,5 @@ function testListenerForSendingMultipleDatagrams() returns error? {
     } else {
         test:assertFail(msg = "No datagrams received by the client");
     }
-    check socketClient->close();
+    return check socketClient->close();
 }
