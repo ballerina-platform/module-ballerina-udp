@@ -28,7 +28,7 @@ public class Listener {
     # ```
     # + localPort - The port number of the remote service
     # + config - Configurations related to the `udp:Listener`
-    public isolated function init(int localPort, *ListenerConfiguration config) returns error? {
+    public isolated function init(int localPort, *ListenerConfiguration config) returns Error? {
         return initListener(self,localPort, config);
     }
 
@@ -94,7 +94,7 @@ public type ListenerConfiguration record {
     string localHost?;
 };
 
-isolated function initListener(Listener listenerObj,int localPort, ListenerConfiguration config) returns error? = @java:Method {
+isolated function initListener(Listener listenerObj,int localPort, ListenerConfiguration config) returns Error? = @java:Method {
     'class: "io.ballerina.stdlib.udp.nativelistener.Listener",
     name: "init"
 } external;
