@@ -29,8 +29,12 @@ that makes it easier to use, combine, and create network services.
         * 3.3.3. [`close` function](#333-close-function)
 4. [Service](#4-service)
     * 4.1. [Listener](#41-listener)
+        * 4.1.1. [Configuration](#411-configuration)
+        * 4.1.2. [`init` function](#412-init-function)
     * 4.2. [Service](#42-service)
     * 4.3. [Caller](#43-caller)
+        * 4.3.1. [`sendDatagram` function](#431-senddatagram-function)
+        * 4.3.2. [`sendBytes` function](#432-sendbytes-function)
 5. [Samples](#5-samples)
     * 5.1. [Client](#51-client)
         * 5.1.1. [Connectionless Client](#511-connectionless-client)
@@ -149,12 +153,21 @@ public class Listener {
 }
 ```
 
+#### 4.1.1 Configuration
+Configured using the record, `ListenerConfiguration` with the connection details required.
+In absense of `remotePort`, the listener does not listen to a remote port but to the local port.
+
+#### 4.1.2 `init` function
+Initialize the listener with the given details.
+
 ### 4.2 Service
 ```ballerina
 public type Service service object {};
 ```
 
 ### 4.3 Caller
+Similar in behavior to a client.
+
 
 ```ballerina
 public client class Caller {
@@ -169,6 +182,12 @@ public client class Caller {
     remote isolated function sendDatagram(udp:Datagram datagram) returns Error? {}
 }
 ```
+
+#### 4.3.1 `sendDatagram` function
+`sendDatagram` function send pre-defined datagrams one-by-one.
+
+#### 4.3.2 `sendBytes` function
+Similar to the `sendDatagram` function but can be given `data`, longer than the allowed maximum size of a datagram, where `data` array is ieratively read and sent as a sequene of datagrams.
 
 ## 5 Samples
 
