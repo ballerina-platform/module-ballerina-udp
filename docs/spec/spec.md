@@ -66,20 +66,17 @@ Follows the principles of pure UDP protocol with connectionless data.
 public type ClientConfiguration record {
     decimal timeout = 300;
     string localhost?;
-    // can have other socket options
 }
 
 public isolated client class Client {
 
-    public isolated function init(*ClientConfiguration	 config) returns udp:Error? { }
+    public isolated function init(*ClientConfiguration config) returns udp:Error? {}
 
-    isolated remote function sendDatagram(udp:Datagram datagram)
-        returns udp:Error? { }
+    isolated remote function sendDatagram(udp:Datagram datagram) returns udp:Error? {}
 
-    isolated remote function receiveDatagram()
-        returns (readonly & udp:Datagram)|udp:Error { }
+    isolated remote function receiveDatagram() returns (readonly & udp:Datagram)|udp:Error {}
 
-    isolated remote function close() returns udp:Error? { }
+    isolated remote function close() returns udp:Error? {}
 }
 ```
 
@@ -107,20 +104,17 @@ Is configured so that it only receives datagrams from an external party, and sen
 public type ConnectClientConfiguration record {
     decimal timeout = 300;
     string localhost?;
-    // can have other socket options
 }
 
 public isolated client class ConnectClient {
 
-    public isolated function init(string remoteHost, int remotePort,
-        *ConnectClientConfiguration config) returns upd:Error? { }
+    public isolated function init(string remoteHost, int remotePort, *ConnectClientConfiguration config) returns upd:Error? {}
 
-    isolated remote function writeBytes(byte[] data) returns udp:Error? { }
+    isolated remote function writeBytes(byte[] data) returns udp:Error? {}
 
-    isolated remote function readBytes()
-        returns (readonly & byte[])|udp:Error { }
+    isolated remote function readBytes() returns (readonly & byte[])|udp:Error {}
 
-    isolated remote function close() returns udp:Error? { }
+    isolated remote function close() returns udp:Error? {}
 }
 ```
 
@@ -147,35 +141,32 @@ public type ListenerConfiguration record {
 
 public class Listener {
 
-    public isolated function init(int localPort, *ListenerConfiguration config)
-            returns upd:error?{ }
+    public isolated function init(int localPort, *ListenerConfiguration config) returns upd:error? {}
 
-    public isolated function attach(Service s, () name = ())
-            returns error?  { }
+    public isolated function attach(Service s, () name = ()) returns error? {}
 
-    public isolated function detach(Service s) returns error? { }
+    public isolated function detach(Service s) returns error? {}
 }
 ```
 
 ### 4.2 Service
 ```ballerina
-public type Service service object { };
+public type Service service object {};
 ```
 
 ### 4.3 Caller
 
 ```ballerina
-public client class Caller{
+public client class Caller {
 
     public string? remoteHost = ();
     public int? remotePort = ();
 
-    isolated function init(){ }
+    isolated function init() {}
 
-    remote isolated function sendBytes(byte[] data) returns Error? { }
+    remote isolated function sendBytes(byte[] data) returns Error? {}
 
-    remote isolated function sendDatagram(udp:Datagram datagram)
-        returns Error? {}
+    remote isolated function sendDatagram(udp:Datagram datagram) returns Error? {}
 }
 ```
 
@@ -189,7 +180,7 @@ public client class Caller{
 public function main() returns error? {
     udp:Client socketClient = check new;
     byte[] data = "Hello from UDP client".toBytes();
-    udp:Datagram datagram = {data, remoteHost: "localhost", remortPort:80 };
+    udp:Datagram datagram = {data, remoteHost: "localhost", remortPort: 80};
     check socketClient->sendDatagram(datagram);
     readonly & udp:Datagram result = check socketClient->receiveDatagram();
     check socketClient->close();
@@ -213,14 +204,12 @@ public function main() returns error? {
 ```ballerina
 service on new udp:Listener(8080) {
 
-    remote function onBytes(readonly & byte[] data)
-            returns byte[] | udp:Error? {
+    remote function onBytes(readonly & byte[] data) returns byte[]|udp:Error? {
 	    //echo back
         return data;
     }
 
-    remote function onDatagram(readonly & udp:Datagram datagram,
-            udp:Caller caller) returns udp:Datagram | udp:Error? {
+    remote function onDatagram(readonly & udp:Datagram datagram, udp:Caller caller) returns udp:Datagram|udp:Error? {
         check caller->sendDatagram(datagram);
 	    // instead we can directly return datagram too, to echo back
 	    // return datagram;
