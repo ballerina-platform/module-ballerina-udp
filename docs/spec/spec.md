@@ -100,8 +100,6 @@ Listened datagrams are retrieved one-by-one. If an error happens during the rece
 #### 3.2.4 `close` function
 Clears the external-party-related information from the client.
 
-
-
 ### 3.3 Connection Oriented Client
 Is configured so that it only receives datagrams from an external party, and sends datagrams to an external party, using the given remote address. Once connected, datagrams may not be received from or sent to any other address. The client remains connected until it is explicitly disconnected or until it is closed.
 
