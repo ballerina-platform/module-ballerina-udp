@@ -15,32 +15,32 @@ that makes it easier to use, combine, and create network services.
 # Contents
 
 1. [Overview](#1-overview)
-2. [User Datagram Protocol (UDP)](#2-basic-udp)
+2. [User Datagram Protocol (UDP)](#2-user-datagram-protocol)
 3. [Client](#3-client)
-    * 3.1. [Datagram](#33-datagram)
-    * 3.2. [Connectionless Client](#31-connectionless-client)
-        * 3.2.1. [`init` function](#311-init-function)
-        * 3.2.2. [`sendDatagram` function](#312-sendDatagram-function)
-        * 3.2.3. [`receiveDatagram` function](#311-receiveDatagram-function)
-        * 3.2.4. [`close` function](#312-close-function)
-    * 3.3. [Connection Oriented Client](#32-connection-oriented-client)
-        * 3.3.1. [`writeBytes` function](#321-writeBytes-function)
-        * 3.3.2. [`readBytes` function](#322-readBytes-function)
-        * 3.3.3. [`close` function](#321-close-function)
+    * 3.1. [Datagram](#31-datagram)
+    * 3.2. [Connectionless Client](#32-connectionless-client)
+        * 3.2.1. [`init` function](#321-init-function)
+        * 3.2.2. [`sendDatagram` function](#322-senddatagram-function)
+        * 3.2.3. [`receiveDatagram` function](#323-receivedatagram-function)
+        * 3.2.4. [`close` function](#324-close-function)
+    * 3.3. [Connection Oriented Client](#33-connection-oriented-client)
+        * 3.3.1. [`writeBytes` function](#331-writebytes-function)
+        * 3.3.2. [`readBytes` function](#332-readbytes-function)
+        * 3.3.3. [`close` function](#333-close-function)
 4. [Service](#4-service)
-    * 4.1. [Listener](#41-service-listener)
-    * 4.2. [Service](#42-service-service)
-    * 4.3. [Caller](#43-service-caller)
+    * 4.1. [Listener](#41-listener)
+    * 4.2. [Service](#42-service)
+    * 4.3. [Caller](#43-caller)
 5. [Samples](#5-samples)
-    * 5.1. [Client](#51-client-samples)
-        * 5.1.1. [Connectionless Client](#511-connectionless-client-sample)
-        * 5.1.2. [Connection Oriented Client](#512-connection-oriented-client-sample)
-    * 5.2. [Service](#52-service-sample)
+    * 5.1. [Client](#51-client)
+        * 5.1.1. [Connectionless Client](#511-connectionless-client)
+        * 5.1.2. [Connection Oriented Client](#512-connection-oriented-client)
+    * 5.2. [Service](#52-service)
 
 ## 1. Overview
 This specification elaborates on Basic UDP clients and services/listeners.
 
-## 2. User Datagram Protocol (UDP)
+## 2. User Datagram Protocol
 UDP is the transport layer protocol used for unreliable connectionless data communication across a network.
 
 Ballerina UDP library has the capability of sending and receiving data via UDP protocol using both clients and services.
