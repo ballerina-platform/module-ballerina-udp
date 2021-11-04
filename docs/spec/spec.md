@@ -1,9 +1,9 @@
 # Specification: Ballerina UDP Library
 
-_Owners_: @Maninda @MohamedSabthar @shafreenAnfar
-_Reviewers_: @shafreenAnfar @Maninda
-_Created_: 2020/11/10
-_Updated_: 2021/11/04
+_Owners_: @Maninda @MohamedSabthar @shafreenAnfar  
+_Reviewers_: @shafreenAnfar @Maninda  
+_Created_: 2020/11/10  
+_Updated_: 2021/11/04  
 _Issue_: [#2197](https://github.com/ballerina-platform/ballerina-standard-library/issues/2197)
 
 # Introduction
