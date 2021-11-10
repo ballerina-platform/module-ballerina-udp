@@ -65,7 +65,7 @@ service on botServer {
                 return prepareDatagram(response, <string>caller.remoteHost, <int>caller.remotePort);
             }
         }
-        Error? res = caller->sendDatagram(prepareDatagram("Sorry,I Can’t help you with that", <string>caller.remoteHost, <int>
+        return caller->sendDatagram(prepareDatagram("Sorry,I Can’t help you with that", <string>caller.remoteHost, <int>
         caller.remotePort));
     }
 
