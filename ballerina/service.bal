@@ -15,7 +15,7 @@
 // under the License.
 
 # Represent UDP Listener service type.
-public type Service service object {
+public type Service distinct service object {
   // optional methods that the service can have
   // remote function onBytes(readonly & byte[] data, Caller caller) returns byte[]|Datagram|Error?;
   // remote function onDatagram(readonly & Datagram datagram, Caller caller) returns byte[]|Datagram|Error?;
