@@ -35,7 +35,7 @@ import java.util.concurrent.Executors;
  * This UDP server udp will use to mock the backend server.
  */
 public class MockServerUtils {
-    private static final Logger log = LoggerFactory.getLogger(MockServerUtils.class);
+
     private static MockUdpServer mockUdpServer;
 
     public static Object startUdpServer() {
