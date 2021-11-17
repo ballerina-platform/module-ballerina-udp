@@ -25,5 +25,5 @@ public class Listener {
     }
 }
 
-public type Service service object {
+public type Service distinct service object {
 };
