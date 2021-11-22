@@ -24,7 +24,6 @@ import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.StringUtils;
-import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
 import io.netty.channel.Channel;
 import io.netty.channel.socket.DatagramPacket;
@@ -42,7 +41,7 @@ public class Dispatcher {
 
     private static void invokeOnBytes(UdpService udpService, DatagramPacket datagramPacket, Channel channel,
                                       Type[] parameterTypes) {
-        try {
+//        try {
             Object[] params = getOnBytesSignature(datagramPacket, channel, parameterTypes);
             StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
                     Utils.getModule().getVersion(), Constants.ON_BYTES);
@@ -54,14 +53,14 @@ public class Dispatcher {
                 udpService.getRuntime().invokeMethodAsyncSequentially(udpService.getService(), Constants.ON_BYTES,
                         null, metadata, new UdpCallback(udpService, channel, datagramPacket), null, null, params);
             }
-        } catch (BError e) {
-            Dispatcher.invokeOnError(udpService, e.getMessage());
-        }
+//        } catch (BError e) {
+//            Dispatcher.invokeOnError(udpService, e.getMessage());
+//        }
     }
 
     private static void invokeOnDatagram(UdpService udpService, DatagramPacket datagramPacket, Channel channel,
                                          Type[] parameterTypes) {
-        try {
+//        try {
             Object[] params = getOnDatagramSignature(datagramPacket, channel, parameterTypes);
             StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
                     Utils.getModule().getVersion(), Constants.ON_DATAGRAM);
@@ -73,9 +72,9 @@ public class Dispatcher {
                 udpService.getRuntime().invokeMethodAsyncSequentially(udpService.getService(), Constants.ON_DATAGRAM,
                         null, metadata, new UdpCallback(udpService, channel, datagramPacket), null, null, params);
             }
-        } catch (BError e) {
-            Dispatcher.invokeOnError(udpService, e.getMessage());
-        }
+//        } catch (BError e) {
+//            Dispatcher.invokeOnError(udpService, e.getMessage());
+//        }
     }
 
     public static void invokeOnError(UdpService udpService, String message) {
