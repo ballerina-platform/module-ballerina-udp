@@ -30,8 +30,6 @@ import io.netty.channel.socket.DatagramPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-
 /**
  * Dispatch async methods.
  */
@@ -41,61 +39,31 @@ public class Dispatcher {
 
     private static void invokeOnBytes(UdpService udpService, DatagramPacket datagramPacket, Channel channel,
                                       Type[] parameterTypes) {
-//        try {
-            Object[] params = getOnBytesSignature(datagramPacket, channel, parameterTypes);
-            StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
-                    Utils.getModule().getVersion(), Constants.ON_BYTES);
-            if (udpService.getService().getType().isIsolated() &&
-                        udpService.getService().getType().isIsolated(Constants.ON_BYTES)) {
-                udpService.getRuntime().invokeMethodAsyncConcurrently(udpService.getService(), Constants.ON_BYTES,
-                        null, metadata, new UdpCallback(udpService, channel, datagramPacket), null, null, params);
-            } else {
-                udpService.getRuntime().invokeMethodAsyncSequentially(udpService.getService(), Constants.ON_BYTES,
-                        null, metadata, new UdpCallback(udpService, channel, datagramPacket), null, null, params);
-            }
-//        } catch (BError e) {
-//            Dispatcher.invokeOnError(udpService, e.getMessage());
-//        }
+        Object[] params = getOnBytesSignature(datagramPacket, channel, parameterTypes);
+        StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
+                Utils.getModule().getVersion(), Constants.ON_BYTES);
+        if (udpService.getService().getType().isIsolated() &&
+                    udpService.getService().getType().isIsolated(Constants.ON_BYTES)) {
+            udpService.getRuntime().invokeMethodAsyncConcurrently(udpService.getService(), Constants.ON_BYTES,
+                    null, metadata, new UdpCallback(udpService, channel, datagramPacket), null, null, params);
+        } else {
+            udpService.getRuntime().invokeMethodAsyncSequentially(udpService.getService(), Constants.ON_BYTES,
+                    null, metadata, new UdpCallback(udpService, channel, datagramPacket), null, null, params);
+        }
     }
 
     private static void invokeOnDatagram(UdpService udpService, DatagramPacket datagramPacket, Channel channel,
                                          Type[] parameterTypes) {
-//        try {
-            Object[] params = getOnDatagramSignature(datagramPacket, channel, parameterTypes);
-            StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
-                    Utils.getModule().getVersion(), Constants.ON_DATAGRAM);
-            if (udpService.getService().getType().isIsolated() &&
-                        udpService.getService().getType().isIsolated(Constants.ON_DATAGRAM)) {
-                udpService.getRuntime().invokeMethodAsyncConcurrently(udpService.getService(), Constants.ON_DATAGRAM,
-                        null, metadata, new UdpCallback(udpService, channel, datagramPacket), null, null, params);
-            } else {
-                udpService.getRuntime().invokeMethodAsyncSequentially(udpService.getService(), Constants.ON_DATAGRAM,
-                        null, metadata, new UdpCallback(udpService, channel, datagramPacket), null, null, params);
-            }
-//        } catch (BError e) {
-//            Dispatcher.invokeOnError(udpService, e.getMessage());
-//        }
-    }
-
-    public static void invokeOnError(UdpService udpService, String message) {
-        try {
-            MethodType methodType = Arrays.stream(udpService.getService().getType().getMethods()).
-                    filter(m -> m.getName().equals(Constants.ON_ERROR)).findFirst().orElse(null);
-            if (methodType != null) {
-                Object params[] = getOnErrorSignature(message);
-                StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
-                        Utils.getModule().getVersion(), Constants.ON_ERROR);
-                if (udpService.getService().getType().isIsolated() &&
-                            udpService.getService().getType().isIsolated(Constants.ON_ERROR)) {
-                    udpService.getRuntime().invokeMethodAsyncConcurrently(udpService.getService(), Constants.ON_ERROR,
-                            null, metadata, new UdpCallback(udpService), null, null, params);
-                } else {
-                    udpService.getRuntime().invokeMethodAsyncSequentially(udpService.getService(), Constants.ON_ERROR,
-                            null, metadata, new UdpCallback(udpService), null, null, params);
-                }
-            }
-        } catch (Throwable t) {
-            log.error("Error while executing onError function", t);
+        Object[] params = getOnDatagramSignature(datagramPacket, channel, parameterTypes);
+        StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
+                Utils.getModule().getVersion(), Constants.ON_DATAGRAM);
+        if (udpService.getService().getType().isIsolated() &&
+                    udpService.getService().getType().isIsolated(Constants.ON_DATAGRAM)) {
+            udpService.getRuntime().invokeMethodAsyncConcurrently(udpService.getService(), Constants.ON_DATAGRAM,
+                    null, metadata, new UdpCallback(udpService, channel, datagramPacket), null, null, params);
+        } else {
+            udpService.getRuntime().invokeMethodAsyncSequentially(udpService.getService(), Constants.ON_DATAGRAM,
+                    null, metadata, new UdpCallback(udpService, channel, datagramPacket), null, null, params);
         }
     }
 
@@ -143,10 +111,6 @@ public class Dispatcher {
             }
         }
         return bValues;
-    }
-
-    private static Object[] getOnErrorSignature(String message) {
-        return new Object[]{Utils.createUdpError(message), true};
     }
 
     private static BObject createClient(DatagramPacket datagramPacket, Channel channel) {

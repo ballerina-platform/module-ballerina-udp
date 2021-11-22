@@ -78,7 +78,6 @@ public class UdpCallback implements Callback {
 
     @Override
     public void notifyFailure(BError bError) {
-        Dispatcher.invokeOnError(udpService, bError.getMessage());
         if (log.isDebugEnabled()) {
             log.debug(String.format("Method dispatch failed: %s", bError.getMessage()));
         }
