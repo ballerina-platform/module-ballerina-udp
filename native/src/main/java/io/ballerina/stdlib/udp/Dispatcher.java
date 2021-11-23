@@ -18,6 +18,7 @@
 
 package io.ballerina.stdlib.udp;
 
+import io.ballerina.runtime.api.Runtime;
 import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.async.StrandMetadata;
 import io.ballerina.runtime.api.creators.ValueCreator;
@@ -26,7 +27,6 @@ import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
-import io.ballerina.stdlib.udp.util.ExcludeCoverageFromGeneratedReport;
 import io.netty.channel.Channel;
 import io.netty.channel.socket.DatagramPacket;
 import org.slf4j.Logger;
@@ -45,16 +45,8 @@ public class Dispatcher {
                                       Type[] parameterTypes) {
         try {
             Object[] params = getOnBytesSignature(datagramPacket, channel, parameterTypes);
-            StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
-                    Utils.getModule().getVersion(), Constants.ON_BYTES);
-            if (udpService.getService().getType().isIsolated() &&
-                        udpService.getService().getType().isIsolated(Constants.ON_BYTES)) {
-                udpService.getRuntime().invokeMethodAsyncConcurrently(udpService.getService(), Constants.ON_BYTES,
-                        null, metadata, new UdpCallback(udpService, channel, datagramPacket), null, null, params);
-            } else {
-                udpService.getRuntime().invokeMethodAsyncSequentially(udpService.getService(), Constants.ON_BYTES,
-                        null, metadata, new UdpCallback(udpService, channel, datagramPacket), null, null, params);
-            }
+            invokeAsyncCall(udpService.getService(), Constants.ON_BYTES, udpService.getRuntime(),
+                    new UdpCallback(udpService, channel, datagramPacket), params);
         } catch (BError e) {
             Dispatcher.invokeOnError(udpService, e.getMessage());
         }
@@ -64,41 +56,38 @@ public class Dispatcher {
                                          Type[] parameterTypes) {
         try {
             Object[] params = getOnDatagramSignature(datagramPacket, channel, parameterTypes);
-            StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
-                    Utils.getModule().getVersion(), Constants.ON_DATAGRAM);
-            if (udpService.getService().getType().isIsolated() &&
-                        udpService.getService().getType().isIsolated(Constants.ON_DATAGRAM)) {
-                udpService.getRuntime().invokeMethodAsyncConcurrently(udpService.getService(), Constants.ON_DATAGRAM,
-                        null, metadata, new UdpCallback(udpService, channel, datagramPacket), null, null, params);
-            } else {
-                udpService.getRuntime().invokeMethodAsyncSequentially(udpService.getService(), Constants.ON_DATAGRAM,
-                        null, metadata, new UdpCallback(udpService, channel, datagramPacket), null, null, params);
-            }
+            invokeAsyncCall(udpService.getService(), Constants.ON_DATAGRAM, udpService.getRuntime(),
+                    new UdpCallback(udpService, channel, datagramPacket), params);
         } catch (BError e) {
             Dispatcher.invokeOnError(udpService, e.getMessage());
         }
     }
 
-    @ExcludeCoverageFromGeneratedReport
     public static void invokeOnError(UdpService udpService, String message) {
         try {
             MethodType methodType = Arrays.stream(udpService.getService().getType().getMethods()).
                     filter(m -> m.getName().equals(Constants.ON_ERROR)).findFirst().orElse(null);
             if (methodType != null) {
-                Object params[] = getOnErrorSignature(message);
-                StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
-                        Utils.getModule().getVersion(), Constants.ON_ERROR);
-                if (udpService.getService().getType().isIsolated() &&
-                            udpService.getService().getType().isIsolated(Constants.ON_ERROR)) {
-                    udpService.getRuntime().invokeMethodAsyncConcurrently(udpService.getService(), Constants.ON_ERROR,
-                            null, metadata, new UdpCallback(udpService), null, null, params);
-                } else {
-                    udpService.getRuntime().invokeMethodAsyncSequentially(udpService.getService(), Constants.ON_ERROR,
-                            null, metadata, new UdpCallback(udpService), null, null, params);
-                }
+                Object[] params = getOnErrorSignature(message);
+                invokeAsyncCall(udpService.getService(), Constants.ON_ERROR, udpService.getRuntime(),
+                        new UdpCallback(udpService), params);
             }
         } catch (Throwable t) {
             log.error("Error while executing onError function", t);
+        }
+    }
+
+    private static void invokeAsyncCall(BObject service, String methodName, Runtime runtime, UdpCallback callback,
+                                        Object[] params) {
+        StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
+                Utils.getModule().getVersion(), methodName);
+        if (service.getType().isIsolated() &&
+                service.getType().isIsolated(methodName)) {
+            runtime.invokeMethodAsyncConcurrently(service, methodName,
+                    null, metadata, callback, null, null, params);
+        } else {
+            runtime.invokeMethodAsyncSequentially(service, methodName,
+                    null, metadata, callback, null, null, params);
         }
     }
 
