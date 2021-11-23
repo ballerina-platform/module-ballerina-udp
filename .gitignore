@@ -39,7 +39,9 @@ velocity.log*
 *Ballerina.lock
 
 # VSCode
+.vscode
 **/*.project
 **/*.settings
 **/*.classpath
+ballerina/ballerinaTarget/
 compiler-plugin-tests/bin/
