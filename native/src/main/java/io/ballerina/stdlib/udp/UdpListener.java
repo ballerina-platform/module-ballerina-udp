@@ -86,7 +86,12 @@ public class UdpListener {
     public static void send(UdpService udpService, DatagramPacket datagram, Channel channel) {
         LinkedList<DatagramPacket> fragments = Utils.fragmentDatagram(datagram);
         PromiseCombiner promiseCombiner = getPromiseCombiner(fragments, channel);
-        promiseCombiner.finish(channel.newPromise());
+
+        promiseCombiner.finish(channel.newPromise().addListener((ChannelFutureListener) future -> {
+            if (!future.isSuccess()) {
+                Dispatcher.invokeOnError(udpService, "Failed to send data.");
+            }
+        }));
     }
 
     private static PromiseCombiner getPromiseCombiner(LinkedList<DatagramPacket> fragments, Channel channel) {

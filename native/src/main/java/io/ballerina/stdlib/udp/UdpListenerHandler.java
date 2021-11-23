@@ -41,6 +41,6 @@ public class UdpListenerHandler extends SimpleChannelInboundHandler<DatagramPack
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-
+        Dispatcher.invokeOnError(udpService, cause.getMessage());
     }
 }
