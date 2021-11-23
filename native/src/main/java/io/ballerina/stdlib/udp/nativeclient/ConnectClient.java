@@ -31,8 +31,6 @@ import io.ballerina.stdlib.udp.UdpClient;
 import io.ballerina.stdlib.udp.UdpFactory;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.socket.DatagramPacket;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 
@@ -42,7 +40,6 @@ import java.net.InetSocketAddress;
  * @since 1.1.0
  */
 public class ConnectClient {
-    private static final Logger log = LoggerFactory.getLogger(Client.class);
 
     public static Object init(Environment env, BObject client, BString remoteHost,
                               int remotePort, BMap<BString, Object> config) {

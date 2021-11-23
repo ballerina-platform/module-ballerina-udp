@@ -18,7 +18,9 @@
 
 package io.ballerina.stdlib.udp;
 
+import io.ballerina.runtime.api.Runtime;
 import io.ballerina.runtime.api.TypeTags;
+import io.ballerina.runtime.api.async.StrandMetadata;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.Type;
@@ -43,8 +45,7 @@ public class Dispatcher {
                                       Type[] parameterTypes) {
         try {
             Object[] params = getOnBytesSignature(datagramPacket, channel, parameterTypes);
-
-            udpService.getRuntime().invokeMethodAsync(udpService.getService(), Constants.ON_BYTES, null, null,
+            invokeAsyncCall(udpService.getService(), Constants.ON_BYTES, udpService.getRuntime(),
                     new UdpCallback(udpService, channel, datagramPacket), params);
         } catch (BError e) {
             Dispatcher.invokeOnError(udpService, e.getMessage());
@@ -55,8 +56,7 @@ public class Dispatcher {
                                          Type[] parameterTypes) {
         try {
             Object[] params = getOnDatagramSignature(datagramPacket, channel, parameterTypes);
-
-            udpService.getRuntime().invokeMethodAsync(udpService.getService(), Constants.ON_DATAGRAM, null, null,
+            invokeAsyncCall(udpService.getService(), Constants.ON_DATAGRAM, udpService.getRuntime(),
                     new UdpCallback(udpService, channel, datagramPacket), params);
         } catch (BError e) {
             Dispatcher.invokeOnError(udpService, e.getMessage());
@@ -68,12 +68,26 @@ public class Dispatcher {
             MethodType methodType = Arrays.stream(udpService.getService().getType().getMethods()).
                     filter(m -> m.getName().equals(Constants.ON_ERROR)).findFirst().orElse(null);
             if (methodType != null) {
-                Object params[] = getOnErrorSignature(message);
-                udpService.getRuntime().invokeMethodAsync(udpService.getService(), Constants.ON_ERROR, null, null,
+                Object[] params = getOnErrorSignature(message);
+                invokeAsyncCall(udpService.getService(), Constants.ON_ERROR, udpService.getRuntime(),
                         new UdpCallback(udpService), params);
             }
         } catch (Throwable t) {
             log.error("Error while executing onError function", t);
+        }
+    }
+
+    private static void invokeAsyncCall(BObject service, String methodName, Runtime runtime, UdpCallback callback,
+                                        Object[] params) {
+        StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
+                Utils.getModule().getVersion(), methodName);
+        if (service.getType().isIsolated() &&
+                service.getType().isIsolated(methodName)) {
+            runtime.invokeMethodAsyncConcurrently(service, methodName,
+                    null, metadata, callback, null, null, params);
+        } else {
+            runtime.invokeMethodAsyncSequentially(service, methodName,
+                    null, metadata, callback, null, null, params);
         }
     }
 
