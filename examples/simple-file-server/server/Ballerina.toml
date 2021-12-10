@@ -1,0 +1,7 @@
+[package]
+org = "udp"
+name = "udp_file_server"
+version = "1.0.0"
+
+[build-options]
+observabilityIncluded = true
