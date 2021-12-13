@@ -1,31 +1,31 @@
 [package]
 org = "ballerina"
 name = "udp"
-version = "1.0.2"
+version = "1.1.0"
 authors = ["Ballerina"]
 keywords = ["UDP", "datagram", "transport"]
 repository = "https://github.com/ballerina-platform/module-ballerina-udp"
 license = ["Apache-2.0"]
-distribution = "slbeta3"
+distribution = "slbeta6"
 
 [[platform.java11.dependency]]
-path = "../native/build/libs/udp-native-1.0.2-SNAPSHOT.jar"
+path = "../native/build/libs/udp-native-1.1.0-SNAPSHOT.jar"
 
 [[platform.java11.dependency]]
-path = "../test-utils/build/libs/udp-test-utils-1.0.2-SNAPSHOT.jar"
+path = "../test-utils/build/libs/udp-test-utils-1.1.0-SNAPSHOT.jar"
 scope = "testOnly"
 
 [[platform.java11.dependency]]
-path = "./lib/netty-handler-4.1.50.Final.jar"
+path = "./lib/netty-handler-4.1.71.Final.jar"
 
 [[platform.java11.dependency]]
-path = "./lib/netty-buffer-4.1.50.Final.jar"
+path = "./lib/netty-buffer-4.1.71.Final.jar"
 
 [[platform.java11.dependency]]
-path = "./lib/netty-transport-4.1.50.Final.jar"
+path = "./lib/netty-transport-4.1.71.Final.jar"
 
 [[platform.java11.dependency]]
-path = "./lib/netty-common-4.1.50.Final.jar"
+path = "./lib/netty-common-4.1.71.Final.jar"
 
 [[platform.java11.dependency]]
-path = "./lib/netty-resolver-4.1.50.Final.jar"
+path = "./lib/netty-resolver-4.1.71.Final.jar"
