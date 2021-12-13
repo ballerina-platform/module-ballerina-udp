@@ -22,11 +22,12 @@ import ballerina/lang.runtime as rt;
 const int PORT = 20211;
 // Take the value of the terminal byte as 14.
 const int TERMINAL = 14;
-// Initialized the UDP client.
-udp:ConnectClient socketClient = check new ("localhost", PORT, timeout = 1);
-// Maintain a counter from 0 to 255, sized of a byte.
-byte sendCounter = 0;
+
 public function main() returns error? {
+    // Initialized the UDP client.
+    udp:ConnectClient socketClient = check new ("localhost", PORT, timeout = 1);
+    // Maintain a counter from 0 to 255, sized of a byte.
+    byte sequenceNo = 0;
     // Add a new file to the given file location. In error cases,
     // an error is returned. The local file is provided as a stream of
     // `byte[]` in which `5` is the block size.
@@ -34,41 +35,41 @@ public function main() returns error? {
         = check io:fileReadBlocksAsStream("../resources/test.txt", 5);
     var fileIterator = fileStream.iterator();
     // Read the first data block from the file.
-    record {|byte[] value;|}|io:Error? token = fileIterator.next();
+    record {|byte[] value;|}|io:Error? fileChunk = fileIterator.next();
     // Iterate through the `fileStream` till either the end of file is reached
     // or till an error has occurred.
-    while (token is (record {|byte[] value;|})) {
+    while (fileChunk is (record {|byte[] value;|})) {
         // Increment the counter as file is read.
-        sendCounter = <byte>((<int>sendCounter + 1) % 256);
-        byte[][] byteArrays = token.toArray();
+        sequenceNo = <byte>((<int>sequenceNo + 1) % 256);
+        byte[][] byteArrays = fileChunk.toArray();
         // Prepare the `byte[]` suitable to be sent to the server.
-        byte[] byteArray = check prepareSendByteArray(sendCounter, byteArrays);
+        byte[] byteArray = check prepareSendByteArray(sequenceNo, byteArrays);
         // Sends the prepared `byte[]` to the server.
         check socketClient->writeBytes(byteArray);
         // Then, read the response of the server which should be as same as the
-        // `sendCounter` byte.
+        // `sequenceNo` byte.
         readonly & byte[] response = check socketClient->readBytes();
-        int retryCounter = 0;
-        // Untill that response is received, wait for 10 seconds.
-        while response[0] != sendCounter && retryCounter < 10 {
+        int waitCounter = 0;
+        // Until that response is received, wait for 10 seconds.
+        while response[0] != sequenceNo && waitCounter < 10 {
             rt:sleep(1);
             response = check socketClient->readBytes();
-            retryCounter += 1;
+            waitCounter += 1;
         }
-        if retryCounter == 10 {
+        if waitCounter == 10 {
             // If the response has not correctly received the program ends with
             // an error message.
             io:print("Server has not received the datagram.");
             break;
         }
         // Iteratively try to get the next data block or the `()`.
-        token = fileIterator.next();
+        fileChunk = fileIterator.next();
     }
     // At the end of the file `()` is returned by the `fileIterator`.
-    // Then again, the `sendCounter` is incremented and do the final data
+    // Then again, the `sequenceNo` is incremented and do the final data
     // transfer to the server.
-    sendCounter = <byte>((<int>sendCounter + 1) % 256);
-    check socketClient->writeBytes([sendCounter, <byte>TERMINAL]);
+    sequenceNo = <byte>((<int>sequenceNo + 1) % 256);
+    check socketClient->writeBytes([sequenceNo, <byte>TERMINAL]);
     // Finally, both the `socketClient` and `fileStream` are closed.
     check socketClient->close();
     check fileStream.close();
@@ -76,7 +77,7 @@ public function main() returns error? {
 }
 
 // Prepare the `byte[]` suitable to be sent to the server.
-// This array starts with the byte of the `sendCounter`.
+// This array starts with the byte of the `sequenceNo`.
 // The remaining content is the file content.
 // As the end of the file is reached file content is replaced by the
 // terminal byte which has the value of 14.

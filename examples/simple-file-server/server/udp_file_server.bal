@@ -24,14 +24,14 @@ const int TERMINAL = 14;
 
 isolated service on new udp:Listener(PORT) {
 
-    // Start the `sendCounter` from zero as no data is received.
-    private int sendCounter = 0;
+    // Start the `sequenceNo` from zero as no data is received.
+    private int sequenceNo = 0;
     // Open a byte channel to a file to append with receving data.
     private io:WritableByteChannel byteChannel
         = checkpanic io:openWritableFile("dest.txt", option = io:APPEND);
 
     // This function is called when data is received.
-    // Return the `sendCounter` byte when successfully received.
+    // Return the `sequenceNo` byte when successfully received.
     // An error is returned, otherwise.
     remote function onBytes(readonly & byte[] data) returns byte[]|udp:Error? {
         lock {
@@ -40,9 +40,9 @@ isolated service on new udp:Listener(PORT) {
             byte[] newData = [];
             // Copy data to be edited.
             newData = data.clone();
-            // First byte is relevant to the `sendCounter`.
-            self.sendCounter = newData[0];
-            // Remove the `sendCounter` byte to prepare the data to be written.
+            // First byte is relevant to the `sequenceNo`.
+            self.sequenceNo = newData[0];
+            // Remove the `sequenceNo` byte to prepare the data to be written.
             _ = newData.remove(0);
             // Check the existance of the terminal byte.
             if newData[newData.length() - 1] == TERMINAL {
@@ -56,7 +56,7 @@ isolated service on new udp:Listener(PORT) {
             if result is int {
                 // Respond with the send counter of the latest written
                 // `byte[]`.
-                return [<byte>self.sendCounter];
+                return [<byte>self.sequenceNo];
             } else if result is io:Error {
                 return <udp:Error?>result;
             }
@@ -66,7 +66,6 @@ isolated service on new udp:Listener(PORT) {
             }
             return;
         }
-
     }
 
 }
