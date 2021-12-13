@@ -32,7 +32,6 @@ isolated service on new udp:Listener(PORT) {
 
     // This function is called when data is received.
     // Return the `sequenceNo` byte when successfully received.
-    // An error is returned, otherwise.
     remote function onBytes(readonly & byte[] data) returns byte[]|udp:Error? {
         lock {
             // Initialize the flag for "End of File Reached".

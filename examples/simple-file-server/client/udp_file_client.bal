@@ -28,16 +28,13 @@ public function main() returns error? {
     udp:ConnectClient socketClient = check new ("localhost", PORT, timeout = 1);
     // Maintain a counter from 0 to 255, sized of a byte.
     byte sequenceNo = 0;
-    // Add a new file to the given file location. In error cases,
-    // an error is returned. The local file is provided as a stream of
-    // `byte[]` in which `5` is the block size.
+    // The file is given as a stream of `byte[]` where `5` is the block size.
     stream<byte[], io:Error?> fileStream
         = check io:fileReadBlocksAsStream("../resources/test.txt", 5);
     var fileIterator = fileStream.iterator();
     // Read the first data block from the file.
     record {|byte[] value;|}|io:Error? fileChunk = fileIterator.next();
-    // Iterate through the `fileStream` till either the end of file is reached
-    // or till an error has occurred.
+    // Iterate through the `fileStream` till either the end of file is reached.
     while (fileChunk is (record {|byte[] value;|})) {
         // Increment the counter as file is read.
         sequenceNo = <byte>((<int>sequenceNo + 1) % 256);
@@ -46,8 +43,7 @@ public function main() returns error? {
         byte[] byteArray = check prepareSendByteArray(sequenceNo, byteArrays);
         // Sends the prepared `byte[]` to the server.
         check socketClient->writeBytes(byteArray);
-        // Then, read the response of the server which should be as same as the
-        // `sequenceNo` byte.
+        // Check the response with the `sequenceNo` byte.
         readonly & byte[] response = check socketClient->readBytes();
         int waitCounter = 0;
         // Until that response is received, wait for 10 seconds.
