@@ -5,7 +5,25 @@
 This guide explains how to put and get a file to/from a UDP server using Ballerina.
 This example explains how to write a simple file server using UDP. The server only supports sending and receiving files. The following figure illustrates the high-level design diagram of the server.
 
-![Sending a File with UDP](./simple-udp-server.jpg)
+<h1 align="center"><img src="simple-udp-server.jpg" alt="Sending a File with UDP" width="500"/></h1>
+
+## Implementation
+
+File transfer via UDP is implemented as described below.
+- Initially, the UDP server is listening to the same port which the UDP client is configured.
+- Both the client and the server maintain a counter, `sequenceNo` for the sequence number for each of the data sending event.
+    - `sequenceNo` is a byte, initialized at 0 and increments by 1, up to 255 and starts again from 0.
+    - `sequenceNo` byte is prepended to the data sent from the client.
+    - When the data is to be sent, the client increments the `sequenceNo` and sends to the server.
+    - Once the server consumes the data by writing them to a file, returns the same `sequenceNo` back to the client.
+    - The client waits up to 10 seconds (loop of 1 second checks) to receive that `sequenceNo` from the server.
+        - If the client receives the same `sequenceNo` from the server it sends the next amount of data to the server.
+        - Otherwise, the client exits the program printing an error message.
+- When the client finds the end of the file to be read, it sends the last datagram, replacing the file content of the data with the `TERMINAL` byte which has the value `14`.
+- Then the client closes both the datagram client and the file reader.
+- Once the server detects the `TERMINAL` byte it also closes the file writer.
+
+## Execution Order
 
 The below are the detailed explanations of each of the steps of this example.
 
@@ -25,22 +43,6 @@ Then the file is stored in the UDP file server.
 ### Step 4 - Close the File Stream
 
 When all the file related operations are finished, the byte stream corresponding to the received file is closed.
-
-## Implementation
-
-File transfer via UDP is implemented as described below.
- - Initially, the UDP server is listening to the same port which the UDP client is configured.
- - Both the client and the server maintain a counter, `sequenceNo` for the sequence number for each of the data sending event.
-   - `sequenceNo` is a byte, initialized at 0 and increments by 1, up to 255 and starts again from 0.
-   - `sequenceNo` byte is prepended to the data sent from the client.
-   - When the data is to be sent, the client increments the `sequenceNo` and sends to the server.
-   - Once the server consumes the data by writing them to a file, returns the same `sequenceNo` back to the client.
-   - The client waits up to 10 seconds (loop of 1 second checks) to receive that `sequenceNo` from the server.
-     - If the client receives the same `sequenceNo` from the server it sends the next amount of data to the server.
-     - Otherwise, the client exits the program printing an error message.
- - When the client finds the end of the file to be read, it sends the last datagram, replacing the file content of the data with the `TERMINAL` byte which has the value `14`.
- - Then the client closes both the datagram client and the file reader.
- - Once the server detects the `TERMINAL` byte it also closes the file writer.
 
 ## Testing
 
