@@ -3,7 +3,7 @@
 ## Overview
 
 This guide explains how to put and get a file to/from a UDP server using Ballerina.
-The following figure illustrates a high-level design diagram of the complete use case.
+This example explains how to write a simple file server using UDP. The server only supports sending and receiving files. The following figure illustrates the high-level design diagram of the server.
 
 ![Sending a File with UDP](./simple-udp-server.jpg)
 
