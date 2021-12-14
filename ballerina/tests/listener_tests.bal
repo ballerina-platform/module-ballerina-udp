@@ -140,3 +140,16 @@ function testListenerForSendingMultipleDatagrams() returns error? {
     }
     return check socketClient->close();
 }
+
+@test:Config {dependsOn: [testListenerForSendingMultipleDatagrams]}
+function testListenerAttachDetatch() returns error? {
+    Service dummyService = service object {
+        remote function onBytes(readonly & byte[] data) returns Error? {
+        }
+
+        remote function onError(Error err) {
+        }
+    };
+    check logServer.attach(dummyService);
+    check logServer.detach(dummyService);
+}
