@@ -72,15 +72,14 @@ public class UdpCallback implements Callback {
             DatagramPacket datagramPacket = new DatagramPacket(Unpooled.wrappedBuffer(byteContent),
                     new InetSocketAddress(host, port));
             UdpListener.send(udpService, datagramPacket, channel);
+        } else if (object instanceof BError) {
+            ((BError) object).printStackTrace();
         }
         log.debug("Method successfully dispatched.");
     }
 
     @Override
     public void notifyFailure(BError bError) {
-        Dispatcher.invokeOnError(udpService, bError.getMessage());
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("Method dispatch failed: %s", bError.getMessage()));
-        }
+        bError.printStackTrace();
     }
 }
