@@ -26,7 +26,7 @@ isolated service on new udp:Listener(PORT) {
 
     // Start the `sequenceNo` from zero as no data is received.
     private int sequenceNo = 0;
-    // Open a byte channel to a file to append with receving data.
+    // Open a byte channel to a file to append with receiving data.
     private io:WritableByteChannel byteChannel
         = checkpanic io:openWritableFile("dest.txt", option = io:APPEND);
 

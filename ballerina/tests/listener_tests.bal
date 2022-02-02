@@ -153,3 +153,13 @@ function testListenerAttachDetatch() returns error? {
     check logServer.attach(dummyService);
     check logServer.detach(dummyService);
 }
+
+@test:Config {}
+function testReadOnly() returns error? {
+    ConnectClient socketClient = check new ("localhost", 9005);
+    string msg = "Echo from connect client";
+    check socketClient->writeBytes(msg.toBytes());
+    readonly & byte[] response = check socketClient->readBytes();
+    test:assertEquals(string:fromBytes(response), "true");
+    return check socketClient->close();
+}
