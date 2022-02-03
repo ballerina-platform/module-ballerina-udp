@@ -106,7 +106,7 @@ service on new Listener(PORT6) {
 
 service on new Listener(PORT7) {
     remote function onBytes(readonly & byte[] data) returns (readonly & byte[])|Error? {
-        string isReadOnly = (data is readonly & byte[]).toString();
+        string isReadOnly = (data is readonly).toString();
         readonly & byte[] resp = isReadOnly.toBytes().cloneReadOnly();
         return resp;
     }
