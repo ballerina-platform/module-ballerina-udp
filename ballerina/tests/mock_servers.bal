@@ -21,6 +21,7 @@ const int PORT3 = 9001;
 const int PORT4 = 9002;
 const int PORT5 = 9003;
 const int PORT6 = 9004;
+const int PORT7 = 9005;
 
 listener Listener logServer = new Listener(PORT1);
 listener Listener echoServer = new Listener(PORT2);
@@ -100,5 +101,13 @@ service on new Listener(PORT6) {
             remoteHost: <string>caller.remoteHost,
             remotePort: <int>caller.remotePort
         });
+    }
+}
+
+service on new Listener(PORT7) {
+    remote function onBytes(readonly & byte[] data) returns (readonly & byte[])|Error? {
+        string isReadOnly = (data is readonly).toString();
+        readonly & byte[] resp = isReadOnly.toBytes().cloneReadOnly();
+        return resp;
     }
 }
