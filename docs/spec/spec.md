@@ -3,14 +3,19 @@
 _Owners_: @Maninda @MohamedSabthar @shafreenAnfar  
 _Reviewers_: @shafreenAnfar @Maninda  
 _Created_: 2020/11/10  
-_Updated_: 2021/11/04  
+_Updated_: 2022/02/07  
+_Edition_: Swan Lake  
 _Issue_: [#2197](https://github.com/ballerina-platform/ballerina-standard-library/issues/2197)
 
 # Introduction
-This is the specification for UDP standard library which is used for sending and
-receiving data with UDP programmed in the
-[Ballerina programming language](https://ballerina.io/), which is an open-source programming language for the cloud
-that makes it easier to use, combine, and create network services.
+
+This is the specification for the UDP standard library of [Ballerina language](https://ballerina.io/), which provides UDP client-server functionalities.
+
+The UDP library specification has evolved and may continue to evolve in the future. Released versions of the specification can be found under the relevant GitHub tag.
+
+If you have any feedback or suggestions about the library, start a discussion via a [GitHub issue](https://github.com/ballerina-platform/ballerina-standard-library/issues) or in the [Slack channel](https://ballerina.io/community/). Based on the outcome of the discussion, specification and implementation can be updated. Community feedback is always welcome. Any accepted proposal which affects the specification is stored under `/docs/proposals`. Proposals under discussion can be found with the label `type/proposal` in GitHub.
+
+Conforming implementation of the specification is released and included in the distribution. Any deviation from the specification is considered a bug.
 
 # Contents
 
