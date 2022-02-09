@@ -1,0 +1,3 @@
+resources:
+  - file_server.yaml
+  - ingress.yaml
