@@ -59,54 +59,64 @@ service /udp on new http:Listener(9100) {
 }
 
 public function publishMessages() returns error? {
-    udp:ConnectClient socketClient = check new ("localhost", PORT, timeout = 1);
-    startedTime = time:utcNow();
-    byte sequenceNo = 0;
-    time:Utc expiryTime = time:utcAddSeconds(startedTime, 200);
-    while time:utcDiffSeconds(expiryTime, time:utcNow()) > 0D {
-        stream<byte[], io:Error?> fileStream = check io:fileReadBlocksAsStream("resources/test.txt", 5);
-        var fileIterator = fileStream.iterator();
-        record {|byte[] value;|}|io:Error? fileChunk = fileIterator.next();
-        while fileChunk is (record {|byte[] value;|}) {
-            sequenceNo = <byte>((<int>sequenceNo + 1) % 256);
-            byte[][] byteArrays = fileChunk.toArray();
-            byte[] byteArray = check prepareSendByteArray(sequenceNo, byteArrays);
-            udp:Error? result = socketClient->writeBytes(byteArray);
-            if result is udp:Error {
-                errorCount += 1;
-            } else {
-                sentCount += 1;
-            }
-            readonly & byte[] response = check socketClient->readBytes();
-            receivedCount += 1;
-            int waitCounter = 0;
-            while response[0] != sequenceNo && waitCounter < 10 {
+    udp:ConnectClient|udp:Error socketClient = new ("localhost", PORT, timeout = 1);
+    if socketClient is udp:Error {
+        io:println("Client creation failed", socketClient);
+    } else {
+        io:println("Client created");
+        startedTime = time:utcNow();
+        byte sequenceNo = 0;
+        time:Utc expiryTime = time:utcAddSeconds(startedTime, 120);
+        while time:utcDiffSeconds(expiryTime, time:utcNow()) > 0D {
+            stream<byte[], io:Error?>|error fileStream = io:fileReadBlocksAsStream("resources/test.txt", 5);
+            if fileStream is error {
+                io:println("Error reading the file resources/test.txt", fileStream);
                 runtime:sleep(1);
-                readonly & byte[]|udp:Error resp = socketClient->readBytes();
-                if resp is udp:Error {
+            } else {
+                var fileIterator = fileStream.iterator();
+                record {|byte[] value;|}|io:Error? fileChunk = fileIterator.next();
+                while fileChunk is (record {|byte[] value;|}) {
+                    sequenceNo = <byte>((<int>sequenceNo + 1) % 256);
+                    byte[][] byteArrays = fileChunk.toArray();
+                    byte[] byteArray = check prepareSendByteArray(sequenceNo, byteArrays);
+                    udp:Error? result = socketClient->writeBytes(byteArray);
+                    if result is udp:Error {
+                        errorCount += 1;
+                    } else {
+                        sentCount += 1;
+                    }
+                    readonly & byte[] response = check socketClient->readBytes();
+                    receivedCount += 1;
+                    int waitCounter = 0;
+                    while response[0] != sequenceNo && waitCounter < 10 {
+                        runtime:sleep(1);
+                        readonly & byte[]|udp:Error resp = socketClient->readBytes();
+                        if resp is udp:Error {
+                            errorCount += 1;
+                        } else {
+                            response = resp;
+                            waitCounter += 1;
+                            receivedCount += 1;
+                        }
+                    }
+                    if waitCounter == 10 {
+                        errorCount += 1;
+                        break;
+                    }
+                    fileChunk = fileIterator.next();
+                }
+                sequenceNo = <byte>((<int>sequenceNo + 1) % 256);
+                udp:Error? result = socketClient->writeBytes([sequenceNo, <byte>TERMINAL]);
+                if (result is udp:Error) {
                     errorCount += 1;
                 } else {
-                    response = resp;
-                    waitCounter += 1;
-                    receivedCount += 1;
+                    sentCount += 1;
                 }
+                check fileStream.close();
             }
-            if waitCounter == 10 {
-                errorCount += 1;
-                break;
-            }
-            fileChunk = fileIterator.next();
         }
-        sequenceNo = <byte>((<int>sequenceNo + 1) % 256);
-        udp:Error? result = socketClient->writeBytes([sequenceNo, <byte>TERMINAL]);
-        if (result is udp:Error) {
-            errorCount += 1;
-        } else {
-            sentCount += 1;
-        }
-        check fileStream.close();
     }
-    check socketClient->close();
+    //check socketClient->close();
     finished = true;
     endedTime = time:utcNow();
 }
