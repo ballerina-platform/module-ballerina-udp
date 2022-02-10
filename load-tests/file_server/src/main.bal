@@ -145,13 +145,7 @@ udp:Service udpServer = service object {
 
     remote function onBytes(readonly & byte[] data) returns byte[]|udp:Error? {
         lock {
-            byte[] newData = [];
-            newData = data.clone();
-            self.sequenceNo = newData[0];
-            _ = newData.remove(0);
-            if newData[newData.length() - 1] == TERMINAL {
-                _ = newData.remove(newData.length() - 1);
-            }
+            self.sequenceNo = data[0];
             return [<byte>self.sequenceNo];
         }
     }
