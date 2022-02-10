@@ -61,9 +61,9 @@ service /udp on new http:Listener(9100) {
 public function publishMessages() returns error? {
     udp:ConnectClient socketClient = check new ("localhost", PORT, timeout = 1);
     startedTime = time:utcNow();
-    int endingTimeInSecs = startedTime[0] + 200;
     byte sequenceNo = 0;
-    while time:utcNow()[0] <= endingTimeInSecs {
+    time:Utc expiryTime = time:utcAddSeconds(startedTime, 200);
+    while time:utcDiffSeconds(expiryTime, time:utcNow()) > 0D {
         stream<byte[], io:Error?> fileStream = check io:fileReadBlocksAsStream("resources/test.txt", 5);
         var fileIterator = fileStream.iterator();
         record {|byte[] value;|}|io:Error? fileChunk = fileIterator.next();
