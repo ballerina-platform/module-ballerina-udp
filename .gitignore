@@ -38,6 +38,10 @@ target
 velocity.log*
 *Ballerina.lock
 
+# Auto generated Dependencies.toml files
+examples/**/Dependencies.toml
+load-tests/**/Dependencies.toml
+
 # VSCode
 .vscode
 **/*.project
