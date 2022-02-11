@@ -66,7 +66,7 @@ public function publishMessages() returns error? {
         io:println("Client created");
         startedTime = time:utcNow();
         byte sequenceNo = 0;
-        time:Utc expiryTime = time:utcAddSeconds(startedTime, 120);
+        time:Utc expiryTime = time:utcAddSeconds(startedTime, 3600);
         while time:utcDiffSeconds(expiryTime, time:utcNow()) > 0D {
             stream<byte[], io:Error?>|error fileStream = io:fileReadBlocksAsStream("resources/test.txt", 5);
             if fileStream is error {
