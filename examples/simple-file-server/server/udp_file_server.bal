@@ -36,9 +36,10 @@ isolated service on new udp:Listener(PORT) {
         lock {
             // Initialize the flag for "End of File Reached".
             boolean eofReached = false;
-            byte[] newData = [];
-            // Copy data to be edited.
-            newData = data.clone();
+            byte[]|error newData = data.cloneWithType();
+            if newData is error {
+                return <udp:Error?>newData;
+            }
             // First byte is relevant to the `sequenceNo`.
             self.sequenceNo = newData[0];
             // Remove the `sequenceNo` byte to prepare the data to be written.
