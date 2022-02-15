@@ -38,13 +38,13 @@ isolated service on new udp:Listener(PORT) {
             boolean eofReached = false;
             byte[]|error newData = data.cloneWithType();
             if newData is error {
-                return <udp:Error?>newData;
+                return error (newData.message());
             }
             // First byte is relevant to the `sequenceNo`.
             self.sequenceNo = newData[0];
             // Remove the `sequenceNo` byte to prepare the data to be written.
             _ = newData.remove(0);
-            // Check the existance of the terminal byte.
+            // Check the existence of the terminal byte.
             if newData[newData.length() - 1] == TERMINAL {
                 // Set the `End of File Reached` flag to be used in the future.
                 eofReached = true;
