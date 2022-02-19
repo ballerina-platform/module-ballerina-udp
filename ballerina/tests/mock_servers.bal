@@ -60,9 +60,9 @@ service on botServer {
     remote function onDatagram(readonly & Datagram datagram, Caller caller) returns Datagram|Error? {
         string|error? dataString = string:fromBytes(datagram.data);
         io:println("Received data: ", dataString);
-        if (dataString is string && QuestionBank.hasKey(dataString)) {
+        if dataString is string && QuestionBank.hasKey(dataString) {
             string? response = QuestionBank[dataString];
-            if (response is string) {
+            if response is string {
                 return prepareDatagram(response, <string>caller.remoteHost, <int>caller.remotePort);
             }
         }

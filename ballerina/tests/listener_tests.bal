@@ -67,7 +67,7 @@ function testCallerSendDatagram() returns error? {
 
         readonly & Datagram response = check socketClient->receiveDatagram();
         // assert echo response
-        if (QuestionBank.hasKey(msg)) {
+        if QuestionBank.hasKey(msg) {
             test:assertEquals(string:fromBytes(response.data), QuestionBank.get(msg), "Found unexpected output");
         } else {
             io:println(string:fromBytes(response.data));
@@ -102,7 +102,7 @@ function testConnectedListener() returns error? {
     log:printInfo("Data was sent to the remote host.");
 
     (readonly & byte[])|Error res = socketClient->readBytes();
-    if (res is (readonly & byte[])) {
+    if res is (readonly & byte[]) {
         test:assertEquals(res, "You are running on 9999".toBytes(), "Found unexpected output");
     } else {
         // since the connected listener only accept the messages from the client running on port 9999
@@ -127,13 +127,13 @@ function testListenerForSendingMultipleDatagrams() returns error? {
     int noOfBytesReceived = 0;
     readonly & Datagram|Error res = socketClient->receiveDatagram();
 
-    while (res is (readonly & Datagram)) {
+    while res is (readonly & Datagram) {
         noOfBytesReceived += res.data.length();
         res = socketClient->receiveDatagram();
     }
 
     // listener sending multiple datagrams this client should recive atleast one datagram
-    if (noOfBytesReceived > 0) {
+    if noOfBytesReceived > 0 {
         io:println("Total number of bytes from received datagrams: ", noOfBytesReceived);
     } else {
         test:assertFail(msg = "No datagrams received by the client");

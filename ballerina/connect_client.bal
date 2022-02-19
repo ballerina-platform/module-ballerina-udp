@@ -27,7 +27,7 @@ public isolated client class ConnectClient {
     #                              localHost = "localHost");
     # ```
     # + remoteHost - The hostname or the IP address of the remote host
-    # + remotePort - The port number of the remmote host
+    # + remotePort - The port number of the remote host
     # + config - Connection oriented client related configuration
     public isolated function init(string remoteHost, int remotePort, *ConnectClientConfiguration config) returns Error? {
         return initConnectClient(self, remoteHost, remotePort, config);
@@ -68,10 +68,10 @@ public isolated client class ConnectClient {
 
 # Configurations for the connection oriented udp client.
 # 
-# + localHost - Local binding of the interface.
+# + localHost - Local binding of the interface
 # + timeout - The socket reading timeout value to be used 
 #             in seconds. If this is not set,the default value
-#             of 300 seconds (5 minutes) will be used.
+#             of 300 seconds (5 minutes) will be used
 public type ConnectClientConfiguration record {
    decimal timeout = 300;
    string localHost?;

@@ -42,9 +42,9 @@ function testClientEcho() returns error? {
 @test:Config {dependsOn: [testClientEcho]}
 isolated function testInvalidLocalHostInClient() {
     Client|Error? socketClient = new (localHost = "invalid", timeout = 1.5);
-    if (socketClient is Client) {
+    if socketClient is Client {
         test:assertFail(msg = "Provided invalid value for localHost this should return an Error");
-    } else if (socketClient is Error) {
+    } else if socketClient is Error {
         log:printInfo("Error initializing UDP Client");
     }
 }
