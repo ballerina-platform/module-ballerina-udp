@@ -117,12 +117,14 @@ public class UdpListener {
     }
 
     public void close(Future callback) throws InterruptedException {
-        channel.close().sync().addListener((ChannelFutureListener) future -> {
-            if (future.isSuccess()) {
-                callback.complete(null);
-            } else {
-                callback.complete(Utils.createUdpError("Failed to gracefully shutdown the Listener."));
-            }
-        });
+        if (channel != null) {
+            channel.close().sync().addListener((ChannelFutureListener) future -> {
+                if (future.isSuccess()) {
+                    callback.complete(null);
+                } else {
+                    callback.complete(Utils.createUdpError("Failed to gracefully shutdown the Listener."));
+                }
+            });
+        }
     }
 }
