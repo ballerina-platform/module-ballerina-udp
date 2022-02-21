@@ -35,7 +35,7 @@ function testConnectClientEcho() returns error? {
 isolated function testInvalidLocalHostInConnectClient() {
     ConnectClient|Error? socketClient = new ("localhost", 48830, localHost = "invalid", timeout = 1.5);
     if socketClient is ConnectClient {
-        test:assertFail(msg = "Provided invalid value for localHost this should return an Error");
+        test:assertFail("Provided invalid value for localHost this should return an Error");
     } else if socketClient is Error {
         log:printInfo("Error initializing UDP Client");
     }
@@ -47,7 +47,7 @@ isolated function testConnectClientReadTimeOut() returns error? {
 
     var result = socketClient->readBytes();
     if result is byte[] {
-        test:assertFail(msg = "No UDP service running on localhost:45830, no result should be returned");
+        test:assertFail("No UDP service running on localhost:45830, no result should be returned");
     } else {
         log:printInfo(result.message());
     }

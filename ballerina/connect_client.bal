@@ -46,7 +46,7 @@ public isolated client class ConnectClient {
 
     # Reads data only from the connected remote host. 
     # ```ballerina
-    # udp:Datagram|udp:Error result = socketClient->receiveDatagram();
+    # readonly & byte[]|udp:Error result = socketClient->readBytes();
     # ```
     #
     # + return - A `byte[]` or else a `udp:Error` if the data

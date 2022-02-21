@@ -43,7 +43,7 @@ function testClientEcho() returns error? {
 isolated function testInvalidLocalHostInClient() {
     Client|Error? socketClient = new (localHost = "invalid", timeout = 1.5);
     if socketClient is Client {
-        test:assertFail(msg = "Provided invalid value for localHost this should return an Error");
+        test:assertFail("Provided invalid value for localHost this should return an Error");
     } else if socketClient is Error {
         log:printInfo("Error initializing UDP Client");
     }
@@ -93,7 +93,7 @@ function testSendAndReciveLargeDataViaDatagram() returns error? {
     int receivedResponseArrayLenght = response.data.length();
 
     test:assertTrue(receivedResponseArrayLenght == expectedResponseArrayLengthOfFirstDatagramPacket, 
-    msg = "Datagrams not recived properly");
+    "Datagrams not recived properly");
 
     return check socketClient->close();
 }
