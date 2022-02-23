@@ -35,7 +35,7 @@ public function main() returns error? {
     // Read the first data block from the file.
     record {|byte[] value;|}|io:Error? fileChunk = fileIterator.next();
     // Iterate through the `fileStream` till either the end of file is reached.
-    while (fileChunk is (record {|byte[] value;|})) {
+    while fileChunk is record {|byte[] value;|} {
         // Increment the counter as file is read.
         sequenceNo = <byte>((<int>sequenceNo + 1) % 256);
         byte[][] byteArrays = fileChunk.toArray();

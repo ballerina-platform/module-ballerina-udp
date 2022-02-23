@@ -107,7 +107,7 @@ public function publishMessages() returns error? {
                 }
                 sequenceNo = <byte>((<int>sequenceNo + 1) % 256);
                 udp:Error? result = socketClient->writeBytes([sequenceNo, <byte>TERMINAL]);
-                if (result is udp:Error) {
+                if result is udp:Error {
                     errorCount += 1;
                 } else {
                     sentCount += 1;
