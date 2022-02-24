@@ -60,8 +60,8 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_package_2");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 3);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[2];
         Assert.assertEquals(diagnostic.diagnosticInfo().messageFormat(),
                 UdpServiceValidator.SERVICE_DOES_NOT_CONTAIN_ON_DATAGRAM_OR_ON_BYTES_FUNCTION);
         Assert.assertEquals(diagnostic.diagnosticInfo().code(), UdpServiceValidator.CODE_102);

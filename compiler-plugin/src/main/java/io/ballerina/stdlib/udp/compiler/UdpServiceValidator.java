@@ -52,6 +52,8 @@ public class UdpServiceValidator {
     public static final String CODE_103 = "UDP_103";
     public static final String CODE_104 = "UDP_104";
     public static final String CODE_105 = "UDP_105";
+    public static final String CODE_106 = "UDP_106";
+    public static final String CODE_107 = "UDP_107";
 
     // Message formats for reporting error diagnostics
     public static final String SERVICE_CANNOT_CONTAIN_BOTH_ON_DATAGRAM_0_AND_ON_BYTES_1_FUNCTIONS
@@ -71,6 +73,8 @@ public class UdpServiceValidator {
     public static final String FUNCTION_0_NOT_ACCEPTED_BY_THE_SERVICE = "Function `{0}` not accepted by the service";
     public static final String PROVIDED_0_PARAMETERS_1_CAN_HAVE_ONLY_2_PARAMETERS
             = "Provided {0} parameters, `{1}` can have only {2} parameters";
+    public static final String DATAGRAM_REMOTE_FUNCTION_GENERATION = "onDatagram remote function generation";
+    public static final String BYTES_REMOTE_FUNCTION_GENERATION = "onBytes remote function generation";
 
     // expected parameters and return types
     public static final String READONLY_INTERSECTION = "readonly & ";
@@ -88,6 +92,18 @@ public class UdpServiceValidator {
 
     public void validate() {
         ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) ctx.node();
+        boolean hasRemoteService = serviceDeclarationNode.members().stream().anyMatch(child -> child.kind() ==
+                SyntaxKind.OBJECT_METHOD_DEFINITION || child.kind() == SyntaxKind.RESOURCE_ACCESSOR_DEFINITION);
+        if (serviceDeclarationNode.members().isEmpty() || !hasRemoteService) {
+            DiagnosticInfo datagramDiagnosticInfo = new DiagnosticInfo(CODE_106, DATAGRAM_REMOTE_FUNCTION_GENERATION,
+                    DiagnosticSeverity.INTERNAL);
+            DiagnosticInfo bytesDiagnosticInfo = new DiagnosticInfo(CODE_107, BYTES_REMOTE_FUNCTION_GENERATION,
+                    DiagnosticSeverity.INTERNAL);
+            ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(
+                    datagramDiagnosticInfo, serviceDeclarationNode.location()));
+            ctx.reportDiagnostic(DiagnosticFactory.createDiagnostic(
+                    bytesDiagnosticInfo, serviceDeclarationNode.location()));
+        }
         serviceDeclarationNode.members().stream()
                 .filter(child -> child.kind() == SyntaxKind.OBJECT_METHOD_DEFINITION
                         || child.kind() == SyntaxKind.RESOURCE_ACCESSOR_DEFINITION).forEach(node -> {
