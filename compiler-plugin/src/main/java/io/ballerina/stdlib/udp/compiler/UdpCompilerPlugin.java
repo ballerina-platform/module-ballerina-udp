@@ -29,5 +29,7 @@ public class UdpCompilerPlugin extends CompilerPlugin {
     @Override
     public void init(CompilerPluginContext compilerPluginContext) {
         compilerPluginContext.addCodeAnalyzer(new UdpServiceAnalyzer());
+        compilerPluginContext.addCodeAction(new OnDatagramCodeTemplate());
+        compilerPluginContext.addCodeAction(new OnBytesCodeTemplate());
     }
 }
