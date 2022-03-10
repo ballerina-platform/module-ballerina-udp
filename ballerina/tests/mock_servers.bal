@@ -40,9 +40,9 @@ service on logServer {
 
 service on echoServer {
 
-    remote function onBytes(readonly & byte[] data) returns byte[]|Error? {
+    remote function onBytes(Caller caller, readonly & byte[] data) returns byte[]|Error? {
         io:println("Received by listener:", string:fromBytes(data));
-        return data;
+        check caller->sendBytes(data);
     }
 
     remote function onError(Error err) {
