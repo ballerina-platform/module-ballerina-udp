@@ -87,8 +87,7 @@ public class Listener {
     public static Object detach(BObject listener) {
         UdpService service = (UdpService) listener.getNativeData(Constants.SERVICE);
         if (service == null) {
-            log.debug("service is not attached to the listener");
-            return null;
+            return Utils.createUdpError("service is not attached to the listener");
         }
         listener.addNativeData(Constants.SERVICE, null);
         return null;

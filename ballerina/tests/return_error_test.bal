@@ -16,6 +16,8 @@
 
 import ballerina/test;
 
+listener Listener tcpServer = new Listener(8090);
+
 service on new Listener(8081) {
 
     remote function onDatagram(readonly & Datagram datagram) returns Datagram|Error? {
@@ -50,4 +52,21 @@ function testErrorReturnFromRemoteServer() returns error? {
     check socketClient->writeBytes(msg.toBytes());
 
     return check socketClient->close();
+}
+
+@test:Config {}
+function testDetachError() returns error? {
+    Service dummyService2 = service object {
+        remote function onBytes(readonly & byte[] data) returns Error? {
+        }
+
+        remote function onError(Error err) {
+        }
+    };
+    error? detachedRes = tcpServer.detach(dummyService2);
+    if detachedRes is error {
+        test:assertEquals(detachedRes.message(), "service is not attached to the listener");
+    } else {
+        test:assertFail("Expected a detaching error");
+    }
 }
