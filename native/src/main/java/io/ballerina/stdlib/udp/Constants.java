@@ -18,22 +18,10 @@
 
 package io.ballerina.stdlib.udp;
 
-import io.ballerina.runtime.api.Module;
-
-import static io.ballerina.runtime.api.constants.RuntimeConstants.BALLERINA_BUILTIN_PKG_PREFIX;
-
 /**
  * Constant variable for udp related operations.
  */
 public class Constants {
-
-    /**
-     * udp standard library package ID.
-     *
-     * @deprecated Use SocketUtils.getUdpPackage().
-     */
-    @Deprecated
-    public static final Module SOCKET_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "udp", "0.8.0");
 
     // Constant related to ballerina Datagram record
     public static final String DATAGRAM_RECORD = "Datagram";

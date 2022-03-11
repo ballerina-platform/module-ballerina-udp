@@ -49,7 +49,7 @@ isolated function testConnectClientReadTimeOut() returns error? {
     if result is byte[] {
         test:assertFail("No UDP service running on localhost:45830, no result should be returned");
     } else {
-        log:printInfo(result.message());
+        test:assertEquals("Read timed out", result.message());
     }
 
     return check socketClient->close();

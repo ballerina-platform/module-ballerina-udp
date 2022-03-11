@@ -45,7 +45,7 @@ isolated function testInvalidLocalHostInClient() {
     if socketClient is Client {
         test:assertFail("Provided invalid value for localHost this should return an Error");
     } else if socketClient is Error {
-        log:printInfo("Error initializing UDP Client");
+        test:assertEquals("Error initializing UDP Client", socketClient.message());
     }
 }
 
