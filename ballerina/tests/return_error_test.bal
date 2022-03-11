@@ -56,14 +56,14 @@ function testErrorReturnFromRemoteServer() returns error? {
 
 @test:Config {}
 function testDetachError() returns error? {
-    Service dummyService2 = service object {
+    Service dummyService = service object {
         remote function onBytes(readonly & byte[] data) returns Error? {
         }
 
         remote function onError(Error err) {
         }
     };
-    error? detachedRes = tcpServer.detach(dummyService2);
+    error? detachedRes = tcpServer.detach(dummyService);
     if detachedRes is error {
         test:assertEquals(detachedRes.message(), "service is not attached to the listener");
     } else {
