@@ -82,6 +82,7 @@ public class UdpServiceValidator {
     public static final String CALLER = "Caller";
     public static final String BYTE_ARRAY = "byte[]";
     public static final String ERROR = "Error";
+    public static final String GENERIC_ERROR = "error";
     public static final String OPTIONAL = "?";
     public static final String NIL = "()";
 
@@ -312,12 +313,14 @@ public class UdpServiceValidator {
         if (isOnBytesOrOnDatagram && returnTypeDescriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
                 && (Utils.equals(returnTypeDescriptorType, modulePrefix + ERROR + OPTIONAL)
                 || Utils.equals(returnTypeDescriptorType, modulePrefix + DATAGRAM + OPTIONAL)
-                || Utils.equals(returnTypeDescriptorType, BYTE_ARRAY + OPTIONAL))) {
+                || Utils.equals(returnTypeDescriptorType, BYTE_ARRAY + OPTIONAL)
+                || Utils.equals(returnTypeDescriptorType, GENERIC_ERROR + OPTIONAL))) {
             return;
         }
 
         if (functionName.equals(Constants.ON_ERROR) && returnTypeDescriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                && Utils.equals(returnTypeDescriptorType, modulePrefix + ERROR + OPTIONAL)) {
+                && (Utils.equals(returnTypeDescriptorType, modulePrefix + ERROR + OPTIONAL)
+                || Utils.equals(returnTypeDescriptorType, GENERIC_ERROR + OPTIONAL))) {
             return;
         }
 
@@ -343,6 +346,7 @@ public class UdpServiceValidator {
                 } else if (descriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
                         && (Utils.equals(descriptorType, modulePrefix + ERROR + OPTIONAL)
                         || Utils.equals(descriptorType, modulePrefix + DATAGRAM + OPTIONAL)
+                        || Utils.equals(descriptorType, GENERIC_ERROR + OPTIONAL)
                         || Utils.equals(descriptorType, BYTE_ARRAY + OPTIONAL))) {
                     continue;
                 } else {
