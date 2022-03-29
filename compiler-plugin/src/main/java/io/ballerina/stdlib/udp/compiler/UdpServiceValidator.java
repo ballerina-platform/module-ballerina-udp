@@ -300,21 +300,7 @@ public class UdpServiceValidator {
         boolean isOnBytesOrOnDatagram = functionName.equals(Constants.ON_DATAGRAM)
                 || functionName.equals(Constants.ON_BYTES);
 
-        if (isOnBytesOrOnDatagram && returnTypeDescriptor.kind() == SyntaxKind.ARRAY_TYPE_DESC
-                && Utils.equals(returnTypeDescriptorType, BYTE_ARRAY)) {
-            return;
-        }
-
-        if (isOnBytesOrOnDatagram && returnTypeDescriptor.kind() == SyntaxKind.QUALIFIED_NAME_REFERENCE
-                && Utils.equals(returnTypeDescriptorType, modulePrefix + DATAGRAM)) {
-            return;
-        }
-
-        if (isOnBytesOrOnDatagram && returnTypeDescriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
-                && (Utils.equals(returnTypeDescriptorType, modulePrefix + ERROR + OPTIONAL)
-                || Utils.equals(returnTypeDescriptorType, modulePrefix + DATAGRAM + OPTIONAL)
-                || Utils.equals(returnTypeDescriptorType, BYTE_ARRAY + OPTIONAL)
-                || Utils.equals(returnTypeDescriptorType, GENERIC_ERROR + OPTIONAL))) {
+        if (validOnDataFunction(returnTypeDescriptor, returnTypeDescriptorType, isOnBytesOrOnDatagram)) {
             return;
         }
 
@@ -367,6 +353,28 @@ public class UdpServiceValidator {
                     returnTypeDescriptor.location(), returnTypeDescriptor.toString(), functionName,
                     modulePrefix + ERROR + " | " + NIL));
         }
+    }
+
+    private boolean validOnDataFunction(Node returnTypeDescriptor, String returnTypeDescriptorType,
+                                        boolean isOnBytesOrOnDatagram) {
+        if (isOnBytesOrOnDatagram && returnTypeDescriptor.kind() == SyntaxKind.ARRAY_TYPE_DESC
+                && Utils.equals(returnTypeDescriptorType, BYTE_ARRAY)) {
+            return true;
+        }
+
+        if (isOnBytesOrOnDatagram && returnTypeDescriptor.kind() == SyntaxKind.QUALIFIED_NAME_REFERENCE
+                && Utils.equals(returnTypeDescriptorType, modulePrefix + DATAGRAM)) {
+            return true;
+        }
+
+        if (isOnBytesOrOnDatagram && returnTypeDescriptor.kind() == SyntaxKind.OPTIONAL_TYPE_DESC
+                && (Utils.equals(returnTypeDescriptorType, modulePrefix + ERROR + OPTIONAL)
+                || Utils.equals(returnTypeDescriptorType, modulePrefix + DATAGRAM + OPTIONAL)
+                || Utils.equals(returnTypeDescriptorType, BYTE_ARRAY + OPTIONAL)
+                || Utils.equals(returnTypeDescriptorType, GENERIC_ERROR + OPTIONAL))) {
+            return true;
+        }
+        return false;
     }
 
 }
