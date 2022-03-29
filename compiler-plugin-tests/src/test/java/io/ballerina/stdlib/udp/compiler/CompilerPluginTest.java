@@ -175,6 +175,14 @@ public class CompilerPluginTest {
     }
 
     @Test
+    public void testWithGenericErrorReturnType() {
+        Package currentPackage = loadPackage("sample_package_15");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+    }
+
+    @Test
     public void testWithUnSupportedFunctionNames() {
         Package currentPackage = loadPackage("sample_package_12");
         PackageCompilation compilation = currentPackage.getCompilation();
