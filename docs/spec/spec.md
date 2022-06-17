@@ -5,7 +5,6 @@ _Reviewers_: @shafreenAnfar @Maninda
 _Created_: 2020/11/10  
 _Updated_: 2022/02/18  
 _Edition_: Swan Lake  
-_Issue_: [#2197](https://github.com/ballerina-platform/ballerina-standard-library/issues/2197)
 
 # Introduction
 
