@@ -6,4 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Changed
+- [API docs updated](https://github.com/ballerina-platform/ballerina-standard-library/issues/3463)
+
+## [2.1.0] - 2021-12-14
+
+### Changed
  - [[#2398]Mark Service type as distinct](https://github.com/ballerina-platform/ballerina-standard-library/issues/2398)
