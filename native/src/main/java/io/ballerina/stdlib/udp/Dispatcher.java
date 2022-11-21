@@ -23,8 +23,10 @@ import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.async.StrandMetadata;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MethodType;
+import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
 import io.netty.channel.Channel;
@@ -65,7 +67,9 @@ public class Dispatcher {
 
     public static void invokeOnError(UdpService udpService, String message) {
         try {
-            MethodType methodType = Arrays.stream(udpService.getService().getType().getMethods()).
+            ObjectType objectType =
+                    (ObjectType) TypeUtils.getReferredType(udpService.getService().getType());
+            MethodType methodType = Arrays.stream(objectType.getMethods()).
                     filter(m -> m.getName().equals(Constants.ON_ERROR)).findFirst().orElse(null);
             if (methodType != null) {
                 Object[] params = getOnErrorSignature(message);
@@ -81,8 +85,8 @@ public class Dispatcher {
                                         Object[] params) {
         StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
                 Utils.getModule().getVersion(), methodName);
-        if (service.getType().isIsolated() &&
-                service.getType().isIsolated(methodName)) {
+        ObjectType objectType = (ObjectType) TypeUtils.getReferredType(service.getType());
+        if (objectType.isIsolated() && objectType.isIsolated(methodName)) {
             runtime.invokeMethodAsyncConcurrently(service, methodName,
                     null, metadata, callback, null, null, params);
         } else {
@@ -151,7 +155,9 @@ public class Dispatcher {
     }
 
     public static void invokeRead(UdpService udpService, DatagramPacket datagramPacket, Channel channel) {
-        for (MethodType method : udpService.getService().getType().getMethods()) {
+        ObjectType objectType =
+                (ObjectType) TypeUtils.getReferredType(udpService.getService().getType());
+        for (MethodType method : objectType.getMethods()) {
             switch (method.getName()) {
                 case Constants.ON_BYTES:
                     Dispatcher.invokeOnBytes(udpService, datagramPacket, channel,
