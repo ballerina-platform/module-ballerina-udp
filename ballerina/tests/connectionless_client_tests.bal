@@ -31,7 +31,7 @@ function testClientEcho() returns error? {
     Datagram datagram = prepareDatagram(msg);
 
     check socketClient->sendDatagram(datagram);
-    log:printInfo("Datagram was sent to the remote host.");
+    log:printInfo("testClientEcho Datagram was sent to the remote host.");
 
     readonly & Datagram response = check socketClient->receiveDatagram();
     test:assertEquals(string:fromBytes(response.data), msg, "Found an unexpected output");
@@ -57,7 +57,7 @@ function testContentReceive() returns error? {
     Datagram datagram = prepareDatagram(msg);
 
     check socketClient->sendDatagram(datagram);
-    log:printInfo("Datagram was sent to the remote host.");
+    log:printInfo("testContentReceive Datagram was sent to the remote host.");
 
     readonly & Datagram response = check socketClient->receiveDatagram();
     string expectedResponseString = "Hi client! here is your data";
@@ -65,7 +65,7 @@ function testContentReceive() returns error? {
 
     // repeating the send and receive
     check socketClient->sendDatagram(datagram);
-    log:printInfo("Datagram was sent to the remote host.");
+    log:printInfo("testContentReceive2 Datagram was sent to the remote host.");
 
     response = check socketClient->receiveDatagram();
     test:assertEquals(string:fromBytes(response.data), expectedResponseString, "Found an unexpected output");
