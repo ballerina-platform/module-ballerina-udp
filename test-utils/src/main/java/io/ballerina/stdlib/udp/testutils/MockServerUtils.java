@@ -38,10 +38,11 @@ public class MockServerUtils {
 
     private static MockUdpServer mockUdpServer;
 
-    public static Object startUdpServer() {
+    public static Object startUdpServer() throws InterruptedException {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         mockUdpServer = new MockUdpServer();
         executor.execute(mockUdpServer);
+        Thread.sleep(3000);
         return null;
     }
 
