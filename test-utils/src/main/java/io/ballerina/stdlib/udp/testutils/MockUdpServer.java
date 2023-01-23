@@ -53,6 +53,7 @@ public class MockUdpServer implements Runnable {
             serverSocket.configureBlocking(false);
             serverSocket.register(selector, SelectionKey.OP_READ);
             ByteBuffer buffer = ByteBuffer.allocate(256);
+            System.out.println("Started the udp server........");
             while (execute) {
                 try {
                     final int select = selector.select();
