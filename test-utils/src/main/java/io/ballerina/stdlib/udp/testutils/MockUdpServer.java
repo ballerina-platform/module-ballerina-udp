@@ -53,6 +53,7 @@ public class MockUdpServer implements Runnable {
             serverSocket.configureBlocking(false);
             serverSocket.register(selector, SelectionKey.OP_READ);
             ByteBuffer buffer = ByteBuffer.allocate(256);
+            System.out.println("Started the udp server........");
             while (execute) {
                 try {
                     final int select = selector.select();
@@ -65,6 +66,7 @@ public class MockUdpServer implements Runnable {
                         SelectionKey key = iter.next();
                         iter.remove();
                         if (key.isReadable()) {
+                            System.out.println("Sending the reply........");
                             reply(buffer, key);
                         }
                     }
@@ -79,6 +81,7 @@ public class MockUdpServer implements Runnable {
     }
 
     void stop() {
+        System.out.println("Stopped the udp server........");
         execute = false;
         if (selector == null) {
             return;
