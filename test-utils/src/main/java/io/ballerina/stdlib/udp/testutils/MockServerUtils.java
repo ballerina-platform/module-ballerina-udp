@@ -20,8 +20,6 @@ package io.ballerina.stdlib.udp.testutils;
 
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.stdlib.udp.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -42,6 +40,7 @@ public class MockServerUtils {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         mockUdpServer = new MockUdpServer();
         executor.execute(mockUdpServer);
+        // Give some time to start the UDP server before starting the tests.
         Thread.sleep(3000);
         return null;
     }
