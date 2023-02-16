@@ -5,7 +5,7 @@ Ballerina UDP Library
   [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-udp/branch/main/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-udp)
   [![Trivy](https://github.com/ballerina-platform/module-ballerina-udp/actions/workflows/trivy-scan.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-udp/actions/workflows/trivy-scan.yml)
   [![GraalVM Check](https://github.com/ballerina-platform/module-ballerina-udp/actions/workflows/build-with-bal-test-native.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-udp/actions/workflows/build-with-bal-test-native.yml)
-  [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-udp.svg)](https://github.com/ballerina-platform/module-ballerina-udp/commits/master)
+  [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-udp.svg)](https://github.com/ballerina-platform/module-ballerina-udp/commits/main)
   [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/udp.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fudp)
 
 This library provides APIs for sending/receiving messages to/from another application process (local or remote) for connectionless protocols.
