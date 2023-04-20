@@ -68,7 +68,7 @@ public class Dispatcher {
     public static void invokeOnError(UdpService udpService, String message) {
         try {
             ObjectType objectType =
-                    (ObjectType) TypeUtils.getReferredType(udpService.getService().getType());
+                    (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(udpService.getService()));
             MethodType methodType = Arrays.stream(objectType.getMethods()).
                     filter(m -> m.getName().equals(Constants.ON_ERROR)).findFirst().orElse(null);
             if (methodType != null) {
@@ -85,7 +85,7 @@ public class Dispatcher {
                                         Object[] params) {
         StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
                 Utils.getModule().getVersion(), methodName);
-        ObjectType objectType = (ObjectType) TypeUtils.getReferredType(service.getType());
+        ObjectType objectType = (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(service));
         if (objectType.isIsolated() && objectType.isIsolated(methodName)) {
             runtime.invokeMethodAsyncConcurrently(service, methodName,
                     null, metadata, callback, null, null, params);
@@ -156,7 +156,7 @@ public class Dispatcher {
 
     public static void invokeRead(UdpService udpService, DatagramPacket datagramPacket, Channel channel) {
         ObjectType objectType =
-                (ObjectType) TypeUtils.getReferredType(udpService.getService().getType());
+                (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(udpService.getService()));
         for (MethodType method : objectType.getMethods()) {
             switch (method.getName()) {
                 case Constants.ON_BYTES:
