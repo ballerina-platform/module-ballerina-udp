@@ -1,5 +1,12 @@
 # Simple File Server
 
+[![Star on Github](https://img.shields.io/badge/-Star%20on%20Github-blue?style=social&logo=github)](https://github.com/ballerina-platform/module-ballerina-udp)
+
+_Authors_: @shafreenAnfar @Maninda   
+_Reviewers_: @shafreenAnfar   
+_Created_: 2021/12/10   
+_Updated_: 2021/12/14 
+
 ## Overview
 
 This guide explains how to add and retrieve a file to/from a UDP server using Ballerina.
