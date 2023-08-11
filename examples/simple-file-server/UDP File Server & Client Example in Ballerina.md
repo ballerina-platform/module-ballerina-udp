@@ -2,10 +2,10 @@
 
 [![Star on Github](https://img.shields.io/badge/-Star%20on%20Github-blue?style=social&logo=github)](https://github.com/ballerina-platform/module-ballerina-udp)
 
-_Authors_: @shafreenAnfar @Maninda   
-_Reviewers_: @shafreenAnfar   
-_Created_: 2021/12/10   
-_Updated_: 2021/12/14 
+_Authors_: @shafreenAnfar @Maninda \
+_Reviewers_: @shafreenAnfar \
+_Created_: 2021/12/10 \
+_Updated_: 2021/12/14
 
 ## Overview
 
