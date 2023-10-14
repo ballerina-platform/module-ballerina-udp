@@ -38,7 +38,9 @@ import java.net.InetSocketAddress;
 /**
  * Native function implementations of the UDP Listener.
  */
-public class Listener {
+public final class Listener {
+    private Listener() {}
+
     private static final Logger log = LoggerFactory.getLogger(Client.class);
 
     public static Object init(BObject listener, int localPort, BMap<BString, Object> config) {
