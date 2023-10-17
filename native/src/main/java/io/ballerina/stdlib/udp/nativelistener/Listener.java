@@ -39,6 +39,7 @@ import java.net.InetSocketAddress;
  * Native function implementations of the UDP Listener.
  */
 public final class Listener {
+
     private Listener() {}
 
     private static final Logger log = LoggerFactory.getLogger(Client.class);
