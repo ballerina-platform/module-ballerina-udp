@@ -39,7 +39,9 @@ import java.util.Arrays;
 /**
  * Dispatch async methods.
  */
-public class Dispatcher {
+public final class Dispatcher {
+
+    private Dispatcher() {}
 
     private static final Logger log = LoggerFactory.getLogger(Dispatcher.class);
 

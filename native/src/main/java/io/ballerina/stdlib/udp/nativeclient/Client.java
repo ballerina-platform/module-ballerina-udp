@@ -39,7 +39,9 @@ import java.net.InetSocketAddress;
  *
  * @since 1.1.0
  */
-public class Client {
+public final class Client {
+
+    private Client() {}
 
     public static Object init(Environment env, BObject client, BMap<BString, Object> config) {
         final Future balFuture = env.markAsync();
