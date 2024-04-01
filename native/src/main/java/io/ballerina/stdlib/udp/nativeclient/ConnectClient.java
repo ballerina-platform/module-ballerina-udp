@@ -39,7 +39,9 @@ import java.net.InetSocketAddress;
  *
  * @since 1.1.0
  */
-public class ConnectClient {
+public final class ConnectClient {
+
+    private ConnectClient() {}
 
     public static Object init(Environment env, BObject client, BString remoteHost,
                               int remotePort, BMap<BString, Object> config) {

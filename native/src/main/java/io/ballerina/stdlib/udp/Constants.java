@@ -21,7 +21,9 @@ package io.ballerina.stdlib.udp;
 /**
  * Constant variable for udp related operations.
  */
-public class Constants {
+public final class Constants {
+
+    private Constants() {}
 
     // Constant related to ballerina Datagram record
     public static final String DATAGRAM_RECORD = "Datagram";

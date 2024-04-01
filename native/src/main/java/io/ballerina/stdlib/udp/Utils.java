@@ -39,7 +39,9 @@ import java.util.Map;
  *
  * @since 0.985.0
  */
-public class Utils {
+public final class Utils {
+
+    private Utils() {}
 
     /**
      * udp standard library package ID.
