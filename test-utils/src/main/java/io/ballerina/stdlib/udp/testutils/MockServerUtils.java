@@ -32,7 +32,9 @@ import java.util.concurrent.Executors;
 /**
  * This UDP server udp will use to mock the backend server.
  */
-public class MockServerUtils {
+public final class MockServerUtils {
+
+    private MockServerUtils() {}
 
     private static MockUdpServer mockUdpServer;
 

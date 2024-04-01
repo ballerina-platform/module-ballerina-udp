@@ -36,7 +36,9 @@ import java.net.InetSocketAddress;
 /**
  * Native function implementations of the UDP Caller.
  */
-public class Caller {
+public final class Caller {
+
+    private Caller() {}
 
     public static Object sendBytes(Environment env, BObject caller, BArray data) {
         final Future callback = env.markAsync();
