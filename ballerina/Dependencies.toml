@@ -5,7 +5,7 @@
 
 [ballerina]
 dependencies-toml-version = "2"
-distribution-version = "2201.8.0"
+distribution-version = "2201.9.0-20240425-195200-d5ce8c72"
 
 [[package]]
 org = "ballerina"
@@ -30,12 +30,38 @@ modules = [
 
 [[package]]
 org = "ballerina"
+name = "lang.__internal"
+version = "0.0.0"
+scope = "testOnly"
+dependencies = [
+	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "lang.object"}
+]
+
+[[package]]
+org = "ballerina"
+name = "lang.array"
+version = "0.0.0"
+scope = "testOnly"
+dependencies = [
+	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "lang.__internal"}
+]
+
+[[package]]
+org = "ballerina"
 name = "lang.error"
 version = "0.0.0"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
+
+[[package]]
+org = "ballerina"
+name = "lang.object"
+version = "0.0.0"
+scope = "testOnly"
 
 [[package]]
 org = "ballerina"
@@ -64,7 +90,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "observe"
-version = "1.2.2"
+version = "1.2.3"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
@@ -77,6 +103,7 @@ version = "0.0.0"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "lang.array"},
 	{org = "ballerina", name = "lang.error"}
 ]
 modules = [
@@ -86,7 +113,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "udp"
-version = "1.9.2"
+version = "1.10.0"
 dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
