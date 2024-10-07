@@ -19,7 +19,6 @@
 package io.ballerina.stdlib.udp.nativeclient;
 
 import io.ballerina.runtime.api.Environment;
-import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BDecimal;
@@ -33,6 +32,9 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.socket.DatagramPacket;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
+
+import static io.ballerina.stdlib.udp.Utils.getResult;
 
 /**
  * Native function implementations of the UDP ConnectionlessClient.
@@ -45,58 +47,58 @@ public final class ConnectClient {
 
     public static Object init(Environment env, BObject client, BString remoteHost,
                               int remotePort, BMap<BString, Object> config) {
-        final Future balFuture = env.markAsync();
+        return env.yieldAndRun(() -> {
+            CompletableFuture<Object> balFuture = new CompletableFuture<>();
+            BString host = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
+            InetSocketAddress localAddress;
+            if (host == null) {
+                // A port number of zero will let the system pick up an ephemeral port in a bind operation.
+                localAddress = new InetSocketAddress(0);
+            } else {
+                localAddress = new InetSocketAddress(host.getValue(), 0);
+            }
 
-        BString host = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
-        InetSocketAddress localAddress;
-        if (host == null) {
-            // A port number of zero will let the system pick up an ephemeral port in a bind operation.
-            localAddress = new InetSocketAddress(0);
-        } else {
-            localAddress = new InetSocketAddress(host.getValue(), 0);
-        }
+            double timeout =
+                    ((BDecimal) config.get(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT))).floatValue();
+            client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
 
-        double timeout = ((BDecimal) config.get(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT))).floatValue();
-        client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
+            InetSocketAddress remoteAddress = new InetSocketAddress(remoteHost.getValue(), remotePort);
+            client.addNativeData(Constants.REMOTE_ADDRESS, remoteAddress);
 
-        InetSocketAddress remoteAddress = new InetSocketAddress(remoteHost.getValue(), remotePort);
-        client.addNativeData(Constants.REMOTE_ADDRESS, remoteAddress);
-
-        UdpClient udpClient = UdpFactory.getInstance().createUdpClient(localAddress, remoteAddress, balFuture);
-        client.addNativeData(Constants.CONNECT_CLIENT, udpClient);
-
-        return null;
+            UdpClient udpClient = UdpFactory.getInstance().createUdpClient(localAddress, remoteAddress, balFuture);
+            client.addNativeData(Constants.CONNECT_CLIENT, udpClient);
+            return getResult(balFuture);
+        });
     }
 
     public static Object read(Environment env, BObject client) {
-        final Future balFuture = env.markAsync();
-
-        double readTimeOut = (double) client.getNativeData(Constants.CONFIG_READ_TIMEOUT);
-        UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECT_CLIENT);
-        udpClient.receiveData(readTimeOut, balFuture);
-
-        return null;
+        return env.yieldAndRun(() -> {
+            CompletableFuture<Object> balFuture = new CompletableFuture<>();
+            double readTimeOut = (double) client.getNativeData(Constants.CONFIG_READ_TIMEOUT);
+            UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECT_CLIENT);
+            udpClient.receiveData(readTimeOut, balFuture);
+            return getResult(balFuture);
+        });
     }
 
     public static Object write(Environment env, BObject client, BArray data) {
-        final Future balFuture = env.markAsync();
-
-        byte[] byteContent = data.getBytes();
-        InetSocketAddress remoteAddress = (InetSocketAddress) client.getNativeData(Constants.REMOTE_ADDRESS);
-        DatagramPacket datagramPacket = new DatagramPacket(Unpooled.wrappedBuffer(byteContent), remoteAddress);
-
-        UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECT_CLIENT);
-        udpClient.sendData(datagramPacket, balFuture);
-
-        return null;
+        return env.yieldAndRun(() -> {
+            CompletableFuture<Object> balFuture = new CompletableFuture<>();
+            byte[] byteContent = data.getBytes();
+            InetSocketAddress remoteAddress = (InetSocketAddress) client.getNativeData(Constants.REMOTE_ADDRESS);
+            DatagramPacket datagramPacket = new DatagramPacket(Unpooled.wrappedBuffer(byteContent), remoteAddress);
+            UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECT_CLIENT);
+            udpClient.sendData(datagramPacket, balFuture);
+            return null;
+        });
     }
 
     public static Object close(Environment env, BObject client) {
-        final Future callback = env.markAsync();
-
-        UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECT_CLIENT);
-        udpClient.close(callback);
-
-        return null;
+        return env.yieldAndRun(() -> {
+            CompletableFuture<Object> balFuture = new CompletableFuture<>();
+            UdpClient udpClient = (UdpClient) client.getNativeData(Constants.CONNECT_CLIENT);
+            udpClient.close(balFuture);
+            return getResult(balFuture);
+        });
     }
 }

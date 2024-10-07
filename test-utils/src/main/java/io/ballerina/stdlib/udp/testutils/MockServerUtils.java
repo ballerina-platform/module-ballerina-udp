@@ -39,9 +39,8 @@ public final class MockServerUtils {
     private static MockUdpServer mockUdpServer;
 
     public static Object startUdpServer() throws InterruptedException {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         mockUdpServer = new MockUdpServer();
-        executor.execute(mockUdpServer);
+        Thread.startVirtualThread(mockUdpServer);
         // Give some time to start the UDP server before starting the tests.
         Thread.sleep(3000);
         return null;
@@ -53,8 +52,7 @@ public final class MockServerUtils {
     }
 
     public static Object passUdpContent(BString serverContent, int port) {
-        ExecutorService client = Executors.newSingleThreadExecutor();
-        client.execute(() -> sendUdpContent(serverContent.getValue(), port));
+        Thread.startVirtualThread(() -> sendUdpContent(serverContent.getValue(), port));
         return null;
     }
 

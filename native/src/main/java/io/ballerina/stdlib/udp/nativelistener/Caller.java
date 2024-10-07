@@ -19,7 +19,6 @@
 package io.ballerina.stdlib.udp.nativelistener;
 
 import io.ballerina.runtime.api.Environment;
-import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
@@ -32,6 +31,9 @@ import io.netty.channel.Channel;
 import io.netty.channel.socket.DatagramPacket;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
+
+import static io.ballerina.stdlib.udp.Utils.getResult;
 
 /**
  * Native function implementations of the UDP Caller.
@@ -41,32 +43,34 @@ public final class Caller {
     private Caller() {}
 
     public static Object sendBytes(Environment env, BObject caller, BArray data) {
-        final Future callback = env.markAsync();
+        return env.yieldAndRun(() -> {
+            CompletableFuture<Object> balFuture = new CompletableFuture<>();
+            byte[] byteContent = data.getBytes();
+            String remoteHost = caller.getStringValue(StringUtils.fromString(Constants.CALLER_REMOTE_HOST))
+                    .getValue();
+            int remotePort = ((Integer) caller.get(StringUtils.fromString(Constants.CALLER_REMOTE_PORT)));
+            InetSocketAddress remoteAddress = new InetSocketAddress(remoteHost, remotePort);
+            DatagramPacket datagram = new DatagramPacket(Unpooled.wrappedBuffer(byteContent), remoteAddress);
+            Channel channel = (Channel) caller.getNativeData(Constants.CHANNEL);
 
-        byte[] byteContent = data.getBytes();
-        String remoteHost = ((BString) caller.getStringValue(StringUtils.fromString(Constants.CALLER_REMOTE_HOST)))
-                .getValue();
-        int remotePort = ((Integer) caller.get(StringUtils.fromString(Constants.CALLER_REMOTE_PORT)));
-        InetSocketAddress remoteAddress = new InetSocketAddress(remoteHost, remotePort);
-        DatagramPacket datagram = new DatagramPacket(Unpooled.wrappedBuffer(byteContent), remoteAddress);
-        Channel channel = (Channel) caller.getNativeData(Constants.CHANNEL);
-
-        UdpListener.send(datagram, channel, callback);
-        return null;
+            UdpListener.send(datagram, channel, balFuture);
+            return getResult(balFuture);
+        });
     }
 
     public static Object sendDatagram(Environment env, BObject caller, BMap<BString, Object> datagram) {
-        final Future callback = env.markAsync();
+        return env.yieldAndRun(() -> {
+            CompletableFuture<Object> balFuture = new CompletableFuture<>();
+            String host = datagram.getStringValue(StringUtils.fromString(Constants.DATAGRAM_REMOTE_HOST)).getValue();
+            int port = datagram.getIntValue(StringUtils.fromString(Constants.DATAGRAM_REMOTE_PORT)).intValue();
+            BArray data = datagram.getArrayValue(StringUtils.fromString(Constants.DATAGRAM_DATA));
+            byte[] byteContent = data.getBytes();
+            DatagramPacket datagramPacket = new DatagramPacket(Unpooled.wrappedBuffer(byteContent),
+                    new InetSocketAddress(host, port));
 
-        String host = datagram.getStringValue(StringUtils.fromString(Constants.DATAGRAM_REMOTE_HOST)).getValue();
-        int port = datagram.getIntValue(StringUtils.fromString(Constants.DATAGRAM_REMOTE_PORT)).intValue();
-        BArray data = datagram.getArrayValue(StringUtils.fromString(Constants.DATAGRAM_DATA));
-        byte[] byteContent = data.getBytes();
-        DatagramPacket datagramPacket = new DatagramPacket(Unpooled.wrappedBuffer(byteContent),
-                new InetSocketAddress(host, port));
-
-        Channel channel = (Channel) caller.getNativeData(Constants.CHANNEL);
-        UdpListener.send(datagramPacket, channel, callback);
-        return null;
+            Channel channel = (Channel) caller.getNativeData(Constants.CHANNEL);
+            UdpListener.send(datagramPacket, channel, balFuture);
+            return getResult(balFuture);
+        });
     }
 }

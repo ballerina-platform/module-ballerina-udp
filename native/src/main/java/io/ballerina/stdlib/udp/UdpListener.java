@@ -18,7 +18,6 @@
 
 package io.ballerina.stdlib.udp;
 
-import io.ballerina.runtime.api.Future;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -32,6 +31,7 @@ import io.netty.util.concurrent.PromiseCombiner;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.LinkedList;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * {@link UdpListener} creates the udp client and handles all the network operations.
@@ -42,25 +42,25 @@ public class UdpListener {
     private final Bootstrap listenerBootstrap;
 
     public UdpListener(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
-                       EventLoopGroup group, Future callback, UdpService udpService) {
+                       EventLoopGroup group, CompletableFuture<Object> balFuture, UdpService udpService) {
         listenerBootstrap = new Bootstrap();
         listenerBootstrap.group(group)
                 .channel(NioDatagramChannel.class)
                 .handler(new ChannelInitializer<>() {
                     @Override
-                    protected void initChannel(Channel ch) throws Exception {
+                    protected void initChannel(Channel ch) {
                         ch.pipeline().addLast(Constants.LISTENER_HANDLER, new UdpListenerHandler(udpService));
                     }
                 });
         if (remoteAddress != null) {
-            connect(remoteAddress, localAddress, callback);
+            connect(remoteAddress, localAddress, balFuture);
         } else {
             listenerBootstrap.bind(localAddress).addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
                     channel = future.channel();
-                    callback.complete(null);
+                    balFuture.complete(null);
                 } else {
-                    callback.complete(Utils.createUdpError("Unable to initialize UDP Listener: " +
+                    balFuture.complete(Utils.createUdpError("Unable to initialize UDP Listener: " +
                             future.cause().getMessage()));
                 }
             });
@@ -68,15 +68,15 @@ public class UdpListener {
     }
 
     // invoke when caller call writeBytes() or sendDatagram()
-    public static void send(DatagramPacket datagram, Channel channel, Future callback) {
+    public static void send(DatagramPacket datagram, Channel channel, CompletableFuture<Object> balFuture) {
         LinkedList<DatagramPacket> fragments = Utils.fragmentDatagram(datagram);
         PromiseCombiner promiseCombiner = getPromiseCombiner(fragments, channel);
 
         promiseCombiner.finish(channel.newPromise().addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
-                callback.complete(null);
+                balFuture.complete(null);
             } else {
-                callback.complete(Utils
+                balFuture.complete(Utils
                         .createUdpError("Failed to send data: " + future.cause().getMessage()));
             }
         }));
@@ -96,7 +96,7 @@ public class UdpListener {
 
     private static PromiseCombiner getPromiseCombiner(LinkedList<DatagramPacket> fragments, Channel channel) {
         PromiseCombiner promiseCombiner = new PromiseCombiner(ImmediateEventExecutor.INSTANCE);
-        while (fragments.size() > 0) {
+        while (!fragments.isEmpty()) {
             if (channel.isWritable()) {
                 promiseCombiner.add(channel.writeAndFlush(fragments.poll()));
             }
@@ -105,24 +105,24 @@ public class UdpListener {
     }
 
     // only invoke if the listener is a connected listener
-    private void connect(SocketAddress remoteAddress, SocketAddress localAddress, Future callback) {
+    private void connect(SocketAddress remoteAddress, SocketAddress localAddress, CompletableFuture<Object> balFuture) {
         listenerBootstrap.connect(remoteAddress, localAddress).addListener((ChannelFutureListener) future -> {
             channel = future.channel();
             if (future.isSuccess()) {
-                callback.complete(null);
+                balFuture.complete(null);
             } else {
-                callback.complete(Utils.createUdpError("Can't connect to remote host."));
+                balFuture.complete(Utils.createUdpError("Can't connect to remote host."));
             }
         });
     }
 
-    public void close(Future callback) throws InterruptedException {
+    public void close(CompletableFuture<Object> balFuture) throws InterruptedException {
         if (channel != null) {
             channel.close().sync().addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
-                    callback.complete(null);
+                    balFuture.complete(null);
                 } else {
-                    callback.complete(Utils.createUdpError("Failed to gracefully shutdown the Listener."));
+                    balFuture.complete(Utils.createUdpError("Failed to gracefully shutdown the Listener."));
                 }
             });
         }
