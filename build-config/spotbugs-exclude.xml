@@ -24,13 +24,12 @@
         </Or>
         <Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON"/>
     </Match>
-
-    <Match>
-        <Class name="io.ballerina.stdlib.udp.UdpCallback"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
     <Match>
         <Class name="io.ballerina.stdlib.udp.UdpService"/>
         <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.udp.UdpClientHandler"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
 </FindBugsFilter>

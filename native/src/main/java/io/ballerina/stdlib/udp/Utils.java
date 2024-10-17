@@ -33,6 +33,7 @@ import io.netty.channel.socket.DatagramPacket;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents the util functions of Socket operations.
@@ -117,5 +118,13 @@ public final class Utils {
 
     public static Module getModule() {
         return udpModule;
+    }
+
+    public static Object getResult(CompletableFuture<Object> balFuture) {
+        try {
+            return balFuture.get();
+        } catch (Throwable throwable) {
+            throw ErrorCreator.createError(throwable);
+        }
     }
 }

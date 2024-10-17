@@ -18,7 +18,6 @@
 package io.ballerina.stdlib.udp.nativelistener;
 
 import io.ballerina.runtime.api.Environment;
-import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
@@ -28,12 +27,12 @@ import io.ballerina.stdlib.udp.UdpFactory;
 import io.ballerina.stdlib.udp.UdpListener;
 import io.ballerina.stdlib.udp.UdpService;
 import io.ballerina.stdlib.udp.Utils;
-import io.ballerina.stdlib.udp.nativeclient.Client;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
+
+import static io.ballerina.stdlib.udp.Utils.getResult;
 
 /**
  * Native function implementations of the UDP Listener.
@@ -41,8 +40,6 @@ import java.net.InetSocketAddress;
 public final class Listener {
 
     private Listener() {}
-
-    private static final Logger log = LoggerFactory.getLogger(Client.class);
 
     public static Object init(BObject listener, int localPort, BMap<BString, Object> config) {
         listener.addNativeData(Constants.LISTENER_CONFIG, config);
@@ -56,35 +53,33 @@ public final class Listener {
     }
 
     public static Object start(Environment env, BObject listener) {
-        Future balFuture = env.markAsync();
+        return env.yieldAndRun(() -> {
+            CompletableFuture<Object> balFuture = new CompletableFuture<>();
+            BMap<BString, Object> config = (BMap<BString, Object>) listener.getNativeData(Constants.LISTENER_CONFIG);
 
-        BMap<BString, Object> config = (BMap<BString, Object>) listener.getNativeData(Constants.LISTENER_CONFIG);
-
-        BString localHost = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
-        int localPort = (int) listener.getNativeData(Constants.LOCAL_PORT);
-        InetSocketAddress localAddress;
-        if (localHost == null) {
-            localAddress = new InetSocketAddress(localPort);
-        } else {
-            String hostname = localHost.getValue();
-            localAddress = new InetSocketAddress(hostname, localPort);
-        }
-
-        InetSocketAddress remoteAddress;
-        BString remoteHost = config.getStringValue(StringUtils.fromString(Constants.CONFIG_REMOTE_HOST));
-        Long remotePort = config.getIntValue(StringUtils.fromString(Constants.CONFIG_REMOTE_PORT));
-
-        try {
-            UdpService udpService = (UdpService) listener.getNativeData(Constants.SERVICE);
-            remoteAddress = getRemoteAddress(remoteHost, remotePort);
-            UdpListener udpListener = UdpFactory.getInstance()
-                    .createUdpListener(localAddress, remoteAddress, balFuture, udpService);
-            listener.addNativeData(Constants.LISTENER, udpListener);
-        } catch (Exception e) {
-            balFuture.complete(Utils.createUdpError(e.getMessage()));
-        }
-
-        return null;
+            BString localHost = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
+            int localPort = (int) listener.getNativeData(Constants.LOCAL_PORT);
+            InetSocketAddress localAddress;
+            if (localHost == null) {
+                localAddress = new InetSocketAddress(localPort);
+            } else {
+                String hostname = localHost.getValue();
+                localAddress = new InetSocketAddress(hostname, localPort);
+            }
+            InetSocketAddress remoteAddress;
+            BString remoteHost = config.getStringValue(StringUtils.fromString(Constants.CONFIG_REMOTE_HOST));
+            Long remotePort = config.getIntValue(StringUtils.fromString(Constants.CONFIG_REMOTE_PORT));
+            try {
+                UdpService udpService = (UdpService) listener.getNativeData(Constants.SERVICE);
+                remoteAddress = getRemoteAddress(remoteHost, remotePort);
+                UdpListener udpListener = UdpFactory.getInstance()
+                        .createUdpListener(localAddress, remoteAddress, balFuture, udpService);
+                listener.addNativeData(Constants.LISTENER, udpListener);
+            } catch (Exception e) {
+                balFuture.complete(Utils.createUdpError(e.getMessage()));
+            }
+            return getResult(balFuture);
+        });
     }
 
     public static Object detach(BObject listener) {
@@ -97,19 +92,20 @@ public final class Listener {
     }
 
     public static Object gracefulStop(Environment env, BObject listener) {
-        Future balFuture = env.markAsync();
-        try {
-            UdpListener udpListener = (UdpListener) listener.getNativeData(Constants.LISTENER);
-            if (udpListener != null) {
-                udpListener.close(balFuture);
-            } else {
-                balFuture.complete(Utils.createUdpError("Unable to initialize the udp listener."));
+        return env.yieldAndRun(() -> {
+            CompletableFuture<Object> balFuture = new CompletableFuture<>();
+            try {
+                UdpListener udpListener = (UdpListener) listener.getNativeData(Constants.LISTENER);
+                if (udpListener != null) {
+                    udpListener.close(balFuture);
+                } else {
+                    balFuture.complete(Utils.createUdpError("Unable to initialize the udp listener."));
+                }
+            } catch (InterruptedException e) {
+                balFuture.complete(Utils.createUdpError("Failed to gracefully shutdown the Listener."));
             }
-        } catch (InterruptedException e) {
-            balFuture.complete(Utils.createUdpError("Failed to gracefully shutdown the Listener."));
-        }
-
-        return null;
+            return getResult(balFuture);
+        });
     }
 
     private static InetSocketAddress getRemoteAddress(BString remoteHost, Long remotePort) throws Exception {
@@ -119,7 +115,6 @@ public final class Listener {
             return new InetSocketAddress(InetAddress.getByName(remoteHost.getValue()).getHostAddress(),
                     (int) remotePort.longValue());
         }
-
         return null;
     }
 }

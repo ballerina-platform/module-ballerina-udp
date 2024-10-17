@@ -9,44 +9,44 @@ icon = "icon.png"
 license = ["Apache-2.0"]
 distribution = "2201.10.0"
 
-[platform.java17]
+[platform.java21]
 graalvmCompatible = true
 
-[[platform.java17.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.ballerina.stdlib"
 artifactId = "udp-native"
 version = "@toml.version@"
 path = "../native/build/libs/udp-native-@project.version@.jar"
 
-[[platform.java17.dependency]]
+[[platform.java21.dependency]]
 path = "../test-utils/build/libs/udp-test-utils-@project.version@.jar"
 scope = "testOnly"
 
-[[platform.java17.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-handler"
 version = "@netty.version@"
 path = "./lib/netty-handler-@netty.version@.jar"
 
-[[platform.java17.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-buffer"
 version = "@netty.version@"
 path = "./lib/netty-buffer-@netty.version@.jar"
 
-[[platform.java17.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-transport"
 version = "@netty.version@"
 path = "./lib/netty-transport-@netty.version@.jar"
 
-[[platform.java17.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-common"
 version = "@netty.version@"
 path = "./lib/netty-common-@netty.version@.jar"
 
-[[platform.java17.dependency]]
+[[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-resolver"
 version = "@netty.version@"
