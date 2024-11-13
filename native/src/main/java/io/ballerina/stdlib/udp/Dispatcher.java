@@ -19,14 +19,14 @@
 package io.ballerina.stdlib.udp;
 
 import io.ballerina.runtime.api.Runtime;
-import io.ballerina.runtime.api.TypeTags;
-import io.ballerina.runtime.api.async.StrandMetadata;
+import io.ballerina.runtime.api.concurrent.StrandMetadata;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.types.Parameter;
 import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.types.TypeTags;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BArray;
@@ -92,16 +92,12 @@ public final class Dispatcher {
         Thread.startVirtualThread(() -> {
             BObject service = udpService.getService();
             Runtime runtime = udpService.getRuntime();
-            StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
-                    Utils.getModule().getVersion(), methodName);
             ObjectType objectType = (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(service));
+            StrandMetadata metadata = new StrandMetadata(
+                    objectType.isIsolated() && objectType.isIsolated(methodName), null);
             Object result;
             try {
-                if (objectType.isIsolated() && objectType.isIsolated(methodName)) {
-                    result = runtime.startIsolatedWorker(service, methodName, null, metadata, null, params).get();
-                } else {
-                    result = runtime.startNonIsolatedWorker(service, methodName, null, metadata, null, params).get();
-                }
+                result = runtime.callMethod(service, methodName, metadata, params);
                 handleResult(udpService, datagramPacket, channel, result);
             } catch (BError error) {
                 handleError(error);
