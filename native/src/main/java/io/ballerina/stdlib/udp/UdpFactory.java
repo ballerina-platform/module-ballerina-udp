@@ -18,18 +18,18 @@
 
 package io.ballerina.stdlib.udp;
 
-import io.ballerina.runtime.api.Future;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * {@link UdpFactory} creates {@link UdpClient} and UdpListener.
  */
 public class UdpFactory {
 
-    private static volatile UdpFactory udpFactory;
+    private static volatile UdpFactory udpFactory = new UdpFactory();;
     private EventLoopGroup group;
 
     private UdpFactory() {
@@ -37,22 +37,20 @@ public class UdpFactory {
     }
 
     public static UdpFactory getInstance() {
-        if (udpFactory == null) {
-            udpFactory = new UdpFactory();
-        }
         return udpFactory;
     }
 
-    public UdpClient createUdpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress, Future callback) {
-        return new UdpClient(localAddress, remoteAddress, getInstance().group, callback);
+    public UdpClient createUdpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
+                                     CompletableFuture<Object> balFuture) {
+        return new UdpClient(localAddress, remoteAddress, getInstance().group, balFuture);
     }
 
-    public UdpClient createUdpClient(InetSocketAddress localAddress, Future callback) {
-        return new UdpClient(localAddress, getInstance().group, callback);
+    public UdpClient createUdpClient(InetSocketAddress localAddress, CompletableFuture<Object> balFuture) {
+        return new UdpClient(localAddress, getInstance().group, balFuture);
     }
 
     public UdpListener createUdpListener(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
-                                         Future callback, UdpService udpService) {
-        return new UdpListener(localAddress, remoteAddress, getInstance().group, callback, udpService);
+                                         CompletableFuture<Object> balFuture, UdpService udpService) {
+        return new UdpListener(localAddress, remoteAddress, getInstance().group, balFuture, udpService);
     }
 }

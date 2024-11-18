@@ -29,9 +29,7 @@ public class UdpConnectClientHandler extends UdpClientHandler {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
                                 DatagramPacket datagramPacket) throws Exception {
-        if (callback != null) {
-            callback.complete(Utils.getReadonlyBytesFromDatagram(datagramPacket));
-        }
+        balFuture.complete(Utils.getReadonlyBytesFromDatagram(datagramPacket));
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
     }
 }

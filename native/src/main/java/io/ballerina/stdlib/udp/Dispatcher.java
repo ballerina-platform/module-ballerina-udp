@@ -19,21 +19,28 @@
 package io.ballerina.stdlib.udp;
 
 import io.ballerina.runtime.api.Runtime;
-import io.ballerina.runtime.api.TypeTags;
-import io.ballerina.runtime.api.async.StrandMetadata;
+import io.ballerina.runtime.api.concurrent.StrandMetadata;
+import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.ObjectType;
+import io.ballerina.runtime.api.types.Parameter;
 import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.types.TypeTags;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.socket.DatagramPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.util.Arrays;
 
 /**
@@ -49,8 +56,7 @@ public final class Dispatcher {
                                       Type[] parameterTypes) {
         try {
             Object[] params = getOnBytesSignature(datagramPacket, channel, parameterTypes);
-            invokeAsyncCall(udpService.getService(), Constants.ON_BYTES, udpService.getRuntime(),
-                    new UdpCallback(udpService, channel, datagramPacket), params);
+            invokeAsyncCall(udpService, datagramPacket, channel, Constants.ON_BYTES, params);
         } catch (BError e) {
             Dispatcher.invokeOnError(udpService, e.getMessage());
         }
@@ -60,8 +66,7 @@ public final class Dispatcher {
                                          Type[] parameterTypes) {
         try {
             Object[] params = getOnDatagramSignature(datagramPacket, channel, parameterTypes);
-            invokeAsyncCall(udpService.getService(), Constants.ON_DATAGRAM, udpService.getRuntime(),
-                    new UdpCallback(udpService, channel, datagramPacket), params);
+            invokeAsyncCall(udpService, datagramPacket, channel, Constants.ON_DATAGRAM, params);
         } catch (BError e) {
             Dispatcher.invokeOnError(udpService, e.getMessage());
         }
@@ -75,44 +80,47 @@ public final class Dispatcher {
                     filter(m -> m.getName().equals(Constants.ON_ERROR)).findFirst().orElse(null);
             if (methodType != null) {
                 Object[] params = getOnErrorSignature(message);
-                invokeAsyncCall(udpService.getService(), Constants.ON_ERROR, udpService.getRuntime(),
-                        new UdpCallback(udpService), params);
+                invokeAsyncCall(udpService, null, null, Constants.ON_ERROR, params);
             }
         } catch (Throwable t) {
             log.error("Error while executing onError function", t);
         }
     }
 
-    private static void invokeAsyncCall(BObject service, String methodName, Runtime runtime, UdpCallback callback,
-                                        Object[] params) {
-        StrandMetadata metadata = new StrandMetadata(Utils.getModule().getOrg(), Utils.getModule().getName(),
-                Utils.getModule().getVersion(), methodName);
-        ObjectType objectType = (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(service));
-        if (objectType.isIsolated() && objectType.isIsolated(methodName)) {
-            runtime.invokeMethodAsyncConcurrently(service, methodName,
-                    null, metadata, callback, null, null, params);
-        } else {
-            runtime.invokeMethodAsyncSequentially(service, methodName,
-                    null, metadata, callback, null, null, params);
-        }
+    private static void invokeAsyncCall(UdpService udpService, DatagramPacket datagramPacket, Channel channel,
+                                        String methodName, Object[] params) {
+        Thread.startVirtualThread(() -> {
+            BObject service = udpService.getService();
+            Runtime runtime = udpService.getRuntime();
+            ObjectType objectType = (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(service));
+            StrandMetadata metadata = new StrandMetadata(
+                    objectType.isIsolated() && objectType.isIsolated(methodName), null);
+            Object result;
+            try {
+                result = runtime.callMethod(service, methodName, metadata, params);
+                handleResult(udpService, datagramPacket, channel, result);
+            } catch (BError error) {
+                handleError(error);
+            } catch (Throwable throwable) {
+                handleError(ErrorCreator.createError(throwable));
+            }
+        });
     }
 
     private static Object[] getOnBytesSignature(DatagramPacket datagramPacket, Channel channel, Type[] parameterTypes) {
         byte[] byteContent = new byte[datagramPacket.content().readableBytes()];
         datagramPacket.content().readBytes(byteContent);
 
-        Object[] bValues = new Object[parameterTypes.length * 2];
+        Object[] bValues = new Object[parameterTypes.length];
         int index = 0;
         for (Type param : parameterTypes) {
             int paramTag = param.getTag();
             switch (paramTag) {
                 case TypeTags.INTERSECTION_TAG:
                     bValues[index++] = ValueCreator.createReadonlyArrayValue(byteContent);
-                    bValues[index++] = true;
                     break;
                 case TypeTags.OBJECT_TYPE_TAG:
                     bValues[index++] = createClient(datagramPacket, channel);
-                    bValues[index++] = true;
                     break;
                 default:
                     break;
@@ -123,18 +131,16 @@ public final class Dispatcher {
 
     private static Object[] getOnDatagramSignature(DatagramPacket datagramPacket, Channel channel,
                                                    Type[] parameterTypes) {
-        Object[] bValues = new Object[parameterTypes.length * 2];
+        Object[] bValues = new Object[parameterTypes.length];
         int index = 0;
         for (Type param : parameterTypes) {
             int paramTag = param.getTag();
             switch (paramTag) {
                 case TypeTags.INTERSECTION_TAG:
                     bValues[index++] = Utils.createReadOnlyDatagramWithSenderAddress(datagramPacket);
-                    bValues[index++] = true;
                     break;
                 case TypeTags.OBJECT_TYPE_TAG:
                     bValues[index++] = createClient(datagramPacket, channel);
-                    bValues[index++] = true;
                     break;
                 default:
                     break;
@@ -144,7 +150,7 @@ public final class Dispatcher {
     }
 
     private static Object[] getOnErrorSignature(String message) {
-        return new Object[]{Utils.createUdpError(message), true};
+        return new Object[]{Utils.createUdpError(message)};
     }
 
     private static BObject createClient(DatagramPacket datagramPacket, Channel channel) {
@@ -159,19 +165,55 @@ public final class Dispatcher {
     public static void invokeRead(UdpService udpService, DatagramPacket datagramPacket, Channel channel) {
         ObjectType objectType =
                 (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(udpService.getService()));
+
         for (MethodType method : objectType.getMethods()) {
             switch (method.getName()) {
                 case Constants.ON_BYTES:
                     Dispatcher.invokeOnBytes(udpService, datagramPacket, channel,
-                            method.getType().getParameterTypes());
+                            getParameterTypes(method.getType().getParameters()));
                     break;
                 case Constants.ON_DATAGRAM:
                     Dispatcher.invokeOnDatagram(udpService, datagramPacket, channel,
-                            method.getType().getParameterTypes());
+                            getParameterTypes(method.getType().getParameters()));
                     break;
                 default:
                     break;
             }
         }
+    }
+
+    private static Type[] getParameterTypes(Parameter[] parameters) {
+        Type[] parameterTypes = new Type[parameters.length];
+        for (int i = 0; i < parameters.length; i++) {
+            parameterTypes[i] = parameters[i].type;
+        }
+        return parameterTypes;
+    }
+
+    private static void handleResult(UdpService udpService, DatagramPacket datagramP, Channel channel, Object object) {
+        if (object instanceof BArray) {
+            // call writeBytes if the service returns byte[]
+            byte[] byteContent = ((BArray) object).getBytes();
+            UdpListener.send(udpService, new DatagramPacket(Unpooled.wrappedBuffer(byteContent),
+                    datagramP.sender()), channel);
+        } else if (object instanceof BMap) {
+            // call sendDatagram if the service returns Datagram
+            BMap<BString, Object> datagram = (BMap<BString, Object>) object;
+            String host = datagram.getStringValue(StringUtils.fromString(Constants.DATAGRAM_REMOTE_HOST)).getValue();
+            int port = datagram.getIntValue(StringUtils.fromString(Constants.DATAGRAM_REMOTE_PORT)).intValue();
+            BArray data = datagram.getArrayValue(StringUtils.fromString(Constants.DATAGRAM_DATA));
+            byte[] byteContent = data.getBytes();
+            DatagramPacket datagramPacket = new DatagramPacket(Unpooled.wrappedBuffer(byteContent),
+                    new InetSocketAddress(host, port));
+            UdpListener.send(udpService, datagramPacket, channel);
+        } else if (object instanceof BError) {
+            ((BError) object).printStackTrace();
+        }
+        log.debug("Method successfully dispatched.");
+    }
+
+
+    public static void handleError(BError bError) {
+        bError.printStackTrace();
     }
 }

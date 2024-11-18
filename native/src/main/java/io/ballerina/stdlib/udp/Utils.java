@@ -24,15 +24,19 @@ import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BArray;
+import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.socket.DatagramPacket;
 
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents the util functions of Socket operations.
@@ -118,4 +122,32 @@ public final class Utils {
     public static Module getModule() {
         return udpModule;
     }
+
+    public static Object getResult(CompletableFuture<Object> balFuture) {
+        try {
+            return balFuture.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw ErrorCreator.createError(e);
+        } catch (Throwable throwable) {
+            throw ErrorCreator.createError(throwable);
+        }
+    }
+
+    public static InetSocketAddress getLocalInetSocketAddress(BObject client, BMap<BString, Object> config) {
+        BString host = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
+        InetSocketAddress localAddress;
+        if (host == null) {
+            // A port number of zero will let the system pick up an ephemeral port in a bind operation.
+            localAddress = new InetSocketAddress(0);
+        } else {
+            localAddress = new InetSocketAddress(host.getValue(), 0);
+        }
+
+        double timeout =
+                ((BDecimal) config.get(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT))).floatValue();
+        client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
+        return localAddress;
+    }
+
 }

@@ -18,55 +18,48 @@
 
 package io.ballerina.stdlib.udp;
 
-import io.ballerina.runtime.api.Future;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.timeout.IdleStateEvent;
 
 import java.net.PortUnreachableException;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * {@link UdpClientHandler} ia a ChannelInboundHandler implementation for udp client.
  */
 public class UdpClientHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
-    protected Future callback;
+    protected CompletableFuture<Object> balFuture;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
                                 DatagramPacket datagramPacket) throws Exception {
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
-        if (callback != null) {
-            callback.complete(Utils.createReadonlyDatagramWithRecipientAddress(datagramPacket));
-        }
+        balFuture.complete(Utils.createReadonlyDatagramWithRecipientAddress(datagramPacket));
     }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
             ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
-            // return timeout error
-            if (callback != null) {
-                callback.complete(Utils.createUdpError("Read timed out"));
-            }
+            balFuture.complete(Utils.createUdpError("Read timed out"));
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         ctx.channel().pipeline().remove(Constants.READ_TIMEOUT_HANDLER);
-        if (callback != null) {
             String errorMsg = cause.getMessage();
             if (cause instanceof PortUnreachableException) {
                 errorMsg = "Port unreachable (" + ctx.channel().remoteAddress() + ")";
             }
-            callback.complete(Utils.createUdpError(errorMsg));
-        }
+            balFuture.complete(Utils.createUdpError(errorMsg));
     }
 
-    public void setCallback(Future callback) {
-        this.callback = callback;
+    public void setBalFuture(CompletableFuture<Object> balFuture) {
+        this.balFuture = balFuture;
     }
 
 }
