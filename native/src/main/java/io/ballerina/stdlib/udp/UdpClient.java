@@ -18,7 +18,6 @@
 
 package io.ballerina.stdlib.udp;
 
-import io.ballerina.runtime.api.Future;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -33,6 +32,7 @@ import io.netty.util.concurrent.PromiseCombiner;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.LinkedList;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,7 +45,7 @@ public class UdpClient {
 
     // create connection oriented client
     public UdpClient(InetSocketAddress localAddress, InetSocketAddress remoteAddress,
-                     EventLoopGroup group, Future callback) {
+                     EventLoopGroup group, CompletableFuture<Object> balFuture) {
         clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioDatagramChannel.class)
@@ -56,13 +56,13 @@ public class UdpClient {
                     }
                 });
         if (remoteAddress != null) {
-            this.connect(remoteAddress, localAddress, callback);
+            this.connect(remoteAddress, localAddress, balFuture);
         }
     }
 
     // create connection less client
     public UdpClient(InetSocketAddress localAddress, EventLoopGroup group,
-                     Future callback) {
+                     CompletableFuture<Object> balFuture) {
         clientBootstrap = new Bootstrap();
         clientBootstrap.group(group)
                 .channel(NioDatagramChannel.class)
@@ -75,16 +75,16 @@ public class UdpClient {
             if (future.isSuccess()) {
                 channel = future.channel();
                 channel.config().setAutoRead(false);
-                callback.complete(null);
+                balFuture.complete(null);
             } else {
-                callback.complete(Utils.createUdpError("Error initializing UDP Client"));
+                balFuture.complete(Utils.createUdpError("Error initializing UDP Client"));
             }
         });
     }
 
     // needed for connection oriented client
     private void connect(SocketAddress remoteAddress, SocketAddress localAddress,
-                         Future callback) {
+                         CompletableFuture<Object> balFuture) {
         clientBootstrap.connect(remoteAddress, localAddress)
                 .addListener((ChannelFutureListener) future -> {
                     if (future.isSuccess()) {
@@ -92,23 +92,23 @@ public class UdpClient {
                         channel.pipeline().replace(Constants.CONNECTIONLESS_CLIENT_HANDLER,
                                 Constants.CONNECT_CLIENT_HANDLER, new UdpConnectClientHandler());
                         channel.config().setAutoRead(false);
-                        callback.complete(null);
+                        balFuture.complete(null);
                     } else {
-                        callback.complete(Utils.createUdpError("Can't connect to remote host: "
+                        balFuture.complete(Utils.createUdpError("Can't connect to remote host: "
                                 + future.cause().getMessage()));
                     }
                 });
     }
 
-    public void sendData(DatagramPacket datagram, Future callback) {
+    public void sendData(DatagramPacket datagram, CompletableFuture<Object> balFuture) {
         LinkedList<DatagramPacket> fragments = Utils.fragmentDatagram(datagram);
         PromiseCombiner promiseCombiner = getPromiseCombiner(fragments);
 
         promiseCombiner.finish(channel.newPromise().addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
-                callback.complete(null);
+                balFuture.complete(null);
             } else {
-                callback.complete(Utils
+                balFuture.complete(Utils
                         .createUdpError("Failed to send data: " + future.cause().getMessage()));
             }
         }));
@@ -116,7 +116,7 @@ public class UdpClient {
 
     private PromiseCombiner getPromiseCombiner(LinkedList<DatagramPacket> fragments) {
         PromiseCombiner promiseCombiner = new PromiseCombiner(ImmediateEventExecutor.INSTANCE);
-        while (fragments.size() > 0) {
+        while (!fragments.isEmpty()) {
             if (channel.isWritable()) {
                 promiseCombiner.add(channel.writeAndFlush(fragments.poll()));
             }
@@ -124,7 +124,8 @@ public class UdpClient {
         return promiseCombiner;
     }
 
-    public void receiveData(double readTimeoutInSec, Future callback) {
+    public void receiveData(double readTimeoutInSec, CompletableFuture<Object> balFuture) {
+
         long readTimeoutInNano = (long) (readTimeoutInSec * 1_000_000_000);
         channel.pipeline().addFirst(Constants.READ_TIMEOUT_HANDLER, new IdleStateHandler(readTimeoutInNano, 0, 0,
                 TimeUnit.NANOSECONDS));
@@ -132,22 +133,22 @@ public class UdpClient {
         if (channel.pipeline().get(Constants.CONNECTIONLESS_CLIENT_HANDLER) != null) {
             UdpClientHandler handler = (UdpClientHandler) channel.pipeline().
                     get(Constants.CONNECTIONLESS_CLIENT_HANDLER);
-            handler.setCallback(callback);
+            handler.setBalFuture(balFuture);
         } else {
             UdpConnectClientHandler handler = (UdpConnectClientHandler) channel.pipeline().
                     get(Constants.CONNECT_CLIENT_HANDLER);
-            handler.setCallback(callback);
+            handler.setBalFuture(balFuture);
         }
 
         channel.read();
     }
 
-    public void close(Future callback) {
+    public void close(CompletableFuture<Object> balFuture) {
         channel.close().addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
-                callback.complete(null);
+                balFuture.complete(null);
             } else {
-                callback.complete(Utils.createUdpError("Unable to close the  UDP client. "
+                balFuture.complete(Utils.createUdpError("Unable to close the  UDP client. "
                         + future.cause().getMessage()));
             }
         });
