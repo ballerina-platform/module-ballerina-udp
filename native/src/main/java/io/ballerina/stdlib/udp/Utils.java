@@ -127,12 +127,14 @@ public final class Utils {
         try {
             return balFuture.get();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw ErrorCreator.createError(e);
         } catch (Throwable throwable) {
             throw ErrorCreator.createError(throwable);
         }
     }
-    private static InetSocketAddress getLocalInetSocketAddress(BObject client, BMap<BString, Object> config) {
+
+    public static InetSocketAddress getLocalInetSocketAddress(BObject client, BMap<BString, Object> config) {
         BString host = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
         InetSocketAddress localAddress;
         if (host == null) {
