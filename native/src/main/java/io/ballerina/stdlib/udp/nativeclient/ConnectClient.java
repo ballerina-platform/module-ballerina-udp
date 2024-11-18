@@ -34,6 +34,7 @@ import io.netty.channel.socket.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
 
+import static io.ballerina.stdlib.udp.Utils.getLocalInetSocketAddress;
 import static io.ballerina.stdlib.udp.Utils.getResult;
 
 /**
@@ -49,22 +50,9 @@ public final class ConnectClient {
                               int remotePort, BMap<BString, Object> config) {
         return env.yieldAndRun(() -> {
             CompletableFuture<Object> balFuture = new CompletableFuture<>();
-            BString host = config.getStringValue(StringUtils.fromString(Constants.CONFIG_LOCALHOST));
-            InetSocketAddress localAddress;
-            if (host == null) {
-                // A port number of zero will let the system pick up an ephemeral port in a bind operation.
-                localAddress = new InetSocketAddress(0);
-            } else {
-                localAddress = new InetSocketAddress(host.getValue(), 0);
-            }
-
-            double timeout =
-                    ((BDecimal) config.get(StringUtils.fromString(Constants.CONFIG_READ_TIMEOUT))).floatValue();
-            client.addNativeData(Constants.CONFIG_READ_TIMEOUT, timeout);
-
+            InetSocketAddress localAddress = getLocalInetSocketAddress(client, config);
             InetSocketAddress remoteAddress = new InetSocketAddress(remoteHost.getValue(), remotePort);
             client.addNativeData(Constants.REMOTE_ADDRESS, remoteAddress);
-
             UdpClient udpClient = UdpFactory.getInstance().createUdpClient(localAddress, remoteAddress, balFuture);
             client.addNativeData(Constants.CONNECT_CLIENT, udpClient);
             return getResult(balFuture);
