@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- [Address CVE-2024-47535 vulnerability](https://github.com/ballerina-platform/ballerina-library/issues/7358)
+
+## [1.11.0] - 2024-08-20
+
 ### Changed
 - [Make some of the Java classes proper utility classes](https://github.com/ballerina-platform/ballerina-standard-library/issues/4926)
 
