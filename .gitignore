@@ -49,3 +49,6 @@ load-tests/**/Dependencies.toml
 **/*.classpath
 ballerina/ballerinaTarget/
 compiler-plugin-tests/bin/
+
+# Cache directory created by the trivy scan
+.cache/
