@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.13.3] - 2025-12-22
+
+### Fixed
+
+- [Address `CVE-2025-67735` security vulnerabilities in Netty](https://github.com/ballerina-platform/ballerina-library/issues/8538)
+
+
 ## [1.13.2] - 2025-09-09
 
 ### Fixed

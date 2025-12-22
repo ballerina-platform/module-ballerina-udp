@@ -90,7 +90,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "observe"
-version = "1.5.0"
+version = "1.5.1"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
@@ -113,7 +113,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "udp"
-version = "1.13.2"
+version = "1.13.3"
 dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
