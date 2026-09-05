@@ -1,5 +1,4 @@
-Ballerina UDP Library
-===================
+# Ballerina UDP Library
 
   [![Build](https://github.com/ballerina-platform/module-ballerina-udp/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-udp/actions/workflows/build-timestamped-master.yml)
   [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-udp/branch/main/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-udp)
@@ -8,7 +7,9 @@ Ballerina UDP Library
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-udp.svg)](https://github.com/ballerina-platform/module-ballerina-udp/commits/main)
   [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/udp.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fudp)
 
-This library provides APIs for sending/receiving messages to/from another application process (local or remote) for connectionless protocols.
+## Overview
+
+This module provides APIs for sending and receiving datagrams to and from another application process (local or remote) using UDP.
 
 When the local host address or the IP address is not given to the optional `localHost` field, the `localhost` address is bound by default.
 The port number of the local port, which is used to connect to the remote server is determined randomly (ephemeral port).
@@ -136,7 +137,7 @@ Execute the commands below to build from the source.
       
 ## Contributing to Ballerina
 
-As an open source project, Ballerina welcomes contributions from the community. 
+As an open-source project, Ballerina welcomes contributions from the community. 
 
 For more information, go to the [contribution guidelines](https://github.com/ballerina-platform/ballerina-lang/blob/master/CONTRIBUTING.md).
 
