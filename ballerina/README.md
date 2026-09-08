@@ -5,6 +5,13 @@ This module provides APIs for sending/receiving datagrams to/from another applic
 When the local host address or the IP address is not given to the optional `localHost` field, the `localhost` address is bound by default.
 The port number of the local port, which is used to connect to the remote server is determined randomly (ephemeral port).
 
+### Key Features
+
+- Send and receive UDP datagrams without establishing a connection using `udp:Client`.
+- Exchange UDP data with a configured remote peer using `udp:ConnectClient`.
+- Build UDP listener services with `onBytes` and `onDatagram` callbacks.
+- Configure local binding and timeouts, and handle listener errors through `onError`.
+
 #### Client
 The `udp:Client` is used to interact with the remote UDP host and it can be defined as follows:
 
