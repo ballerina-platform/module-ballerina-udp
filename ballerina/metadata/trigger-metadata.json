@@ -32,7 +32,7 @@
                 "id": "$service.onBytes.data",
                 "name": "data",
                 "doc": "The received datagram payload.",
-                "type": { "shape": "array", "elementType": { "name": "byte", "builtin": true } },
+                "type": { "shape": "readonly", "elementType": { "shape": "array", "elementType": { "name": "byte", "builtin": true } } },
                 "presence": "required"
               },
               {
@@ -64,7 +64,7 @@
                 "id": "$service.onDatagram.datagram",
                 "name": "datagram",
                 "doc": "The received datagram, including the sender's host, port, and payload.",
-                "type": { "name": "Datagram" },
+                "type": { "shape": "readonly", "elementType": { "name": "Datagram" } },
                 "presence": "required"
               },
               {
