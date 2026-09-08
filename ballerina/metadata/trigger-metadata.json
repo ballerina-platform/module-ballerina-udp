@@ -1,0 +1,117 @@
+{
+  "version": "v1.0",
+
+  "listeners": [
+    {
+      "id": "$listener",
+      "doc": "Receives UDP datagrams on the bound local port and dispatches each to the attached service.",
+      "type": { "name": "Listener" },
+      "services": ["$service"],
+      "multipleServicesAllowed": false
+    }
+  ],
+
+  "serviceTypes": [
+    {
+      "id": "$service",
+      "doc": "Handles UDP datagrams received on the bound local port.",
+      "type": { "name": "Service" },
+      "concrete": false,
+      "multipleListenersAllowed": false,
+      "handlers": {
+        "backedByConcreteType": false,
+        "options": [
+          {
+            "id": "$service.onBytes",
+            "name": "onBytes",
+            "kind": "remote",
+            "doc": "Invoked with the raw bytes of each received datagram.",
+            "presence": "optional",
+            "params": [
+              {
+                "id": "$service.onBytes.data",
+                "name": "data",
+                "doc": "The received datagram payload.",
+                "type": { "shape": "array", "elementType": { "name": "byte", "builtin": true } },
+                "presence": "required"
+              },
+              {
+                "id": "$service.onBytes.caller",
+                "name": "caller",
+                "doc": "Handle for sending a response back to the sender.",
+                "type": { "name": "Caller" },
+                "presence": "optional"
+              }
+            ],
+            "returns": {
+              "id": "$service.onBytes.returns",
+              "type": [
+                { "shape": "array", "elementType": { "name": "byte", "builtin": true } },
+                { "name": "Datagram" },
+                { "name": "Error" },
+                { "name": "()", "builtin": true }
+              ]
+            }
+          },
+          {
+            "id": "$service.onDatagram",
+            "name": "onDatagram",
+            "kind": "remote",
+            "doc": "Invoked with each received datagram, including the sender's host and port.",
+            "presence": "optional",
+            "params": [
+              {
+                "id": "$service.onDatagram.datagram",
+                "name": "datagram",
+                "doc": "The received datagram, including the sender's host, port, and payload.",
+                "type": { "name": "Datagram" },
+                "presence": "required"
+              },
+              {
+                "id": "$service.onDatagram.caller",
+                "name": "caller",
+                "doc": "Handle for sending a response back to the sender.",
+                "type": { "name": "Caller" },
+                "presence": "optional"
+              }
+            ],
+            "returns": {
+              "id": "$service.onDatagram.returns",
+              "type": [
+                { "shape": "array", "elementType": { "name": "byte", "builtin": true } },
+                { "name": "Datagram" },
+                { "name": "Error" },
+                { "name": "()", "builtin": true }
+              ]
+            }
+          },
+          {
+            "id": "$service.onError",
+            "name": "onError",
+            "kind": "remote",
+            "doc": "Invoked when an error occurs while receiving or dispatching a datagram.",
+            "presence": "optional",
+            "params": [
+              {
+                "id": "$service.onError.err",
+                "name": "err",
+                "doc": "The error that occurred.",
+                "type": { "name": "Error" },
+                "presence": "required"
+              }
+            ],
+            "returns": { "id": "$service.onError.returns", "type": [{ "name": "Error" }, { "name": "()", "builtin": true }] }
+          }
+        ]
+      },
+      "rules": [
+        {
+          "id": "$handlerChoice",
+          "rule": "structure.exactlyOne",
+          "message": "A UDP service must implement exactly one of onBytes or onDatagram.",
+          "subjects": [{ "kind": "handler", "id": "$service.onBytes" }, { "kind": "handler", "id": "$service.onDatagram" }]
+        }
+      ]
+    }
+  ]
+}
