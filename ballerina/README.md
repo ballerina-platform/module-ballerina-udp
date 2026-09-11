@@ -1,6 +1,12 @@
 ## Overview
 
-This module provides APIs for sending/receiving datagrams to/from another application process (local or remote) using UDP.
+This module provides APIs for sending and receiving datagrams to and from another application process (local or remote) using UDP.
+
+### Key Features
+
+- UDP Client and ConnectClient for sending and receiving datagrams
+- Listener for handling incoming UDP datagrams via `onDatagram`/`onBytes`
+- Automatic local host/port binding when not explicitly configured
 
 When the local host address or the IP address is not given to the optional `localHost` field, the `localhost` address is bound by default.
 The port number of the local port, which is used to connect to the remote server is determined randomly (ephemeral port).
