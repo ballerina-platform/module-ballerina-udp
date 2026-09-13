@@ -26,29 +26,29 @@ scope = "testOnly"
 [[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-handler"
-version = "4.1.137.Final"
-path = "./lib/netty-handler-4.1.137.Final.jar"
+version = "4.2.18.Final"
+path = "./lib/netty-handler-4.2.18.Final.jar"
 
 [[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-buffer"
-version = "4.1.137.Final"
-path = "./lib/netty-buffer-4.1.137.Final.jar"
+version = "4.2.18.Final"
+path = "./lib/netty-buffer-4.2.18.Final.jar"
 
 [[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-transport"
-version = "4.1.137.Final"
-path = "./lib/netty-transport-4.1.137.Final.jar"
+version = "4.2.18.Final"
+path = "./lib/netty-transport-4.2.18.Final.jar"
 
 [[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-common"
-version = "4.1.137.Final"
-path = "./lib/netty-common-4.1.137.Final.jar"
+version = "4.2.18.Final"
+path = "./lib/netty-common-4.2.18.Final.jar"
 
 [[platform.java21.dependency]]
 groupId = "io.netty"
 artifactId = "netty-resolver"
-version = "4.1.137.Final"
-path = "./lib/netty-resolver-4.1.137.Final.jar"
+version = "4.2.18.Final"
+path = "./lib/netty-resolver-4.2.18.Final.jar"
