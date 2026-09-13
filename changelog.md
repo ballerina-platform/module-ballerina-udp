@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- [Migrate to Netty 4.2.18.Final ahead of the Netty 4.1 end of life](https://github.com/ballerina-platform/ballerina-library/issues/9152)
 - [[#9132] Updated Keywords and Reformat README for Connector Store Discoverability](https://github.com/ballerina-platform/ballerina-library/issues/9132)
 
 ### Fixed
