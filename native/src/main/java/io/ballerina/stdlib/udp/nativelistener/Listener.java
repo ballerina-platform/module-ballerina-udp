@@ -28,6 +28,7 @@ import io.ballerina.stdlib.udp.UdpListener;
 import io.ballerina.stdlib.udp.UdpService;
 import io.ballerina.stdlib.udp.Utils;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
@@ -108,9 +109,10 @@ public final class Listener {
         });
     }
 
-    private static InetSocketAddress getRemoteAddress(BString remoteHost, Long remotePort) throws Exception {
+    private static InetSocketAddress getRemoteAddress(BString remoteHost, Long remotePort) throws IOException {
         if (remoteHost != null && remotePort == null || remoteHost == null && remotePort != null) {
-            throw new Exception("Required both remoteHost and remotePort to connect to remote address.");
+            throw new IllegalArgumentException("Required both remoteHost and remotePort to connect to remote " +
+                    "address.");
         } else if (remoteHost != null && remotePort != null) {
             return new InetSocketAddress(InetAddress.getByName(remoteHost.getValue()).getHostAddress(),
                     (int) remotePort.longValue());
