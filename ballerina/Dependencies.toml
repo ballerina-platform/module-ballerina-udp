@@ -10,7 +10,7 @@ distribution-version = "2201.14.0-20260917-124200-7f273e6a"
 [[package]]
 org = "ballerina"
 name = "io"
-version = "1.8.1"
+version = "1.8.2"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
@@ -75,7 +75,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "log"
-version = "2.12.0"
+version = "2.17.1"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "io"},
@@ -90,7 +90,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "observe"
-version = "1.5.1"
+version = "1.8.0"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
