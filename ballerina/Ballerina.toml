@@ -19,7 +19,7 @@ artifactId = "udp-native"
 version = "1.14.0"
 path = "../native/build/libs/udp-native-1.14.0-SNAPSHOT.jar"
 
-[[platform.java21.dependency]]
+[[platform.java25.dependency]]
 path = "../test-utils/build/libs/udp-test-utils-1.14.0-SNAPSHOT.jar"
 scope = "testOnly"
 
